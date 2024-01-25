@@ -1,95 +1,133 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+import BaliyoAdvantage from "@/components/BaliyoAdvantage";
+import ProjectCard from "@/components/ProjectCard";
 
 export default function Home() {
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
+    <>
+      <div className="container-fluid">
+        <div className="row row-cols-1 row-cols-md-2 align-items-center pb-1 pt-1">
+          <div className="col">
+            {/* <h1 className="fw-bold fs-big">Baliyo Ventures</h1> */}
+            <img
+              src="/baliyotext.svg"
+              alt="baliyo venture"
+              className="img-fluid"
             />
-          </a>
+            <h2>Providing expertise and solution in </h2>
+            <h5 className="fw-light bef-light display-inline">
+              <span className="bg-white p-2 fs-s shadow">
+                <span>
+                  <img
+                    src="/manufacturing.png"
+                    alt="manufacturing"
+                    className="img-fluid small-icon"
+                  />
+                </span>{" "}
+                Product Development
+              </span>
+              <span className="bg-white p-2 fs-s shadow ms-3">
+                <span>
+                  <img
+                    src="/web-development.png"
+                    alt="web-development"
+                    className="img-fluid small-icon"
+                  />
+                </span>{" "}
+                Software Development
+              </span>
+              <span className="bg-white p-2 fs-s shadow ms-3">
+                <span>
+                  <img
+                    src="/engineer.png"
+                    alt="engineer"
+                    className="img-fluid small-icon"
+                  />
+                </span>{" "}
+                Architecture Design
+              </span>
+            </h5>
+            <p className="mt-3 mb-4">
+              Whether you're a business looking for tech solutions or a
+              professional aspiring to make a difference in the tech world, we
+              invite you to join us on this exciting journey. We're not just
+              building products; we're shaping the future of technology in
+              Nepal.
+            </p>
+            <div className="d-flex">
+              <button className="btn btn-lg bg-white shadow-lg">
+                Discuss your project now
+              </button>
+              <button className="btn my-2 my-sm-0 ms-md-3 d-flex text-dark gap-1">
+                <img
+                  src="/COA-agent-pic.png"
+                  alt="agent pic"
+                  className="img-fluid img-call-height"
+                />
+                <span
+                  className="d-flex flex-column justify-content-start utility__phone-msg"
+                  id="utility__phone-msg"
+                >
+                  <b id="utility__phone-number text-dark">(+977) 9866316114</b>
+                  <span className="d-block travel__expert fs-vsmall">
+                    Speak to a technology expert
+                  </span>
+                </span>
+              </button>
+            </div>
+          </div>
+          <div className="col">
+            <img src="/hero.png" alt="baliyo team" className="img-fluid" />
+          </div>
         </div>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className="bg-white">
+        <div className="py-5"></div>
+        <div>
+          <h2 className="text-center fw-bold fs-1 mb-4">
+            Not Flexing, but just look at our Clients
+          </h2>
+          <div className="d-flex justify-content-start">
+            <img src="/downarrw.png" alt="sdvf" className="img-fluid" />
+          </div>
+          <img
+            src="/www.png"
+            alt="our client"
+            className="img-fluid w-100 px-md-5"
+          />
+        </div>
+        <div className="py-5"></div>
       </div>
+      <div className="py-5"></div>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className="container-fluid">
+        <h2 className="text-center fw-bold fs-1">
+          Big Client names and no projects. No, Not at Baliyo
+        </h2>
+        <p className="text-center mb-4">
+          Explore our wide range of projects and see how we have helped our
+          clients to achieve their goals.
+        </p>
+        <div className="row row-cols-1 row-cols-md-4 row-cols-lg-5 gy-4 gx-3 gx-lg-2">
+          <div className="col">
+            <ProjectCard></ProjectCard>
+          </div>
+          <div className="col">
+            <ProjectCard></ProjectCard>
+          </div>
+          <div className="col">
+            <ProjectCard></ProjectCard>
+          </div>
+          <div className="col">
+            <ProjectCard></ProjectCard>
+          </div>
+          <div className="col">
+            <ProjectCard></ProjectCard>
+          </div>
+        </div>
+        <div className="py-5"></div>
+        <BaliyoAdvantage></BaliyoAdvantage>
+        <div className="py-5"></div>
       </div>
-    </main>
-  )
+    </>
+  );
 }

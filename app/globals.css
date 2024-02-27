@@ -1288,7 +1288,12 @@ color: #2c2c2c !important;
   width: 60%;
 }
 .text-mine {
-  color: #00a1ff !important;
+  color: #060d29 !important;
+}
+.text-mine2{
+  color: #060d29 !important;
+  text-decoration: 1px underline;
+  text-underline-offset: 5px;
 }
 .outline-red {
   background-color: #ff6a5b;

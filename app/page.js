@@ -82,27 +82,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="py-5">
-        <div className="container-fluid">
-          <div className="row row-cols-2 row-cols-md-4 row-cols-lg-5 align-items-center">
-            <div className="col">
-              <img src="/services/5.png" alt="" className="img-fluid" />
-            </div>
-            <div className="col">
-              <img src="/services/6.png" alt="" className="img-fluid" />
-            </div>
-            <div className="col">
-              <img src="/services/7.png" alt="" className="img-fluid" />
-            </div>
-            <div className="col">
-              <img src="/services/8.png" alt="" className="img-fluid" />
-            </div>
-            <div className="col">
-              <img src="/services/9.png" alt="" className="img-fluid" />
-            </div>
-          </div>
-        </div>
-      </div>
       <div className="bg-white">
         <div className="py-5"></div>
         <div>
@@ -130,6 +109,21 @@ export default function Home() {
           clients to achieve their goals.
         </p>
         <div className="row row-cols-1 row-cols-md-4 row-cols-lg-5 gy-4 gx-3 gx-lg-2">
+          <div className="col">
+            <ProjectCard></ProjectCard>
+          </div>
+          <div className="col">
+            <ProjectCard></ProjectCard>
+          </div>
+          <div className="col">
+            <ProjectCard></ProjectCard>
+          </div>
+          <div className="col">
+            <ProjectCard></ProjectCard>
+          </div>
+          <div className="col">
+            <ProjectCard></ProjectCard>
+          </div>
           <div className="col">
             <ProjectCard></ProjectCard>
           </div>

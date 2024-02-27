@@ -2,6 +2,7 @@ import BottomContactForm from "@/components/BottomContactForm";
 import AboutUs from "@/components/AboutUs";
 import FAQ from "@/components/FAQ";
 import Team from "@/components/Team";
+import Process from "@/components/Process";
 
 export default function About() {
   return (
@@ -32,6 +33,9 @@ export default function About() {
               </div>
             </div>
           </div>
+        </div>
+        <div className="py-3">
+          <Process></Process>
         </div>
         <div className="py-3">
           <Team></Team>

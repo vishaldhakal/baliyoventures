@@ -12,9 +12,9 @@ export default function Home() {
             <img
               src="/baliyotext.svg"
               alt="baliyo venture"
-              className="img-fluid"
+              className="img-fluid baliyo"
             />
-            <h2>Providing expertise and solution in </h2>
+            <h1 className="main-title">Providing expertise and solution in </h1>
             <h5 className="fw-light bef-light display-inline">
               <span className="bg-white p-2 fs-s shadow">
                 <span>
@@ -47,6 +47,7 @@ export default function Home() {
                 Architecture Design
               </span>
             </h5>
+            <div className="my-5"></div>
             <p className="mt-3 mb-4">
               Whether you're a business looking for tech solutions or a
               professional aspiring to make a difference in the tech world, we
@@ -65,11 +66,11 @@ export default function Home() {
                   className="img-fluid img-call-height"
                 />
                 <span
-                  className="d-flex flex-column justify-content-start utility__phone-msg"
+                  className="d-flex flex-column justify-content-start"
                   id="utility__phone-msg"
                 >
                   <b id="utility__phone-number text-dark">(+977) 9866316114</b>
-                  <span className="d-block travel__expert fs-vsmall">
+                  <span className="d-block travel__expert fs-vsmall text-dark">
                     Speak to a technology expert
                   </span>
                 </span>
@@ -78,6 +79,27 @@ export default function Home() {
           </div>
           <div className="col">
             <img src="/hero.png" alt="baliyo team" className="img-fluid" />
+          </div>
+        </div>
+      </div>
+      <div className="py-5">
+        <div className="container-fluid">
+          <div className="row row-cols-2 row-cols-md-4 row-cols-lg-5 align-items-center">
+            <div className="col">
+              <img src="/services/5.png" alt="" className="img-fluid" />
+            </div>
+            <div className="col">
+              <img src="/services/6.png" alt="" className="img-fluid" />
+            </div>
+            <div className="col">
+              <img src="/services/7.png" alt="" className="img-fluid" />
+            </div>
+            <div className="col">
+              <img src="/services/8.png" alt="" className="img-fluid" />
+            </div>
+            <div className="col">
+              <img src="/services/9.png" alt="" className="img-fluid" />
+            </div>
           </div>
         </div>
       </div>
@@ -99,7 +121,6 @@ export default function Home() {
         <div className="py-5"></div>
       </div>
       <div className="py-5"></div>
-
       <div className="container-fluid">
         <h2 className="text-center fw-bold fs-1">
           Big Client names and no projects. No, Not at Baliyo
@@ -134,7 +155,7 @@ export default function Home() {
           <div className="container-fluid2">
             <div className="row justify-content-center">
               <img
-                src="/contact-bottom.png"
+                src="/cb.png"
                 alt="dce"
                 className="img-fluid w-25 w-smm-50 mb-3"
               />

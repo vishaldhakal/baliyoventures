@@ -8,7 +8,7 @@ export default function Contact() {
           <div className="container-fluid2">
             <div className="row justify-content-center">
               <img
-                src="/contact-bottom.png"
+                src="/cb.png"
                 alt="dce"
                 className="img-fluid w-25 w-smm-50 mb-3"
               />

@@ -25,10 +25,10 @@ const Navbar = () => {
           />
         </button>
         <div className="collapse navbar-collapse" id="collapsibleNavId">
-          <ul className="navbar-nav ms-auto mt-2 mt-lg-0 align-items-center align-items-md-center">
+          <ul className="navbar-nav ms-auto mt-2 mt-lg-0 align-items-center align-items-md-center gap-3">
             <li className="nav-item dropdown dropdown-fullwidth">
               <button
-                className="nav-link dropdown-toggle align-items-center d-flex shadow-lg fw-500 text-dark me-3 px-2"
+                className="nav-link dropdown-toggle align-items-center d-flex shadow-lg fw-500 text-dark"
                 data-bs-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="true"
@@ -45,7 +45,7 @@ const Navbar = () => {
                 data-bs-popper="static"
               >
                 <div className="row p-3 pt-2 dopp">
-                  <div className="col-12 col-sm-6 col-md-3 mb-3">
+                  <div className="col-12 col-sm-6 col-md-4 mb-3">
                     <Link
                       className="link-black"
                       href={`/pre-construction-homes/`}
@@ -95,7 +95,7 @@ const Navbar = () => {
                       </li>
                     </ul>
                   </div>
-                  <div className="col-12 col-sm-6 col-md-3 mb-3">
+                  <div className="col-12 col-sm-6 col-md-4 mb-3">
                     <Link
                       className="link-black"
                       href={`/pre-construction-homes/`}
@@ -145,7 +145,7 @@ const Navbar = () => {
                       </li>
                     </ul>
                   </div>
-                  <div className="col-12 col-sm-6 col-md-3 mb-3">
+                  <div className="col-12 col-sm-6 col-md-4 mb-3">
                     <Link
                       className="link-black"
                       href={`/pre-construction-homes/`}
@@ -191,24 +191,6 @@ const Navbar = () => {
                           href="#"
                         >
                           Consultancy Management
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="col-12 col-sm-6 col-md-3 mb-3">
-                    <Link
-                      className="link-black"
-                      href={`/pre-construction-homes/`}
-                    >
-                      <h5 className="mb-2 fw-mine fs-m">Baliyo Marketing</h5>
-                    </Link>
-                    <ul className="list-unstyled">
-                      <li>
-                        <Link
-                          className="dropdown-item link-black text-limit"
-                          href={`/pre-construction-homes`}
-                        >
-                          Yachu Hair Oil
                         </Link>
                       </li>
                     </ul>

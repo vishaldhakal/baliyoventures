@@ -93,7 +93,7 @@ const Footer = ({ cities }) => {
         </div>
       </footer>
       <div className="bg-white">
-        <img src="/pattern.svg" alt="" className="img-fluid mt-5 mb-0" />
+        <img src="/pattern.svg" alt="" className="img-fluid mb-0" />
       </div>
     </>
   );

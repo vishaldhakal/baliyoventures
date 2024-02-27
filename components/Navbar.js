@@ -5,7 +5,11 @@ const Navbar = () => {
     <nav className="navbar navbar-expand-sm navbar-light bg-white py-3 py-md-2 shadow-navbar mb-3">
       <div className="container-fluid justify-content-start">
         <Link href="/" className="logo">
-          <img src="/logo(1).svg" alt="Dolphy logo" className="img-fluid" />
+          <img
+            src="/baliyo-logo-1.svg"
+            alt="Dolphy logo"
+            className="img-fluid"
+          />
         </Link>
         <button
           className="navbar-toggler d-lg-none ms-auto"
@@ -242,10 +246,7 @@ const Navbar = () => {
                           </div>
                         </div>
                       </div>
-                      <Link
-                        className="btn btn-white link-black"
-                        href={"/pre-construction-homes/"}
-                      >
+                      <Link className="btn btn-white link-black" href={"/"}>
                         Explore Baliyo Portfolio
                       </Link>
                     </div>

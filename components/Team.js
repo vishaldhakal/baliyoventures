@@ -27,8 +27,8 @@ const Team = () => {
                     alt=""
                   />
                   <figcaption className="m-0 p-4">
-                    <h4 className="mb-1">Flora Nyra</h4>
-                    <p className="text-secondary mb-0">Product Manager</p>
+                    <h4 className="mb-1">Dipawoli Malla</h4>
+                    <p className="text-secondary mb-0">CEO</p>
                   </figcaption>
                 </figure>
               </div>
@@ -45,8 +45,8 @@ const Team = () => {
                     alt=""
                   />
                   <figcaption className="m-0 p-4">
-                    <h4 className="mb-1">Flora Nyra</h4>
-                    <p className="text-secondary mb-0">Product Manager</p>
+                    <h4 className="mb-1">Anil Singh</h4>
+                    <p className="text-secondary mb-0">Managing Director</p>
                   </figcaption>
                 </figure>
               </div>
@@ -63,8 +63,10 @@ const Team = () => {
                     alt=""
                   />
                   <figcaption className="m-0 p-4">
-                    <h4 className="mb-1">Evander Mac</h4>
-                    <p className="text-secondary mb-0">Art Director</p>
+                    <h4 className="mb-1">Prithvi Chaudhary</h4>
+                    <p className="text-secondary mb-0">
+                      Product Development Head
+                    </p>
                   </figcaption>
                 </figure>
               </div>
@@ -81,8 +83,8 @@ const Team = () => {
                     alt=""
                   />
                   <figcaption className="m-0 p-4">
-                    <h4 className="mb-1">Taytum Elia</h4>
-                    <p className="text-secondary mb-0">Investment Planner</p>
+                    <h4 className="mb-1">Manav Khadka</h4>
+                    <p className="text-secondary mb-0">IOT & Automation Head</p>
                   </figcaption>
                 </figure>
               </div>
@@ -99,8 +101,10 @@ const Team = () => {
                     alt=""
                   />
                   <figcaption className="m-0 p-4">
-                    <h4 className="mb-1">Wylder Elio</h4>
-                    <p className="text-secondary mb-0">Financial Analyst</p>
+                    <h4 className="mb-1">Vishal Dhakal</h4>
+                    <p className="text-secondary mb-0">
+                      Software Development Head
+                    </p>
                   </figcaption>
                 </figure>
               </div>

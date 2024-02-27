@@ -1,6 +1,7 @@
 import BaliyoAdvantage from "@/components/BaliyoAdvantage";
 import BottomContactForm from "@/components/BottomContactForm";
 import ProjectCard from "@/components/ProjectCard";
+import Testimonial from "@/components/Testimonial";
 
 export default function Home() {
   return (
@@ -143,6 +144,9 @@ export default function Home() {
         <div className="py-5"></div>
         <BaliyoAdvantage></BaliyoAdvantage>
         <div className="py-5"></div>
+      </div>
+      <div className="container py-4">
+        <Testimonial></Testimonial>
       </div>
       <div className="container">
         <div className="py-5 my-5" id="mycontact">

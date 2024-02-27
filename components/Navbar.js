@@ -2,14 +2,10 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <nav className="navbar navbar-expand-sm navbar-light bg-white py-3 py-md-2 shadow-navbar mb-3">
+    <nav className="navbar navbar-expand-sm navbar-light bg1 py-3 py-md-2 shadow-navbar mb-3 sticky-top">
       <div className="container-fluid justify-content-start">
         <Link href="/" className="logo">
-          <img
-            src="/baliyo-logo-1.svg"
-            alt="Dolphy logo"
-            className="img-fluid"
-          />
+          <img src="/baliyo-logo.svg" alt="Dolphy logo" className="img-fluid" />
         </Link>
         <button
           className="navbar-toggler d-lg-none ms-auto"
@@ -270,7 +266,7 @@ const Navbar = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link href="#mycontact" className="nav-link">
+              <Link href="/contact" className="nav-link">
                 Contact
               </Link>
             </li>
@@ -288,7 +284,7 @@ const Navbar = () => {
                   className="d-flex flex-column justify-content-start utility__phone-msg"
                   id="utility__phone-msg"
                 >
-                  <b id="utility__phone-number text-dark">(+977) 9866316114</b>
+                  <b id="utility__phone-number">(+977) 9866316114</b>
                   <span className="d-block travel__expert fs-vsmall">
                     Speak to a technology expert
                   </span>

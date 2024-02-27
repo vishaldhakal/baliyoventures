@@ -3,14 +3,13 @@ import Link from "next/link";
 const Footer = ({ cities }) => {
   return (
     <>
-      {/* <img src="/pattern.svg" alt="" className="img-fluid  mt-5" /> */}
-      <footer className="footer shadow-lg bg1 text-white">
+      <footer className="footer shadow-lg text-dark">
         <div className="container-fluid footer-top">
           <div className="row gy-4">
             <div className="col-lg-5 col-md-12 footer-about">
               <Link href="/" className="footer-logo d-flex align-items-center">
                 <img
-                  src="/baliyo-logo.svg"
+                  src="/baliyo-logo-1.svg"
                   alt="Baliyo Ventures logo"
                   className="img-fluid"
                 />
@@ -93,6 +92,9 @@ const Footer = ({ cities }) => {
           </p>
         </div>
       </footer>
+      <div className="bg-white">
+        <img src="/pattern.svg" alt="" className="img-fluid mt-5 mb-0" />
+      </div>
     </>
   );
 };

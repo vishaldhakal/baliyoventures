@@ -1,82 +1,96 @@
+import Image from "next/image";
 import Link from "next/link";
 
-const Footer = ({ cities }) => {
+export default function Footer() {
+  const services = [
+    { name: "Product Development", href: "#" },
+    { name: "Baliyo Architecture", href: "#" },
+    { name: "Baliyo Software", href: "#" },
+    { name: "Baliyo Marketing", href: "#" },
+  ];
+
+  const socialLinks = [
+    { name: "Facebook", href: "#" },
+    { name: "Instagram", href: "#" },
+    { name: "Linkedin", href: "#" },
+  ];
+
   return (
-    <>
-      <footer className="footer shadow-lg text-dark">
-        <div className="container-fluid footer-top">
-          <div className="row gy-4">
-            <div className="col-lg-5 col-md-12 footer-about">
-              <Link href="/" className="footer-logo d-flex align-items-center">
-                <img
-                  src="/baliyo-logo-1.svg"
-                  alt="Baliyo Ventures logo"
-                  className="img-fluid"
-                />
-              </Link>
-              <p></p>
-              <p>
-                Baliyo Ventures is a technology company that provides solutions
-                to all your technology needs. We provide services like product
-                development, architecture design, software development and
-                marketing. We are a team of experienced professionals who are
-                dedicated to provide you the best services.
-              </p>
-              <div className="social-links d-flex mt-4">
-                <Link href="#" className="me-2" target="_blank">
-                  Facebook
-                </Link>
-                <Link href="#" className="me-2" target="_blank">
-                  Instagram
-                </Link>
+    <footer className="bg-card text-foreground">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          {/* Logo and Description */}
+          <div className="space-y-6">
+            <Image
+              src="/baliyo-logo.svg"
+              alt="Baliyo Ventures"
+              width={240}
+              height={80}
+              className="mb-6"
+            />
+            <p className="text-muted-foreground">
+              Baliyo Ventures is a technology company that provides solutions to
+              all your technology needs. We provide services like product
+              development, architecture design, software development and
+              marketing. We are a team of experienced professionals who are
+              dedicated to provide you the best services.
+            </p>
+            <div className="flex gap-4">
+              {socialLinks.map((link) => (
                 <Link
-                  href="https://www.instagram.com/Baliyo Ventures_ca/"
-                  className="me-2"
-                  target="_blank"
+                  key={link.name}
+                  href={link.href}
+                  className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Linkedin
+                  {link.name}
                 </Link>
-              </div>
+              ))}
             </div>
+          </div>
 
-            <div className="col-12 col-lg-3 col-6 footer-links">
-              <h4>Service by Baliyo Ventures</h4>
-              <ul className="row row-cols-1">
-                <li className="footerlinks">
-                  <Link href="#">
-                    <span>Product Development</span>
+          {/* Services */}
+          <div>
+            <h3 className="text-xl font-semibold mb-6">
+              Service by Baliyo Ventures
+            </h3>
+            <ul className="space-y-3">
+              {services.map((service) => (
+                <li key={service.name}>
+                  <Link
+                    href={service.href}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {service.name}
                   </Link>
                 </li>
-                <li className="footerlinks">
-                  <Link href="#">
-                    <span>Baliyo Architecture</span>
-                  </Link>
-                </li>
-                <li className="footerlinks">
-                  <Link href="#">
-                    <span>Baliyo Software</span>
-                  </Link>
-                </li>
-                <li className="footerlinks">
-                  <Link href="#">
-                    <span>Baliyo Marketing</span>
-                  </Link>
-                </li>
-              </ul>
-            </div>
+              ))}
+            </ul>
+          </div>
 
-            <div className="col-lg-4 col-md-12 footer-contact text-start text-md-start">
-              <h4>Contact Baliyo Ventures</h4>
-              <p className="mb-1">Baliyo Ventures Pvt. Ltd.</p>
-              <p className="mb-1">Pulchowk, Lalitpur</p>
-              <p className="mb-1">Office Hours ⋅ 9AM - 6 PM</p>
-              <p className="mt-1 mb-1">
-                <strong>Phone: </strong>
-                <Link href="tel:9866316114">9866316114</Link>
+          {/* Contact Info */}
+          <div>
+            <h3 className="text-xl font-semibold mb-6">
+              Contact Baliyo Ventures
+            </h3>
+            <div className="space-y-3 text-muted-foreground">
+              <p>Baliyo Ventures Pvt. Ltd.</p>
+              <p>Sankhamul, Lalitpur</p>
+              <p>Office Hours · 10AM - 6 PM</p>
+              <p>
+                Phone:{" "}
+                <Link
+                  href="tel:9866316114"
+                  className="hover:text-primary transition-colors"
+                >
+                  9866316114
+                </Link>
               </p>
               <p>
-                <strong>Email: </strong>
-                <Link href="mailto:baliyoventures@gmail.com">
+                Email:{" "}
+                <Link
+                  href="mailto:baliyoventures@gmail.com"
+                  className="hover:text-primary transition-colors"
+                >
                   baliyoventures@gmail.com
                 </Link>
               </p>
@@ -84,19 +98,17 @@ const Footer = ({ cities }) => {
           </div>
         </div>
 
-        <div className="container copyright text-start text-md-center mt-4">
-          <p>
-            ©2023 <span>Copyright</span>{" "}
-            <strong className="px-1">Baliyo Ventures Inc.</strong>{" "}
-            <span>All Rights Reserved</span>
+        {/* Copyright */}
+        <div className="mt-16 pt-8 border-t border-muted">
+          <p className="text-center text-muted-foreground">
+            ©2023 Copyright{" "}
+            <span className="font-semibold text-foreground">
+              Baliyo Ventures Inc.
+            </span>{" "}
+            All Rights Reserved
           </p>
         </div>
-      </footer>
-      <div className="bg-white">
-        <img src="/pattern.svg" alt="" className="img-fluid mb-0" />
       </div>
-    </>
+    </footer>
   );
-};
-
-export default Footer;
+}

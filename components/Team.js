@@ -1,119 +1,141 @@
-import React from "react";
+import Image from "next/image";
+import { Card, CardContent } from "./ui/card";
+import { Button } from "./ui/button";
+import { Github, Linkedin, Twitter } from "lucide-react";
 
-const Team = () => {
+export default function Team() {
+  const teamMembers = [
+    {
+      name: "Rajesh Sharma",
+      role: "CEO & Founder",
+      image: "/team/1.jpg",
+      bio: "Tech visionary with 10+ years of experience in software development and AI",
+      social: {
+        linkedin: "#",
+        twitter: "#",
+        github: "#",
+      },
+    },
+    {
+      name: "Priya Patel",
+      role: "CTO",
+      image: "/team/2.jpg",
+      bio: "AI/ML expert specializing in computer vision and deep learning",
+      social: {
+        linkedin: "#",
+        twitter: "#",
+        github: "#",
+      },
+    },
+    {
+      name: "Alex Wong",
+      role: "Lead Engineer",
+      image: "/team/3.jpg",
+      bio: "Full-stack developer with expertise in scalable cloud architectures",
+      social: {
+        linkedin: "#",
+        twitter: "#",
+        github: "#",
+      },
+    },
+    {
+      name: "Sarah Miller",
+      role: "Product Manager",
+      image: "/team/4.jpg",
+      bio: "Product strategist focused on delivering innovative tech solutions",
+      social: {
+        linkedin: "#",
+        twitter: "#",
+        github: "#",
+      },
+    },
+  ];
+
   return (
-    <section className="py-3 py-md-5 py-xl-8">
-      <div className="row justify-content-md-center">
-        <div className="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
-          <h2 className="display-5 text-center fs-1 main-title">Our Team</h2>
-          <p className="mb-5 text-center lead fs-4">
-            Group of <strong className="text-mine2">Innovative</strong> -{" "}
-            <strong className="text-mine2">Experienced</strong> -{" "}
-            <strong className="text-mine2">Proficient</strong>
-          </p>
-        </div>
-      </div>
+    <section className="py-20 px-4 md:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          Meet Our <span className="text-primary">Team</span>
+        </h2>
+        <p className="text-muted-foreground mb-12 max-w-2xl">
+          Our diverse team of experts brings together years of experience in
+          technology, innovation, and business strategy.
+        </p>
 
-      <div className="overflow-hidden">
-        <div className="row row-cols-2 row-cols-md-4 row-cols-lg-5 gy-4 gy-lg-0 gx-xxl-3">
-          <div className="col">
-            <div className="card border-0 border-bottom border-warning shadow-sm overflow-hidden">
-              <div className="card-body p-0">
-                <figure className="m-0 p-0">
-                  <img
-                    className="img-fluid"
-                    loading="lazy"
-                    src="baliyoadvantage/1.jpeg"
-                    alt=""
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {teamMembers.map((member, index) => (
+            <Card
+              key={index}
+              className="border-primary/20 hover:border-primary transition-colors"
+            >
+              <CardContent className="p-6">
+                <div className="relative w-32 h-32 mx-auto mb-4">
+                  <Image
+                    src={member.image}
+                    alt={member.name}
+                    fill
+                    className="object-cover rounded-full"
                   />
-                  <figcaption className="m-0 p-4">
-                    <h4 className="mb-1">Dipawoli Malla</h4>
-                    <p className="text-secondary mb-0">CEO</p>
-                  </figcaption>
-                </figure>
-              </div>
-            </div>
-          </div>
-          <div className="col">
-            <div className="card border-0 border-bottom border-warning shadow-sm overflow-hidden">
-              <div className="card-body p-0">
-                <figure className="m-0 p-0">
-                  <img
-                    className="img-fluid"
-                    loading="lazy"
-                    src="baliyoadvantage/1.jpeg"
-                    alt=""
-                  />
-                  <figcaption className="m-0 p-4">
-                    <h4 className="mb-1">Anil Singh</h4>
-                    <p className="text-secondary mb-0">Managing Director</p>
-                  </figcaption>
-                </figure>
-              </div>
-            </div>
-          </div>
-          <div className="col">
-            <div className="card border-0 border-bottom border-warning shadow-sm overflow-hidden">
-              <div className="card-body p-0">
-                <figure className="m-0 p-0">
-                  <img
-                    className="img-fluid"
-                    loading="lazy"
-                    src="baliyoadvantage/1.jpeg"
-                    alt=""
-                  />
-                  <figcaption className="m-0 p-4">
-                    <h4 className="mb-1">Prithvi Chaudhary</h4>
-                    <p className="text-secondary mb-0">
-                      Product Development Head
-                    </p>
-                  </figcaption>
-                </figure>
-              </div>
-            </div>
-          </div>
-          <div className="col">
-            <div className="card border-0 border-bottom border-warning shadow-sm overflow-hidden">
-              <div className="card-body p-0">
-                <figure className="m-0 p-0">
-                  <img
-                    className="img-fluid"
-                    loading="lazy"
-                    src="baliyoadvantage/1.jpeg"
-                    alt=""
-                  />
-                  <figcaption className="m-0 p-4">
-                    <h4 className="mb-1">Manav Khadka</h4>
-                    <p className="text-secondary mb-0">IOT & Automation Head</p>
-                  </figcaption>
-                </figure>
-              </div>
-            </div>
-          </div>
-          <div className="col">
-            <div className="card border-0 border-bottom border-warning shadow-sm overflow-hidden">
-              <div className="card-body p-0">
-                <figure className="m-0 p-0">
-                  <img
-                    className="img-fluid"
-                    loading="lazy"
-                    src="baliyoadvantage/1.jpeg"
-                    alt=""
-                  />
-                  <figcaption className="m-0 p-4">
-                    <h4 className="mb-1">Vishal Dhakal</h4>
-                    <p className="text-secondary mb-0">
-                      Software Development Head
-                    </p>
-                  </figcaption>
-                </figure>
-              </div>
-            </div>
-          </div>
+                </div>
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold">{member.name}</h3>
+                  <p className="text-primary font-medium mb-2">{member.role}</p>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    {member.bio}
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hover:text-primary"
+                      asChild
+                    >
+                      <a
+                        href={member.social.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Linkedin className="h-5 w-5" />
+                        <span className="sr-only">LinkedIn</span>
+                      </a>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hover:text-primary"
+                      asChild
+                    >
+                      <a
+                        href={member.social.twitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Twitter className="h-5 w-5" />
+                        <span className="sr-only">Twitter</span>
+                      </a>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hover:text-primary"
+                      asChild
+                    >
+                      <a
+                        href={member.social.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Github className="h-5 w-5" />
+                        <span className="sr-only">GitHub</span>
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </section>
   );
-};
-
-export default Team;
+}

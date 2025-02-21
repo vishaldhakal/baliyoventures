@@ -52,9 +52,10 @@ export default function Navbar() {
         {/* Sign Up Button */}
         <Button
           variant="outline"
-          className="hidden md:flex border-primary text-primary hover:bg-primary/10"
+          className="hidden md:flex border-primary text-primary hover:text-background relative overflow-hidden transition-colors group rounded-full"
         >
-          Signup
+          <span className="relative z-10">Signup</span>
+          <span className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-yellow-500 transform scale-0 rounded-full transition-transform duration-1000 origin-center group-hover:scale-[400%]"></span>
         </Button>
 
         <MobileNav />

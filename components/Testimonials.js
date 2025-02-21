@@ -14,21 +14,21 @@ export default function Testimonials() {
     {
       name: "John Smith",
       role: "CTO, TechCorp",
-      image: "/testimonials/1.jpg",
+      image: "/avatar.webp",
       content:
         "Baliyo Ventures has been instrumental in our digital transformation journey. Their expertise in AI and machine learning helped us achieve remarkable results.",
     },
     {
       name: "Sarah Johnson",
       role: "CEO, InnovateNow",
-      image: "/testimonials/2.jpg",
+      image: "/avatar.webp",
       content:
         "Working with Baliyo Ventures was a game-changer for our business. Their team's technical prowess and commitment to excellence are unmatched.",
     },
     {
       name: "Michael Chen",
       role: "Product Manager, FutureTech",
-      image: "/testimonials/3.jpg",
+      image: "/avatar.webp",
       content:
         "The team at Baliyo Ventures delivered beyond our expectations. Their innovative solutions and attention to detail set them apart.",
     },

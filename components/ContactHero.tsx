@@ -36,10 +36,10 @@ const ContactHero = () => {
   };
 
   return (
-    <section className="bg-[#010714] pt-32 pb-12">
+    <section className="bg-[#00040C] py-8 md:py-16">
       <div className="container mx-auto px-4">
-        <h1 className="text-4xl md:text-[42px] font-bold text-white text-center mb-10">
-          Contact Baliyo Ventures Today
+        <h1 className="text-4xl md:text-[42px] font-bold text-white mb-10">
+          Contact <span className="text-[#F0D100]">Baliyo Ventures</span> Today
         </h1>
 
         <div className="flex flex-col md:flex-row justify-between items-start gap-16">
@@ -62,14 +62,14 @@ const ContactHero = () => {
                     control={form.control}
                     name="name"
                     render={({ field }) => (
-                      <FormItem className="relative">
-                        <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#F0D100] bg-[#010714] z-10">
+                      <FormItem className="relative group">
+                        <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-[#F0D100] bg-[#111111] z-10">
                           Name
                         </FormLabel>
                         <FormControl>
                           <Input
                             placeholder="John Abraham"
-                            className="w-full bg-[#171717] border-[#6F6F6F] focus:border-[#F0D100] rounded-lg px-4 py-6  text-white"
+                            className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-[#F0D100] focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white"
                             {...field}
                           />
                         </FormControl>
@@ -82,14 +82,14 @@ const ContactHero = () => {
                     control={form.control}
                     name="phone"
                     render={({ field }) => (
-                      <FormItem className="relative">
-                        <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] bg-[#010714] z-10">
+                      <FormItem className="relative group">
+                        <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-[#F0D100] bg-[#111111] z-10">
                           Phone Number
                         </FormLabel>
                         <FormControl>
                           <Input
                             placeholder="+977 9800000000"
-                            className="w-full bg-[#171717] border-[#6F6F6F] focus:border-[#F0D100] rounded-lg px-4 py-6  text-white"
+                            className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-[#F0D100] focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white"
                             {...field}
                           />
                         </FormControl>
@@ -102,14 +102,14 @@ const ContactHero = () => {
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                      <FormItem className="relative">
-                        <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] bg-[#010714] z-10">
+                      <FormItem className="relative group">
+                        <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-[#F0D100] bg-[#111111] z-10">
                           Email
                         </FormLabel>
                         <FormControl>
                           <Input
                             placeholder="johndoe@gmail.com"
-                            className="w-full bg-[#171717] border-[#6F6F6F] focus:border-[#F0D100] rounded-lg px-4 py-6  text-white"
+                            className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-[#F0D100] focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white"
                             {...field}
                           />
                         </FormControl>
@@ -122,14 +122,14 @@ const ContactHero = () => {
                     control={form.control}
                     name="message"
                     render={({ field }) => (
-                      <FormItem className="relative">
-                        <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] bg-[#010714] z-10">
+                      <FormItem className="relative group">
+                        <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-[#F0D100] bg-[#111111] z-10">
                           Message
                         </FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder="Tell us about your project or query..."
-                            className="w-full bg-[#171717] border-[#6F6F6F] focus:border-[#F0D100] rounded-lg px-4 py-6  text-white min-h-[105px]"
+                            className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-[#F0D100] focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white min-h-[105px]"
                             {...field}
                           />
                         </FormControl>
@@ -141,7 +141,7 @@ const ContactHero = () => {
 
                 <Button
                   type="submit"
-                  className="bg-[#EBB51F] hover:bg-[#d9a71c] text-black font-bold py-6 rounded-md mt-4 flex items-center justify-center gap-2 w-full md:w-auto md:self-start"
+                  className="bg-[#EBB51F] hover:bg-[#d9a71c] text-black font-bold py-6 rounded-md mt-4 flex items-center justify-center gap-2 w-full md:w-auto md:self-start cursor-pointer"
                 >
                   Send Message
                   <ArrowRight size={16} />

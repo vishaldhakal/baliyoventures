@@ -2,8 +2,20 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-export default function ResearchOverview() {
+type ResearchOverviewProps = {
+  title: string;
+  description: string;
+  cta?: string;
+};
+
+export default function ResearchOverview({
+  title,
+  description,
+  cta,
+}: ResearchOverviewProps) {
   return (
     <section className="relative w-full min-h-[600px] flex items-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -30,13 +42,23 @@ export default function ResearchOverview() {
           className="max-w-[663px] flex flex-col gap-[42px]"
         >
           <h2 className="font-oxanium text-[42px] font-semibold leading-[1.14] text-transparent bg-clip-text bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] md:max-w-[600px]">
-            Innovating for a better Tomorrow
+            {/* Innovating for a better Tomorrow  */}
+            {title}
           </h2>
           <p className="text-white font-inter text-xl font-medium leading-[1.6]">
-            Our Commitment to research and Development goes beyond creating
+            {/* Our Commitment to research and Development goes beyond creating
             products- We&apos;re dedicated to solving real-world challenges and
-            shaping the future of Technology.
+            shaping the future of Technology. */}
+            {description}
           </p>
+          {cta && (
+            <Button
+              asChild
+              className="text-[#00040C] font-inter bg-[#F0D100] text-xl w-fit font-medium leading-[1.6] hover:bg-[#F0D100]/80 transition-all duration-300"
+            >
+              <Link href="/contact">{cta}</Link>
+            </Button>
+          )}
         </motion.div>
       </div>
     </section>

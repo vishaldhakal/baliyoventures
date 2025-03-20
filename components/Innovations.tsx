@@ -39,7 +39,7 @@ const Innovations = () => {
       link: "/projects/product-development",
     },
     {
-      id: 4,
+      id: 6,
       image: "/images/innovations/project-4.jpg",
       title: "Engineering Solutions",
       description: "Comprehensive engineering services for complex challenges",

@@ -11,7 +11,7 @@ import {
 
 const ContactMap = () => {
   return (
-    <section className="relative bg-gradient-to-b from-[#010714] to-[#020917] py-20 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-[#00040C] to-[#0a0a0a] py-20 overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-10 left-10 w-64 h-64 bg-[#EBB51F]/5 rounded-full blur-3xl" />

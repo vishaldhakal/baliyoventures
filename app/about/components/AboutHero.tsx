@@ -3,8 +3,8 @@ import Link from "next/link";
 
 const AboutHero = () => {
   return (
-    <section className="relative min-h-[90vh] bg-black px-4 pt-32 pb-16 md:px-8 lg:px-16">
-      <div className="mx-auto max-w-7xl">
+    <section className="relative min-h-[90vh] bg-black ">
+      <div className="mx-auto container px-2">
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Content */}
           <div className="flex flex-col justify-center space-y-8">

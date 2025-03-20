@@ -4,25 +4,27 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
-interface ServiceCardProps {
+interface ProjectCardProps {
   title: string;
   description: string;
   image: string;
   index: number;
+  slug: string;
 }
 
-export default function ServiceCard({
+export default function ProjectCard({
   title,
   description,
   image,
+  slug,
   index,
-}: ServiceCardProps) {
+}: ProjectCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group flex flex-col gap-6 rounded-[5px] border border-white/[0.07] bg-[#171717] p-8"
+      className="group flex flex-col gap-6 rounded-[5px] border border-white/[0.07] bg-[#171717] p-6"
     >
       {/* Image */}
       <div className="relative h-[200px] w-full overflow-hidden rounded-sm">
@@ -47,9 +49,12 @@ export default function ServiceCard({
       {/* Learn More Button */}
       <div className="mt-7">
         <motion.button className="group/btn cursor-pointer flex items-center gap-3 rounded-sm bg-[#F0D100]/20 px-4 py-2.5 transition-colors hover:bg-[#F0D100]/30">
-          <span className="font-saira text-sm font-semibold uppercase tracking-[0.03em] text-[#E5E5E5]">
+          <a
+            href={`/project-detail/${slug}`}
+            className="font-headings text-sm font-semibold uppercase tracking-[0.03em] text-[#E5E5E5]"
+          >
             Learn More
-          </span>
+          </a>
           <ArrowRight className="h-4 w-4 stroke-[1.5px] text-[#E5E5E5] transition-transform group-hover/btn:translate-x-1" />
         </motion.button>
       </div>

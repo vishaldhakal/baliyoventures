@@ -7,8 +7,13 @@ export default function ResearchAndDevelopment() {
   return (
     <main>
       <Hero />
-      <ResearchOverview />
       <Services />
+      <ResearchOverview
+        title="Innovating for a better Tomorrow"
+        description="Our Commitment to research and Development goes beyond creating
+            products- We're dedicated to solving real-world challenges and
+            shaping the future of Technology."
+      />
       <LandingContact />
     </main>
   );

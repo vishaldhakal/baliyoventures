@@ -15,9 +15,17 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Baliyo Ventures - Technology Solutions",
-  description:
-    "Baliyo Ventures is a technology company that provides solutions to all your technology needs.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
+  authors: [{ name: "Baliyo Ventures", url: "https://baliyoventures.com" }],
+  robots: {
+    index: true,
+    follow: true,
+    noimageindex: true,
+  },
 };
 
 export default function RootLayout({

@@ -3,12 +3,14 @@ import Hero from "./components/Hero";
 import ResearchOverview from "./components/ResearchOverview";
 import Services from "./components/Services";
 import { Metadata } from "next";
+import { getServices } from "@/services/service.service";
 
-export default function ResearchAndDevelopment() {
+export default async function ResearchAndDevelopment() {
+  const services = await getServices();
   return (
     <main>
       <Hero />
-      <Services />
+      <Services services={services} />
       <ResearchOverview
         title="Innovating for a better Tomorrow"
         description="Our Commitment to research and Development goes beyond creating

@@ -3,20 +3,18 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { ServiceListResponse } from "@/types/services";
 
-interface ServiceCardProps {
-  title: string;
-  description: string;
-  image: string;
+interface ServiceCardProps extends ServiceListResponse {
   index: number;
-  slug: string;
 }
 
 export default function ServiceCard({
   title,
-  description,
-  image,
+  short_description,
   slug,
+  thumbnail_image,
+  thumbnail_image_alt_description,
   index,
 }: ServiceCardProps) {
   return (
@@ -27,12 +25,12 @@ export default function ServiceCard({
       className="group flex flex-col gap-6 rounded-[5px] border border-white/[0.07] bg-[#171717] p-6"
     >
       {/* Image */}
-      <div className="relative h-[200px] w-full overflow-hidden rounded-sm">
+      <div className="relative h-[300px] w-full overflow-hidden rounded-sm">
         <Image
-          src={image}
-          alt={title}
+          src={thumbnail_image}
+          alt={thumbnail_image_alt_description}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          className="object-cover object-center transition-transform duration-500 group-hover:scale-110"
         />
       </div>
 
@@ -42,7 +40,7 @@ export default function ServiceCard({
           {title}
         </h3>
         <p className="font-inter text-sm font-light leading-[2.14] tracking-[0.03em] text-[#B5B5B5]">
-          {description}
+          {short_description}
         </p>
       </div>
 

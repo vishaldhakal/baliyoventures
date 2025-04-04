@@ -1,4 +1,5 @@
 import HomePageView from "@/components/HomePageView";
+import { getServices } from "@/services/service.service";
 import { Metadata } from "next";
 
 const websiteSchema = {
@@ -46,13 +47,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const services = await getServices();
   return (
     <>
       <script type="application/ld+json">
         {JSON.stringify(websiteSchema)}
       </script>
-      <HomePageView />
+      <HomePageView services={services} />
     </>
   );
 }

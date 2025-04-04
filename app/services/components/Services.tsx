@@ -2,32 +2,13 @@
 
 import { motion } from "framer-motion";
 import ServiceCard from "./ServiceCard";
+import { ServiceListResponse } from "@/types/services";
 
-const services = [
-  {
-    title: "Product Development",
-    slug: "product-development",
-    description:
-      "Web development is the process of creating websites and web applications for the internet or intranet.",
-    image: "/images/research/product-dev.jpg",
-  },
-  {
-    title: "Software Development",
-    slug: "software-development",
-    description:
-      "Cloud solutions refer to the use of cloud computing technology to provide services and solutions over the internet.",
-    image: "/images/research/software-dev.jpg",
-  },
-  {
-    title: "Research & Development",
-    slug: "research-development",
-    description:
-      "Revolutionize your Digital Presence with Cutting-Edge Mobile App Development, Design, and Innovation Services.",
-    image: "/images/research/research-dev.jpg",
-  },
-];
-
-export default function Services() {
+export default function Services({
+  services,
+}: {
+  services: ServiceListResponse[];
+}) {
   return (
     <section className="w-full bg-[#00040C] py-16 md:py-24">
       <div className="container mx-auto px-4">

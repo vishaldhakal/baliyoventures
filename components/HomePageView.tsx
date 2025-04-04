@@ -6,14 +6,19 @@ import Innovations from "./Innovations";
 import OurClients from "./OurClients";
 import ProjectInMind from "./ProjectInMind";
 import LandingContact from "./LandingContact";
+import { ServiceListResponse } from "@/types/services";
 
-const HomePageView = () => {
+interface HomePageViewProps {
+  services: ServiceListResponse[];
+}
+
+const HomePageView = ({ services }: HomePageViewProps) => {
   return (
     <main className="min-h-screen bg-[#00040C]">
       <Hero />
       <AboutUs />
       <Stats />
-      <Services />
+      <Services services={services} />
       <Innovations />
       <OurClients />
       <ProjectInMind />

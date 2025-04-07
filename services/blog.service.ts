@@ -14,7 +14,7 @@ import { BlogResponse } from "../types/blogs";
 
 
 export const getBlogsDetails = async (slug: string): Promise<BlogResponse> => {
-  const response = await fetch(`${process.env.PUBLIC_API_URL}/blogs/${slug}`);
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${slug}`);
   const data = await response.json();
   return data;
 };

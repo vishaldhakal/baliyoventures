@@ -21,12 +21,12 @@ const Hero = () => {
             technological solutions. Experience the future with Baliyo Ventures.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button className="bg-[#F0D100] hover:bg-[#d9a71c] text-black font-bold px-8 py-6 rounded-md text-lg">
+            <Button className="bg-[#F0D100] hover:bg-[#d9a71c] cursor-pointer text-black font-bold px-8 py-6 rounded-md text-lg">
               Get Started
             </Button>
             <Button
               variant="outline"
-              className="border-white text-white hover:bg-white/10 px-8 py-6 rounded-md text-lg"
+              className="border-white text-black hover:bg-white/10 hover:text-white cursor-pointer px-8 py-6 rounded-md text-lg"
             >
               Learn More <ArrowRight className="ml-2 h-5 w-5" />
             </Button>

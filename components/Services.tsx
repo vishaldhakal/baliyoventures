@@ -7,11 +7,6 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 
@@ -25,62 +20,41 @@ const ServiceCard = ({
   description: string;
 }) => {
   return (
-    <HoverCard>
-      <HoverCardTrigger asChild>
-        <Card className="bg-[#171717] border-[rgba(255,255,255,0.07)] h-full transition-all duration-300 hover:border-[#F0D100]/20 hover:shadow-[0_0_15px_rgba(240,209,0,0.1)]">
-          <CardHeader className="pb-4">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <Image
-                src={icon}
-                alt={title}
-                width={48}
-                height={48}
-                className="object-contain"
-              />
-            </div>
-          </CardHeader>
-
-          <CardContent className="flex-grow flex flex-col">
-            <h3 className="text-[#E4E4E4] text-2xl font-semibold uppercase tracking-wider mb-4 font-oxanium">
-              {title}
-            </h3>
-            <p className="text-[#B5B5B5] text-sm font-light leading-[2.1] tracking-widest mb-auto">
-              {description}
-            </p>
-          </CardContent>
-
-          <CardFooter className="pt-7 flex flex-col w-full">
-            <Separator className="bg-[rgba(255,255,255,0.07)]" />
-            <div className="pt-7 ml-auto">
-              <Button
-                variant="ghost"
-                className="w-full flex items-center justify-between text-[#E5E5E5] text-xs uppercase font-semibold tracking-widest font-saira group hover:bg-[rgba(240,209,0,0.2)]"
-              >
-                <span>Learn More</span>
-                <ArrowRightIcon className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-              </Button>
-            </div>
-          </CardFooter>
-        </Card>
-      </HoverCardTrigger>
-      <HoverCardContent className="w-80 bg-[#171717] border-[rgba(255,255,255,0.07)] text-[#E4E4E4]">
-        <div className="flex justify-between space-x-4">
-          <div className="space-y-1">
-            <h4 className="text-sm font-semibold">{title}</h4>
-            <p className="text-sm text-[#B5B5B5]">{description}</p>
-            <div className="flex items-center pt-2">
-              <Button
-                variant="ghost"
-                className="text-xs uppercase font-semibold tracking-widest font-saira group hover:bg-[rgba(240,209,0,0.2)] px-0"
-              >
-                <span className="text-[#F0D100]">View Projects</span>
-                <ArrowRightIcon className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-              </Button>
-            </div>
-          </div>
+    <Card className="bg-[#171717] border-[rgba(255,255,255,0.07)] h-full transition-all duration-300 hover:border-[#F0D100]/20 hover:shadow-[0_0_15px_rgba(240,209,0,0.1)]">
+      <CardHeader className="pb-4">
+        <div className="w-12 h-12 flex items-center justify-center">
+          <Image
+            src={icon}
+            alt={title}
+            width={48}
+            height={48}
+            className="object-contain"
+          />
         </div>
-      </HoverCardContent>
-    </HoverCard>
+      </CardHeader>
+
+      <CardContent className="flex-grow flex flex-col">
+        <h3 className="text-[#E4E4E4] text-2xl font-semibold uppercase tracking-wider mb-4 font-oxanium">
+          {title}
+        </h3>
+        <p className="text-[#B5B5B5] text-sm font-light leading-[2.1] tracking-widest mb-auto">
+          {description}
+        </p>
+      </CardContent>
+
+      <CardFooter className="pt-7 flex flex-col w-full">
+        <Separator className="bg-[rgba(255,255,255,0.07)]" />
+        <div className="pt-7 ml-auto">
+          <Button
+            variant="ghost"
+            className="w-full flex items-center justify-between text-[#E5E5E5] text-xs uppercase font-semibold tracking-widest font-saira group hover:bg-[rgba(240,209,0,0.2)] hover:text-white"
+          >
+            <span>Learn More</span>
+            <ArrowRightIcon className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
   );
 };
 

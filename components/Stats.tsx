@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 const StatItem = ({ value, label }: { value: string; label: string }) => {
   return (
     <div className="flex flex-col items-center gap-4">
@@ -16,16 +14,34 @@ const StatItem = ({ value, label }: { value: string; label: string }) => {
 const Stats = () => {
   return (
     <section className="relative py-16 md:py-24 overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/stats/stats-background.png"
-          alt="Background"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black opacity-80"></div>
+      {/* Pattern Background */}
+      <div className="absolute inset-0 opacity-[0.03]">
+        <svg
+          width="100%"
+          height="100%"
+          xmlns="http://www.w3.org/2000/svg"
+          className="absolute inset-0"
+        >
+          <defs>
+            <pattern
+              id="cross-pattern"
+              x="0"
+              y="0"
+              width="40"
+              height="40"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 40 0 L 0 0 0 40"
+                fill="none"
+                stroke="white"
+                strokeWidth="1"
+                strokeOpacity="0.5"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#cross-pattern)" />
+        </svg>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">

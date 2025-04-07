@@ -1,29 +1,31 @@
 import ProjectDetailView from "./components/ProjectDetailView";
 import { getServicesDetails } from "@/services/service.service";
+import { ServiceDetailResponse } from "@/types/services";
 
 type ProjectDetailProps = {
   params: Promise<{ slug: string }>;
 };
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const slug = (await params).slug;
-  const post = await getServicesDetails(slug);
+  const service: ServiceDetailResponse = await getServicesDetails(slug);
 
   return {
-    title: post.title,
+    title: service.title,
   };
 }
+
 export default async function ProjectDetail({ params }: ProjectDetailProps) {
   const { slug } = await params;
 
   try {
     const service = await getServicesDetails(slug);
 
-    // Check if the response is valid JSON
-    if (!service || Array.isArray(service)) {
+    if (!service) {
       return <div>Service not found</div>;
     }
 

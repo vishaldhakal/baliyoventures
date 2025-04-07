@@ -1,7 +1,7 @@
 import { BlogResponse } from "../types/blogs";
  
  export const getBlogs = async (): Promise<BlogResponse[]> => {
-   const response = await fetch(`${process.env.PUBLIC_API_URL}/blogs`);
+   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blogs`);
    const data = await response.json();
    return data.results.map((item: BlogResponse) => ({
     id: item.id,

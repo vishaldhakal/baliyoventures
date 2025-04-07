@@ -1,9 +1,10 @@
-import { mockBlogs } from "../mock/blogs";
+import { getBlogs } from "@/services/blog.service";
 import BlogCard from "./BlogCard";
 import BlogsSideBar from "./BlogsSideBar";
+import { BlogResponse } from "@/types/blogs";
 
-export default function BlogsPageView() {
-  const blogs = mockBlogs;
+export default async function BlogsPageView() {
+  const blogs: BlogResponse[] = await getBlogs();
 
   return (
     <main className="bg-[#00040C] px-4 py-8 md:py-16">

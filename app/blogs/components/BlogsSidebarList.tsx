@@ -9,7 +9,7 @@ export default function BlogsSidebarList({ blogs }: BlogsSidebarListProps) {
           <div className="flex gap-4">
             <div className="relative w-[120px] h-[90px] rounded-lg overflow-hidden flex-shrink-0">
               <Image
-                src={blog.imageUrl}
+                src={blog.thumbnail_image || ""}
                 alt={blog.title}
                 fill
                 className="object-cover"
@@ -19,12 +19,6 @@ export default function BlogsSidebarList({ blogs }: BlogsSidebarListProps) {
               <h4 className="text-base font-bold text-[#CDCDCD] leading-[1.67] tracking-[-0.03em] group-hover:text-[#F0D100] line-clamp-2">
                 {blog.title}
               </h4>
-              <div className="flex gap-4 text-sm">
-                <span className="text-[#64607D] font-bold">{blog.date}</span>
-                <span className="text-[#64607D] font-bold">
-                  {blog.category}
-                </span>
-              </div>
             </div>
           </div>
           <div className="h-px bg-[#DEE1E6] mt-4" />

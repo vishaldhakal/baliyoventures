@@ -18,8 +18,13 @@ import {
   contactFormSchema,
   type ContactFormValues,
 } from "@/lib/schema/contact-form-schema";
+import { useState } from "react";
+import { postContactForm } from "@/services/contact.service";
 
 const ContactHero = () => {
+  const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState("");
+
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -30,17 +35,26 @@ const ContactHero = () => {
     },
   });
 
-  const onSubmit = (data: ContactFormValues) => {
+  const onSubmit = async (data: ContactFormValues) => {
     console.log("Form submitted:", data);
-    // Add actual form submission logic here
+    setLoading(true);
+
+    try {
+      await postContactForm(data);
+      setNotification("Your message has been sent!");
+      form.reset();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setNotification("There was an error sending your message.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <section className="bg-[#00040C] py-8 md:py-16">
       <div className="container mx-auto px-4">
-        <h1 className="text-4xl md:text-[42px] font-bold text-white mb-10">
-          Contact <span className="text-[#F0D100]">Baliyo Ventures</span> Today
-        </h1>
+        {notification && <div className="text-green-500">{notification}</div>}
 
         <div className="flex flex-col md:flex-row justify-between items-start gap-16">
           {/* Contact Form */}
@@ -141,10 +155,13 @@ const ContactHero = () => {
 
                 <Button
                   type="submit"
-                  className="bg-[#EBB51F] hover:bg-[#d9a71c] text-black font-bold py-6 rounded-md mt-4 flex items-center justify-center gap-2 w-full md:w-auto md:self-start cursor-pointer"
+                  className={`bg-[#EBB51F] hover:bg-[#d9a71c] text-black font-bold py-6 rounded-md mt-4 flex items-center justify-center gap-2 w-full md:w-auto md:self-start cursor-pointer ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  disabled={loading}
                 >
-                  Send Message
-                  <ArrowRight size={16} />
+                  {loading ? "Sending..." : "Send Message"}
+                  {loading && <ArrowRight size={16} className="animate-spin" />}
                 </Button>
               </form>
             </Form>

@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     title: "Baliyo Ventures - Mechanical, Software & Electronics Technology",
     description:
       "Looking for a technology partner to design and develop your mechanical and software products? At Baliyo Ventures help businesses build their tech.",
-    images: "/images/about/about-hero-1.jpg",
+    images: "/favicon.ico",
   },
 };
 

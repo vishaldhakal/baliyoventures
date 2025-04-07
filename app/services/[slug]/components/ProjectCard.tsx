@@ -3,22 +3,15 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-
-interface ProjectCardProps {
-  title: string;
-  description: string;
-  image: string;
-  index: number;
-  slug: string;
-}
+import { ServiceDetailResponse } from "@/types/services";
 
 export default function ProjectCard({
   title,
   description,
-  image,
+  thumbnail_image,
   slug,
   index,
-}: ProjectCardProps) {
+}: ServiceDetailResponse) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -29,7 +22,7 @@ export default function ProjectCard({
       {/* Image */}
       <div className="relative h-[200px] w-full overflow-hidden rounded-sm">
         <Image
-          src={image}
+          src={thumbnail_image}
           alt={title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"

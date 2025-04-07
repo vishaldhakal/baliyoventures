@@ -1,7 +1,6 @@
 import { ServiceListResponse } from "@/types/services";
 import { ArrowRightIcon } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   Card,
   CardContent,

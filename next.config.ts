@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname: "yachu.baliyoventures.com",
+        hostname: "www.yachu.baliyoventures.com",
       },
     ],
   },

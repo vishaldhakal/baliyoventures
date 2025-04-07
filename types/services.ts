@@ -9,6 +9,8 @@ export interface Service {
   icon: string;
   created_at: string;
   updated_at: string;
+  projects:[];
+  index:number
 }
 
 export interface ServiceListResponse

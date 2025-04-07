@@ -1,9 +1,9 @@
 import ResearchOverview from "../../components/ResearchOverview";
-import { Service } from "../page";
+import { ServiceDetailResponse } from "@/types/services";
 import ProjectCard from "./ProjectCard";
 
 type ProjectDetailViewProps = {
-  service: Service;
+  service: ServiceDetailResponse;
 };
 
 export default function ProjectDetailView({ service }: ProjectDetailViewProps) {
@@ -14,16 +14,33 @@ export default function ProjectDetailView({ service }: ProjectDetailViewProps) {
           {service.title}
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {service.projects.map((project, index) => (
-            <ProjectCard
-              key={project.slug}
-              title={project.title}
-              description={project.description}
-              image={project.image}
-              slug={project.slug}
-              index={index}
-            />
-          ))}
+          {service.projects.map(
+            (
+              project: {
+                slug: string;
+                title: string;
+                meta_description: string;
+                thumbnail_image: string;
+              },
+              index: number
+            ) => (
+              <ProjectCard
+                key={project.slug}
+                title={project.title}
+                description={project.meta_description}
+                thumbnail_image={
+                  project.thumbnail_image || "/default-image.jpg"
+                }
+                slug={project.slug}
+                index={index}
+                id={0}
+                short_description={""}
+                thumbnail_image_alt_description={""}
+                icon={""}
+                projects={[]}
+              />
+            )
+          )}
         </div>
       </div>
       <ResearchOverview

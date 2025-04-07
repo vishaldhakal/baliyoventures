@@ -1,10 +1,9 @@
 export interface Blog {
   id: string;
   title: string;
-  description: string;
-  imageUrl: string;
-  date: string;
-  category: string;
+  slug: string;
+  thumbnail_image: string | null;
+  thumbnail_image_alt_description: string | null;
 }
 
 export interface BlogCardProps {
@@ -22,3 +21,23 @@ export interface BlogsSidebarListProps {
 export interface BlogsPageViewProps {
   blogs: Blog[];
 }
+
+export interface BlogResponse {
+  id: string;
+  title: string;
+  description:string;
+  slug: string;
+  thumbnail_image: string | null;
+  thumbnail_image_alt_description: string | null;
+  created_at: string
+  category: {
+    id: string
+    title: string
+  }
+  tags: {
+    id: string
+    title: string
+  }[]
+  // Add any additional properties you want to include in the response
+}
+

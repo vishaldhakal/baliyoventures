@@ -51,7 +51,7 @@ export default function Hero() {
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="flex items-center gap-2"
                       >
-                        <span className="h-1 w-12 bg-gradient-to-r from-[#F0D100] to-[#FFFCCB]" />
+                        <span className="h-1 w-12 bg-gradient-to-r from-yellow-300 to-[#FFFCCB]" />
                         <span className="text-[#FFFCCB] font-medium">
                           Research & Development
                         </span>
@@ -63,7 +63,7 @@ export default function Hero() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="text-left font-oxanium text-2xl md:text-3xl lg:text-[32px] font-semibold leading-tight text-transparent bg-clip-text bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] min-h-[96px] lg:min-h-[128px]"
+                        className="text-left font-oxanium text-2xl md:text-3xl lg:text-[32px] font-semibold leading-tight text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-[#FFFCCB] min-h-[96px] lg:min-h-[128px]"
                       >
                         {slide.title}
                       </motion.h1>
@@ -104,7 +104,7 @@ export default function Hero() {
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="flex items-center gap-2"
                       >
-                        <span className="h-1 w-12 bg-gradient-to-r from-[#F0D100] to-[#FFFCCB]" />
+                        <span className="h-1 w-12 bg-gradient-to-r from-yellow-300 to-[#FFFCCB]" />
                         <span className="text-[#FFFCCB] font-medium">
                           Research & Development
                         </span>

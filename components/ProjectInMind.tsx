@@ -19,7 +19,7 @@ const ProjectInMind = () => {
 
       <div className="container mx-auto px-4 relative z-20">
         <div className="max-w-xl md:max-w-2xl md:ml-8 lg:ml-16 py-8">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold font-oxanium mb-8 bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold font-oxanium mb-8 bg-gradient-to-br from-yellow-300 to-[#FFFCCB] bg-clip-text text-transparent">
             Got any Project in mind?
           </h2>
           <p className="text-white text-lg leading-relaxed mb-12">
@@ -27,7 +27,7 @@ const ProjectInMind = () => {
             and implement them into reality with precision and innovation!
           </p>
           <Link href="/contact" passHref>
-            <button className="px-6 py-3 bg-black bg-opacity-20 text-white border-2 border-[#F0D100] rounded-md font-oxanium text-lg transition-all duration-300 hover:bg-[rgba(240,209,0,0.7)] hover:shadow-md">
+            <button className="px-6 py-3 bg-black bg-opacity-20 text-white border-2 border-yellow-300 rounded-md font-oxanium text-lg transition-all duration-300 hover:bg-[rgba(240,209,0,0.7)] hover:shadow-md">
               Discuss your Project
             </button>
           </Link>

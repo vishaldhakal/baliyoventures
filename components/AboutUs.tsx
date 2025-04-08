@@ -15,7 +15,7 @@ const AboutUs = () => {
       <div className="absolute left-0 top-1/4 w-20 h-full  pointer-events-none">
         <Image
           src="/images/home/left-image.svg"
-          alt=""
+          alt="design element left"
           width={86}
           height={234}
           className="absolute left-0 top-0"
@@ -26,7 +26,7 @@ const AboutUs = () => {
       <div className="absolute right-0 top-1/3 w-20 h-full  pointer-events-none">
         <Image
           src="/images/home/right-image.svg"
-          alt=""
+          alt="design element right"
           width={81}
           height={142}
           className="absolute right-0 top-0"
@@ -58,13 +58,13 @@ const AboutUs = () => {
 
           {/* Right Side - Content */}
           <div className="w-full lg:w-1/2 max-w-[553px]">
-            <h4 className="text-[#F0D100] font-oxanium text-xl mb-2">
-              About Us
-            </h4>
+            <h2 className="text-yellow-300 font-oxanium text-xl mb-2">
+              About Baliyo Ventures
+            </h2>
             <div className="space-y-5">
-              <h2 className="text-[#F0D100] font-saira text-3xl font-medium">
-                We Are Baliyo Ventures
-              </h2>
+              <h3 className="text-yellow-300 font-saira text-3xl font-medium">
+                Know More About Who We Are
+              </h3>
               <p className="text-2xl text-[#9A9A9A] font-inter leading-[1.375]">
                 We&apos;re not just building products; We&apos;re shaping the
                 future of technology in Nepal.
@@ -78,7 +78,7 @@ const AboutUs = () => {
                 exciting journey.
               </p>
               <div className="pt-4">
-                <Button className="bg-black/20 text-white hover:bg-[#F0D100] hover:text-black border-2 border-[#F0D100] rounded-md px-5 py-3 transition-all duration-300 font-oxanium text-lg">
+                <Button className="bg-black/20 text-white hover:bg-yellow-300 hover:text-black border-2 border-yellow-300 rounded-md px-5 py-3 transition-all duration-300 font-oxanium text-lg hover:shadow-[0_0_15px_rgba(235,181,31,0.5)] shadow-[0_0_25px_rgba(235,181,31,0.7)] hover:scale-105 h-12 cursor-pointer">
                   Learn More about Baliyo Ventures
                 </Button>
               </div>

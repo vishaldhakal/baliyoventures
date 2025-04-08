@@ -40,10 +40,13 @@ const LandingContact = () => {
     <>
       <section className="bg-[#111111] py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold font-oxanium bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] bg-clip-text text-transparent">
-              Contact Us
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold font-oxanium bg-gradient-to-br from-yellow-300 to-[#FFFCCB] bg-clip-text text-transparent">
+              Want Help Building Your Next Big Idea?
             </h2>
+            <p className="text-white opacity-80">
+              Baliyo Ventures is here to help you build your next big idea.
+            </p>
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-start gap-16">
@@ -69,13 +72,13 @@ const LandingContact = () => {
                       name="name"
                       render={({ field }) => (
                         <FormItem className="relative group">
-                          <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-[#F0D100] bg-[#111111] z-10">
+                          <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-yellow-300 bg-[#111111] z-10">
                             Name
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="John Abraham"
-                              className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-[#F0D100] focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white"
+                              className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-yellow-300 focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white"
                               {...field}
                             />
                           </FormControl>
@@ -89,13 +92,13 @@ const LandingContact = () => {
                       name="phone"
                       render={({ field }) => (
                         <FormItem className="relative group">
-                          <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-[#F0D100] bg-[#111111] z-10">
+                          <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-yellow-300 bg-[#111111] z-10">
                             Phone Number
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="+977 9800000000"
-                              className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-[#F0D100] focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white"
+                              className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-yellow-300 focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white"
                               {...field}
                             />
                           </FormControl>
@@ -109,13 +112,13 @@ const LandingContact = () => {
                       name="email"
                       render={({ field }) => (
                         <FormItem className="relative group">
-                          <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-[#F0D100] bg-[#111111] z-10">
+                          <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-yellow-300 bg-[#111111] z-10">
                             Email
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="johndoe@gmail.com"
-                              className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-[#F0D100] focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white"
+                              className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-yellow-300 focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white"
                               {...field}
                             />
                           </FormControl>
@@ -129,13 +132,13 @@ const LandingContact = () => {
                       name="message"
                       render={({ field }) => (
                         <FormItem className="relative group">
-                          <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-[#F0D100] bg-[#111111] z-10">
+                          <FormLabel className="absolute -top-2 left-4 px-1 text-xs text-[#7D7D7D] group-focus-within:text-yellow-300 bg-[#111111] z-10">
                             Message
                           </FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Tell us about your project or query..."
-                              className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-[#F0D100] focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white min-h-[105px]"
+                              className="w-full bg-[#171717] border-[#6F6F6F] focus-visible:border-yellow-300 focus-visible:ring-0 focus:ring-0 rounded-lg px-4 py-6 text-white min-h-[105px]"
                               {...field}
                             />
                           </FormControl>

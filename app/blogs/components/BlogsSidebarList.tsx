@@ -16,7 +16,7 @@ export default function BlogsSidebarList({ blogs }: BlogsSidebarListProps) {
               />
             </div>
             <div className="flex flex-col gap-2 flex-1 min-w-0">
-              <h4 className="text-base font-bold text-[#CDCDCD] leading-[1.67] tracking-[-0.03em] group-hover:text-[#F0D100] line-clamp-2">
+              <h4 className="text-base font-bold text-[#CDCDCD] leading-[1.67] tracking-[-0.03em] group-hover:text-yellow-300 line-clamp-2">
                 {blog.title}
               </h4>
             </div>

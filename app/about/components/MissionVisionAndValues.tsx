@@ -4,8 +4,8 @@ const MissionVisionAndValues = () => {
   return (
     <section className="py-24 bg-[#050505] relative overflow-hidden">
       {/* Yellow blur elements */}
-      <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-[#F0D100] rounded-full blur-[368px] opacity-20"></div>
-      <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-[#F0D100] rounded-full blur-[368px] opacity-20"></div>
+      <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-yellow-300 rounded-full blur-[368px] opacity-20"></div>
+      <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-yellow-300 rounded-full blur-[368px] opacity-20"></div>
 
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row justify-center items-stretch gap-16 lg:gap-[76px] max-w-5xl mx-auto">
@@ -20,7 +20,7 @@ const MissionVisionAndValues = () => {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-[#F0D100] text-2xl font-bold font-oxanium">
+              <h3 className="text-yellow-300 text-2xl font-bold font-oxanium">
                 OUR MISSION
               </h3>
             </div>
@@ -45,7 +45,7 @@ const MissionVisionAndValues = () => {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-[#F0D100] text-2xl font-bold font-oxanium">
+              <h3 className="text-yellow-300 text-2xl font-bold font-oxanium">
                 OUR VISION
               </h3>
             </div>
@@ -70,7 +70,7 @@ const MissionVisionAndValues = () => {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-[#F0D100] text-2xl font-bold font-oxanium">
+              <h3 className="text-yellow-300 text-2xl font-bold font-oxanium">
                 OUR VALUES
               </h3>
             </div>

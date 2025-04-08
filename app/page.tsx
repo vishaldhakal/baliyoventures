@@ -36,11 +36,11 @@ const websiteSchema = {
 };
 
 export const metadata: Metadata = {
-  title: "Baliyo Ventures - Mechanical, Software & Electronics Technology",
+  title: "Baliyo Ventures - Mechanical, Software & Electronics",
   description:
     "Looking for a technology partner to design and develop your mechanical and software products? At Baliyo Ventures help businesses build their tech.",
   openGraph: {
-    title: "Baliyo Ventures - Mechanical, Software & Electronics Technology",
+    title: "Baliyo Ventures - Mechanical, Software & Electronics",
     description:
       "Looking for a technology partner to design and develop your mechanical and software products? At Baliyo Ventures help businesses build their tech.",
     images: "/favicon.ico",

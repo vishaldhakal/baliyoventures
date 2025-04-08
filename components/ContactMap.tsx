@@ -35,7 +35,7 @@ const ContactMap = () => {
             <div className="group flex flex-col items-center transform transition-all duration-500 hover:translate-y-[-8px]">
               <div className="relative">
                 <div className="absolute inset-0 bg-[#EBB51F]/20 rounded-full blur group-hover:blur-xl transition-all duration-500" />
-                <div className="bg-gradient-to-br from-[#EBB51F] to-[#F0D100] p-4 rounded-full mb-5 w-16 h-16 flex items-center justify-center shadow-lg shadow-[#EBB51F]/20 group-hover:shadow-[#EBB51F]/40 transition-all duration-500 relative">
+                <div className="bg-gradient-to-br from-[#EBB51F] to-yellow-300 p-4 rounded-full mb-5 w-16 h-16 flex items-center justify-center shadow-lg shadow-[#EBB51F]/20 group-hover:shadow-[#EBB51F]/40 transition-all duration-500 relative">
                   <Phone
                     size={28}
                     className="text-white transform group-hover:rotate-12 transition-transform duration-300"
@@ -48,7 +48,7 @@ const ContactMap = () => {
               <div className="text-center">
                 <Link
                   href="tel:+977-9866316114"
-                  className="text-gray-300 hover:text-[#F0D100] transition-colors duration-300 text-lg relative group-hover:underline decoration-[#EBB51F]/30 underline-offset-4"
+                  className="text-gray-300 hover:text-yellow-300 transition-colors duration-300 text-lg relative group-hover:underline decoration-[#EBB51F]/30 underline-offset-4"
                 >
                   +977-9866316114
                 </Link>
@@ -59,7 +59,7 @@ const ContactMap = () => {
             <div className="group flex flex-col items-center transform transition-all duration-500 hover:translate-y-[-8px]">
               <div className="relative">
                 <div className="absolute inset-0 bg-[#EBB51F]/20 rounded-full blur group-hover:blur-xl transition-all duration-500" />
-                <div className="bg-gradient-to-br from-[#EBB51F] to-[#F0D100] p-4 rounded-full mb-5 w-16 h-16 flex items-center justify-center shadow-lg shadow-[#EBB51F]/20 group-hover:shadow-[#EBB51F]/40 transition-all duration-500 relative">
+                <div className="bg-gradient-to-br from-[#EBB51F] to-yellow-300 p-4 rounded-full mb-5 w-16 h-16 flex items-center justify-center shadow-lg shadow-[#EBB51F]/20 group-hover:shadow-[#EBB51F]/40 transition-all duration-500 relative">
                   <Mail
                     size={28}
                     className="text-white transform group-hover:rotate-12 transition-transform duration-300"
@@ -71,7 +71,7 @@ const ContactMap = () => {
               </h3>
               <Link
                 href="mailto:baliyoventures@gmail.com"
-                className="text-gray-300 hover:text-[#F0D100] transition-colors duration-300 text-lg relative group-hover:underline decoration-[#EBB51F]/30 underline-offset-4"
+                className="text-gray-300 hover:text-yellow-300 transition-colors duration-300 text-lg relative group-hover:underline decoration-[#EBB51F]/30 underline-offset-4"
               >
                 baliyoventures@gmail.com
               </Link>
@@ -81,7 +81,7 @@ const ContactMap = () => {
             <div className="group flex flex-col items-center transform transition-all duration-500 hover:translate-y-[-8px] md:col-span-2 lg:col-span-1">
               <div className="relative">
                 <div className="absolute inset-0 bg-[#EBB51F]/20 rounded-full blur group-hover:blur-xl transition-all duration-500" />
-                <div className="bg-gradient-to-br from-[#EBB51F] to-[#F0D100] p-4 rounded-full mb-5 w-16 h-16 flex items-center justify-center shadow-lg shadow-[#EBB51F]/20 group-hover:shadow-[#EBB51F]/40 transition-all duration-500 relative">
+                <div className="bg-gradient-to-br from-[#EBB51F] to-yellow-300 p-4 rounded-full mb-5 w-16 h-16 flex items-center justify-center shadow-lg shadow-[#EBB51F]/20 group-hover:shadow-[#EBB51F]/40 transition-all duration-500 relative">
                   <MapPin
                     size={28}
                     className="text-white transform group-hover:rotate-12 transition-transform duration-300"
@@ -100,7 +100,7 @@ const ContactMap = () => {
 
         {/* Social Media */}
         <div className="flex flex-col items-center justify-center mt-8">
-          <h4 className="text-2xl font-semibold mb-8 tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-[#EBB51F] to-[#F0D100]">
+          <h4 className="text-2xl font-semibold mb-8 tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-[#EBB51F] to-yellow-300">
             Connect With Us
           </h4>
           <div className="flex flex-wrap justify-center gap-6 md:gap-8">

@@ -18,12 +18,12 @@ const MessageFromMD = () => {
 
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center mb-6 md:mb-10">
-          <div className="bg-black/30 border border-[#F0D100] rounded-[14px] px-5 py-2 mb-6">
+          <div className="bg-black/30 border border-yellow-300 rounded-[14px] px-5 py-2 mb-6">
             <p className="text-white uppercase font-bold text-lg">
               Message from Managing Director
             </p>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] font-oxanium">
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-[#FFFCCB] font-oxanium">
             Empowering Business Through Technology
           </h2>
         </div>
@@ -39,8 +39,8 @@ const MessageFromMD = () => {
                 className="object-cover rounded-2xl"
               />
               {/* Decorative boxes */}
-              <div className="absolute top-8 -left-4 w-10 h-20 bg-[#F0D100] rounded-md"></div>
-              <div className="absolute bottom-8 -right-4 w-10 h-20 bg-[#F0D100] rounded-md"></div>
+              <div className="absolute top-8 -left-4 w-10 h-20 bg-yellow-300 rounded-md"></div>
+              <div className="absolute bottom-8 -right-4 w-10 h-20 bg-yellow-300 rounded-md"></div>
             </div>
           </div>
 
@@ -81,7 +81,7 @@ const MessageFromMD = () => {
               </div>
               <div>
                 <h4 className="text-white font-bold text-2xl">Anil Singh</h4>
-                <p className="text-[#F0D100] text-lg">Managing Director</p>
+                <p className="text-yellow-300 text-lg">Managing Director</p>
               </div>
             </div>
           </div>

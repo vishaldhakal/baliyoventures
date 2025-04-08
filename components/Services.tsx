@@ -20,7 +20,7 @@ const ServiceCard = ({
   description: string;
 }) => {
   return (
-    <Card className="bg-[#171717] border-[rgba(255,255,255,0.07)] h-full transition-all duration-300 hover:border-[#F0D100]/20 hover:shadow-[0_0_15px_rgba(240,209,0,0.1)]">
+    <Card className="bg-[#171717] border-[rgba(255,255,255,0.07)] h-full transition-all duration-300 hover:border-yellow-300/20 hover:shadow-[0_0_15px_rgba(240,209,0,0.1)]">
       <CardHeader className="pb-4">
         <div className="w-12 h-12 flex items-center justify-center">
           <Image
@@ -102,8 +102,8 @@ const Services = ({ services }: { services: ServiceListResponse[] }) => {
     <section className="py-16 md:py-24 bg-[#212121] relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-semibold mb-4 font-oxanium bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] bg-clip-text text-transparent">
-            Services & Solutions
+          <h2 className="text-3xl md:text-4xl font-semibold mb-4 font-oxanium bg-gradient-to-br from-yellow-300 to-[#FFFCCB] bg-clip-text text-transparent">
+            Services & Solutions Baliyo Ventures Offers
           </h2>
         </div>
 

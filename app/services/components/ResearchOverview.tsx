@@ -41,7 +41,7 @@ export default function ResearchOverview({
           transition={{ duration: 0.5 }}
           className="max-w-[663px] flex flex-col gap-[42px]"
         >
-          <h2 className="font-oxanium text-[42px] font-semibold leading-[1.14] text-transparent bg-clip-text bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] md:max-w-[600px]">
+          <h2 className="font-oxanium text-[42px] font-semibold leading-[1.14] text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-[#FFFCCB] md:max-w-[600px]">
             {/* Innovating for a better Tomorrow  */}
             {title}
           </h2>
@@ -54,7 +54,7 @@ export default function ResearchOverview({
           {cta && (
             <Button
               asChild
-              className="text-[#00040C] font-inter bg-[#F0D100] text-xl w-fit font-medium leading-[1.6] hover:bg-[#F0D100]/80 transition-all duration-300"
+              className="text-[#00040C] font-inter bg-yellow-300 text-xl w-fit font-medium leading-[1.6] hover:bg-yellow-300/80 transition-all duration-300"
             >
               <Link href="/contact">{cta}</Link>
             </Button>

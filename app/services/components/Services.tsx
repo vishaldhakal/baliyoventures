@@ -19,7 +19,7 @@ export default function Services({
           className="flex flex-col items-center gap-6 md:gap-16"
         >
           {/* Section Title */}
-          <h2 className="text-center font-oxanium text-[42px] font-semibold leading-[1.43] tracking-[0.012em] text-transparent bg-clip-text bg-gradient-to-br from-[#F0D100] to-[#FFFCCB]">
+          <h2 className="text-center font-oxanium text-[42px] font-semibold leading-[1.43] tracking-[0.012em] text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-[#FFFCCB]">
             Services & Solutions
           </h2>
 

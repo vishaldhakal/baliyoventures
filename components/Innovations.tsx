@@ -37,8 +37,8 @@ const Innovations = () => {
           <p className="text-[#FCE8C6] uppercase tracking-[0.2em] font-saira font-medium text-sm mb-4">
             OUR WORK
           </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold font-oxanium mb-6 bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] bg-clip-text text-transparent">
-            Innovations we Delivered
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold font-oxanium mb-6 bg-gradient-to-br from-yellow-300 to-[#FFFCCB] bg-clip-text text-transparent">
+            Innovations We Delivered
           </h2>
           <p className="text-[#F3EEE0] font-saira text-base md:text-lg leading-relaxed">
             First hand insight into how our processes have been implemented in
@@ -62,14 +62,14 @@ const Innovations = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[#F0D100] text-sm font-saira tracking-wider">
+                    <span className="text-yellow-300 text-sm font-saira tracking-wider">
                       {project.category}
                     </span>
                     <span className="text-white/60 text-sm font-saira">
                       View Project →
                     </span>
                   </div>
-                  <h3 className="text-white font-oxanium text-xl font-semibold group-hover:text-[#F0D100] transition-colors duration-300">
+                  <h3 className="text-white font-oxanium text-xl font-semibold group-hover:text-yellow-300 transition-colors duration-300">
                     {project.title}
                   </h3>
                   <p className="text-[#F3EEE0]/80 text-sm font-saira line-clamp-2">
@@ -85,7 +85,7 @@ const Innovations = () => {
         <div className="flex justify-center mt-12 md:mt-16">
           <Link
             href="/projects"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-[#F0D100]/10 border border-[#F0D100]/20 rounded-full text-[#F0D100] font-saira text-base hover:bg-[#F0D100]/20 transition-all duration-300"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-yellow-300/10 border border-yellow-300/20 rounded-full text-yellow-300 font-saira text-base hover:bg-yellow-300/20 transition-all duration-300"
           >
             <span>View All Works</span>
             <Image

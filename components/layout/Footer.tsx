@@ -52,9 +52,9 @@ const Footer = () => {
 
             {/* Services */}
             <div className="space-y-4">
-              <h4 className="text-lg font-bold mb-3">
-                Service by Baliyo Ventures
-              </h4>
+              <h2 className="text-lg font-bold mb-3">
+                Services by Baliyo Ventures
+              </h2>
               <ul className="space-y-2">
                 <li>
                   <Link
@@ -93,9 +93,9 @@ const Footer = () => {
 
             {/* Contact */}
             <div className="space-y-4">
-              <h4 className="text-lg font-bold mb-3">
+              <h2 className="text-lg font-bold mb-3">
                 Contact Baliyo Ventures
-              </h4>
+              </h2>
               <p className="text-[#D6DADE] text-sm leading-relaxed">
                 Baliyo Ventures Pvt. Ltd.
               </p>

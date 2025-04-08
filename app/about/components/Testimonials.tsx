@@ -101,11 +101,11 @@ const Testimonials = () => {
   return (
     <section className="py-24 bg-[#00040C] relative overflow-hidden">
       {/* Yellow blur elements */}
-      <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-[#F0D100] rounded-full blur-[368px] opacity-20"></div>
-      <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-[#F0D100] rounded-full blur-[368px] opacity-20"></div>
+      <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-yellow-300 rounded-full blur-[368px] opacity-20"></div>
+      <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-yellow-300 rounded-full blur-[368px] opacity-20"></div>
 
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] font-oxanium text-center">
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-[#FFFCCB] font-oxanium text-center">
           What Our Clients Say About Us
         </h2>
 
@@ -130,7 +130,7 @@ const Testimonials = () => {
                       transition-all duration-300 transform-gpu
                       ${
                         current === index
-                          ? "scale-110 shadow-xl shadow-[#F0D100]/10 border border-[#F0D100]/20 z-10"
+                          ? "scale-110 shadow-xl shadow-yellow-300/10 border border-yellow-300/20 z-10"
                           : "scale-90 opacity-70"
                       }
                     `}
@@ -180,7 +180,7 @@ const Testimonials = () => {
 
             <div className="flex justify-center items-center mt-10 gap-4">
               <CarouselPrevious
-                className="static translate-y-0 rounded-full bg-transparent text-white border-gray-600 hover:bg-[#F0D100]/10 hover:border-[#F0D100] hover:text-[#F0D100]"
+                className="static translate-y-0 rounded-full bg-transparent text-white border-gray-600 hover:bg-yellow-300/10 hover:border-yellow-300 hover:text-yellow-300"
                 onClick={() => api?.scrollPrev()}
               />
 
@@ -199,7 +199,7 @@ const Testimonials = () => {
               </div>
 
               <CarouselNext
-                className="static translate-y-0 rounded-full bg-transparent text-white border-gray-600 hover:bg-[#F0D100]/10 hover:border-[#F0D100] hover:text-[#F0D100]"
+                className="static translate-y-0 rounded-full bg-transparent text-white border-gray-600 hover:bg-yellow-300/10 hover:border-yellow-300 hover:text-yellow-300"
                 onClick={() => api?.scrollNext()}
               />
             </div>

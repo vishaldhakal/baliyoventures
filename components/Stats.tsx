@@ -61,7 +61,7 @@ const Stats = () => {
                   maskComposite: "exclude",
                 }}
               ></div>
-              <h2 className="text-3xl md:text-4xl lg:text-[42px] font-semibold tracking-wider font-oxanium bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] bg-clip-text text-transparent">
+              <h2 className="text-3xl md:text-4xl lg:text-[42px] font-semibold tracking-wider font-oxanium bg-gradient-to-br from-yellow-300 to-[#FFFCCB] bg-clip-text text-transparent">
                 Facts and Figures
               </h2>
             </div>

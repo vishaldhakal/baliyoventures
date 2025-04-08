@@ -8,18 +8,20 @@ const AboutHero = () => {
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Content */}
           <div className="flex flex-col justify-center space-y-8">
-            <div className="text-white/70">
-              <Link href="/" className="hover:text-yellow-400">
-                Home
-              </Link>
-              <span className="mx-2">/</span>
-              <span>About</span>
-            </div>
-            <h1 className="text-4xl font-bold text-white md:text-5xl lg:text-6xl">
-              <span className="text-yellow-400">Creativity</span> fuels
-              everything we do.
+            <h1 className="text-4xl font-bold text-white md:text-5xl lg:text-5xl">
+              <span className="text-yellow-400">About</span> Baliyo Ventures
             </h1>
-            <div>
+            <h2 className="text-white/80 text-lg md:text-xl leading-relaxed max-w-xl me-auto font-mono">
+              Know more about Baliyo Ventures and our journey. How we build,
+              innovate and deliver. Our process and our team.
+            </h2>
+            <div className="flex gap-4">
+              <Link
+                href="tel:+9779861058997"
+                className="inline-block rounded-md border-2 border-gradient-to-br from-yellow-400 to-yellow-100 bg-black/20 px-6 py-3 text-lg font-medium text-white transition-all hover:bg-yellow-400 hover:text-black"
+              >
+                Give us a call
+              </Link>
               <Link
                 href="/contact"
                 className="inline-block rounded-md border-2 border-gradient-to-br from-yellow-400 to-yellow-100 bg-black/20 px-6 py-3 text-lg font-medium text-white transition-all hover:bg-yellow-400 hover:text-black"

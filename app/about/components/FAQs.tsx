@@ -43,11 +43,11 @@ const FAQs = () => {
   return (
     <section className="py-24 bg-[#050505] relative overflow-hidden">
       {/* Yellow blur elements */}
-      <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-[#F0D100] rounded-full blur-[368px] opacity-20"></div>
-      <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-[#F0D100] rounded-full blur-[368px] opacity-20"></div>
+      <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-yellow-300 rounded-full blur-[368px] opacity-20"></div>
+      <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-yellow-300 rounded-full blur-[368px] opacity-20"></div>
 
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] font-oxanium">
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-[#FFFCCB] font-oxanium">
           Frequently Asked Questions
         </h2>
 
@@ -62,9 +62,9 @@ const FAQs = () => {
                 <div
                   className="
                     bg-[#010714] border border-[#131B2C] 
-                    group-data-[state=open]:border-[#F0D100] 
+                    group-data-[state=open]:border-yellow-300 
                     group-data-[state=open]:shadow-[0px_0px_10px_rgba(240,209,0,0.3)]
-                    hover:border-[#F0D100] rounded-lg shadow-md overflow-hidden 
+                    hover:border-yellow-300 rounded-lg shadow-md overflow-hidden 
                     transition-all duration-300
                   "
                 >
@@ -77,7 +77,7 @@ const FAQs = () => {
                     <span>{faq.question}</span>
                     <div className="flex items-center justify-center">
                       <PlusIcon className="h-5 w-5 text-gray-400 group-data-[state=open]:hidden block" />
-                      <MinusIcon className="h-5 w-5 text-[#F0D100] group-data-[state=closed]:hidden block" />
+                      <MinusIcon className="h-5 w-5 text-yellow-300 group-data-[state=closed]:hidden block" />
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="px-6 pb-5 text-gray-400 text-base leading-relaxed">

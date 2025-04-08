@@ -20,7 +20,9 @@ export function StatsValueText({
           <h6 className="text-white  font-bold text-4xl md:text-5xl">
             {value}
           </h6>
-          <span className="text-[#F0D100] font-semibold text-xl">{suffix}</span>
+          <span className="text-yellow-300 font-semibold text-xl">
+            {suffix}
+          </span>
         </div>
         <span className="text-white uppercase text-xs md:text-sm font-medium">
           {subtitle}

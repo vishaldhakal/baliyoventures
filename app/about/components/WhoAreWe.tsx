@@ -6,19 +6,19 @@ const WhoAreWe = () => {
   return (
     <section className=" py-20 md:py-32 bg-[#00040C] relative overflow-hidden">
       {/* Yellow blur elements */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#F0D100] rounded-full blur-[368px] opacity-40"></div>
-      <div className="absolute top-1/2 right-1/4 w-64 h-64 bg-[#F0D100] rounded-full blur-[368px] opacity-40"></div>
-      <div className="absolute bottom-1/4 left-1/2 w-64 h-64 bg-[#F0D100] rounded-full blur-[368px] opacity-40"></div>
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-yellow-300 rounded-full blur-[368px] opacity-40"></div>
+      <div className="absolute top-1/2 right-1/4 w-64 h-64 bg-yellow-300 rounded-full blur-[368px] opacity-40"></div>
+      <div className="absolute bottom-1/4 left-1/2 w-64 h-64 bg-yellow-300 rounded-full blur-[368px] opacity-40"></div>
 
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row justify-between gap-12 lg:gap-24">
           {/* Left Content */}
           <div className="w-full lg:w-5/12 flex flex-col items-start">
             <div className="flex flex-col items-start text-left w-full">
-              <span className="text-[#F0D100] font-bold uppercase mb-6">
+              <span className="text-yellow-300 font-bold uppercase mb-6">
                 About Us
               </span>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-br from-[#F0D100] to-[#FFFCCB] font-oxanium">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-[#FFFCCB] font-oxanium">
                 Who Are We?
               </h2>
               <p className="text-[#B0B0B0] text-base md:text-lg mb-10 max-w-md">

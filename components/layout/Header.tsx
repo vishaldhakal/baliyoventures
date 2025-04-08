@@ -60,7 +60,7 @@ const Header = () => {
               <React.Fragment key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-white font-medium hover:text-[#F0D100] transition-colors"
+                  className="text-white font-medium hover:text-yellow-300 transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -93,10 +93,10 @@ const Header = () => {
                   </Link>
                 ))}
                 <Link
-                  href="tel:+1234567890"
+                  href="tel:+977 9861058997"
                   className="text-white font-medium p-4 hover:bg-[#161616] transition-colors"
                 >
-                  Give us a call
+                  +977 9861058997
                 </Link>
               </nav>
             </SheetContent>
@@ -104,9 +104,9 @@ const Header = () => {
         </div>
 
         {/* Contact Button - Hidden on Mobile */}
-        <Link href="tel:+1234567890" className="hidden md:block">
-          <Button className="bg-transparent border border-[#F0D100] hover:bg-[#F0D100] hover:text-black text-white rounded-[60px] px-6 py-2 transition-all duration-300">
-            Give us a call
+        <Link href="tel:+977 9861058997" className="hidden md:block">
+          <Button className="border border-yellow-300 bg-white/5 hover:bg-yellow-300 hover:text-black text-white rounded-[60px] px-6 h-12 transition-all duration-300">
+            +977 9861058997
           </Button>
         </Link>
       </div>

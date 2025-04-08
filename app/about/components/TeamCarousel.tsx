@@ -15,9 +15,9 @@ interface TeamMember {
 const teamMembers: TeamMember[] = [
   {
     id: 1,
-    name: "John Doe",
-    position: "CEO",
-    image: "/images/team/team-member-1.png",
+    name: "MD.Anil Singh",
+    position: "Managing Director",
+    image: "/images/team/team-member-5.png",
   },
   {
     id: 2,
@@ -29,36 +29,18 @@ const teamMembers: TeamMember[] = [
     id: 3,
     name: "Er. Manav Khadka",
     position: "Electronics & Communication Engineer",
-    image: "/images/team/team-member-3.png",
+    image: "/images/team/manav.png",
   },
   {
     id: 4,
-    name: "Sarah Williams",
+    name: "Prithvi Chaudhary ",
     position: "Product Manager",
-    image: "/images/team/team-member-4.png",
+    image: "/images/team/prithvi.png",
   },
   {
     id: 5,
-    name: "Anil Singh",
-    position: "Managing Director",
-    image: "/images/team/team-member-5.png",
-  },
-  {
-    id: 6,
-    name: "Emily Davis",
-    position: "Marketing Lead",
-    image: "/images/team/team-member-6.png",
-  },
-  {
-    id: 7,
-    name: "Alex Wilson",
-    position: "Developer",
-    image: "/images/team/team-member-7.png",
-  },
-  {
-    id: 8,
-    name: "Lisa Anderson",
-    position: "UX Designer",
+    name: "Dipawoli Malla",
+    position: "CEO",
     image: "/images/team/team-member-8.png",
   },
 ];

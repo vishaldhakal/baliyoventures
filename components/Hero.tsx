@@ -16,7 +16,7 @@ const Hero = () => {
           </h1>
           <h2 className="text-lg md:text-xl text-gray-300 mb-10 max-w-4xl font-mono">
             Looking for a reliable partner to build your next big idea? Whether
-            you're a startup or an established company, we're here to
+            you&apos;re a startup or an established company, we&apos;re here to
             help.Baliyo ventures can help you build the best technology whether
             it is <span className="text-yellow-300">mechanical</span>,{" "}
             <span className="text-yellow-300">software</span> or{" "}

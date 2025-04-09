@@ -84,7 +84,7 @@ const Innovations = () => {
         {/* View All Works button */}
         <div className="flex justify-center mt-12 md:mt-16">
           <Link
-            href="/projects"
+            href="/services"
             className="inline-flex items-center gap-3 px-8 py-4 bg-yellow-300/10 border border-yellow-300/20 rounded-full text-yellow-300 font-saira text-base hover:bg-yellow-300/20 transition-all duration-300"
           >
             <span>View All Works</span>

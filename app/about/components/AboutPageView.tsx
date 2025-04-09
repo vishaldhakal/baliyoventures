@@ -8,8 +8,19 @@ import WorkingProcess from "./WorkingProcess";
 import AboutHero from "./AboutHero";
 import WhatWeDo from "./WhatWeDo";
 import TeamCarousel from "./TeamCarousel";
+import {
+  getTeam,
+  getTestimonials,
+  getFaq,
+  getGallery,
+} from "@/services/about.service";
 
-const AboutPageView = () => {
+const AboutPageView = async () => {
+  const teamMembers = await getTeam();
+  const testimonials = await getTestimonials();
+  const faqs = await getFaq();
+  const gallery = await getGallery();
+
   return (
     <>
       <AboutHero />
@@ -18,10 +29,10 @@ const AboutPageView = () => {
       <WorkingProcess />
       <WhatWeDo />
       <MessageFromMD />
-      <WorkCulture />
-      <TeamCarousel />
-      <Testimonials />
-      <FAQs />
+      <WorkCulture gallery={gallery} />
+      <TeamCarousel teamMembers={teamMembers} />
+      <Testimonials testimonials={testimonials} />
+      <FAQs faqs={faqs} />
       {/* Other about page sections can be added here */}
     </>
   );

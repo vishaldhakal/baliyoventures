@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Cpu, Code, Cog, Server, Database, ArrowRight } from "lucide-react";
 
@@ -218,23 +219,27 @@ const Hero = () => {
             variants={itemVariants}
             className="flex flex-col sm:flex-row gap-5"
           >
-            <Button className="bg-yellow-400 hover:bg-yellow-300 text-black font-medium px-8 py-6 rounded-lg text-base transition-all duration-300 shadow-lg hover:shadow-yellow-400/30 group">
-              <span className="mr-2">Have Any Project In Mind?</span>
-              <motion.span
-                initial={{ x: 0 }}
-                whileHover={{ x: 5 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ArrowRight className="w-5 h-5" />
-              </motion.span>
-            </Button>
+            <Link href={"/contact"}>
+              <Button className="bg-yellow-400 hover:bg-yellow-300 text-black font-medium px-8 py-6 rounded-lg text-base transition-all duration-300 shadow-lg hover:shadow-yellow-400/30 group">
+                <span className="mr-2">Have Any Project In Mind?</span>
+                <motion.span
+                  initial={{ x: 0 }}
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ArrowRight className="w-5 h-5" />
+                </motion.span>
+              </Button>
+            </Link>
 
-            <Button
-              variant="outline"
-              className="border-yellow-400/30 text-black hover:bg-yellow-400/10 hover:text-amber-50 transition-all duration-300 px-8 py-6 rounded-lg text-base backdrop-blur-sm"
-            >
-              Explore What We Have Done
-            </Button>
+            <Link href={"/services"}>
+              <Button
+                variant="outline"
+                className="border-yellow-400/30 text-black hover:bg-yellow-400/10 hover:text-amber-50 transition-all duration-300 px-8 py-6 rounded-lg text-base backdrop-blur-sm"
+              >
+                Explore What We Have Done
+              </Button>
+            </Link>
           </motion.div>
 
           {/* Added feature highlights */}

@@ -54,7 +54,7 @@ export default async function HomePage() {
       <script type="application/ld+json">
         {JSON.stringify(websiteSchema)}
       </script>
-      <HomePageView services={services} />
+      <HomePageView services={services} partners={[]} />
     </>
   );
 }

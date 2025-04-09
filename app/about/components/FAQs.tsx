@@ -8,38 +8,13 @@ import {
 } from "@/components/ui/accordion";
 import { PlusIcon, MinusIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Faq } from "@/types/about";
 
-const FAQs = () => {
-  // FAQ data for Baliyo Ventures
-  const faqData = [
-    {
-      question: "What services does Baliyo Ventures offer?",
-      answer:
-        "Baliyo Ventures offers a comprehensive range of technology solutions including product design, architecture design, software development, and research & development. We specialize in creating tailored digital solutions that help businesses innovate, grow, and succeed in today's competitive landscape.",
-    },
-    {
-      question: "How does Baliyo Ventures approach new projects?",
-      answer:
-        "We follow a collaborative and strategic approach to every project. Our process begins with understanding your business goals and challenges, followed by a detailed planning phase. We then develop customized solutions, implement them with rigorous quality assurance, and provide ongoing support and maintenance to ensure long-term success.",
-    },
-    {
-      question: "What industries does Baliyo Ventures work with?",
-      answer:
-        "Baliyo Ventures works with a diverse range of industries including healthcare, finance, education, retail, and manufacturing. Our solutions are adaptable to various sectors, and we have experience delivering successful projects across different business domains.",
-    },
-    {
-      question: "How long does a typical project take to complete?",
-      answer:
-        "Project timelines vary depending on scope, complexity, and specific requirements. Small to medium projects typically take 2-4 months, while larger enterprise solutions may require 6+ months. During our initial consultation, we provide a detailed timeline based on your project specifications.",
-    },
-    {
-      question:
-        "Does Baliyo Ventures offer ongoing support after project completion?",
-      answer:
-        "Yes, we offer comprehensive post-deployment support and maintenance services. We believe in building long-term relationships with our clients, and our support packages include regular updates, performance monitoring, security patches, and technical assistance to ensure your solution continues to perform optimally.",
-    },
-  ];
+interface FAQsProps {
+  faqs: Faq[];
+}
 
+const FAQs: React.FC<FAQsProps> = ({ faqs }) => {
   return (
     <section className="py-24 bg-[#050505] relative overflow-hidden">
       {/* Yellow blur elements */}
@@ -53,7 +28,7 @@ const FAQs = () => {
 
         <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible className="w-full space-y-4">
-            {faqData.map((faq, index) => (
+            {faqs.map((faq, index) => (
               <AccordionItem
                 key={index}
                 value={`item-${index}`}

@@ -2,67 +2,9 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Partner } from "@/types/about";
 
-const OurClients = () => {
-  // Combined logos array for better management
-  const clientLogos = [
-    {
-      src: "/images/clients/client-1.png",
-      alt: "Client Logo 1",
-      width: 120,
-      height: 120,
-    },
-    {
-      src: "/images/clients/client-2.png",
-      alt: "Client Logo 2",
-      width: 120,
-      height: 60,
-    },
-    {
-      src: "/images/clients/client-3.png",
-      alt: "Client Logo 3",
-      width: 120,
-      height: 60,
-    },
-    {
-      src: "/images/clients/client-4.png",
-      alt: "Client Logo 4",
-      width: 120,
-      height: 120,
-    },
-    {
-      src: "/images/clients/client-5.png",
-      alt: "Client Logo 5",
-      width: 120,
-      height: 120,
-    },
-    {
-      src: "/images/clients/client-6.png",
-      alt: "Client Logo 6",
-      width: 120,
-      height: 60,
-    },
-    {
-      src: "/images/clients/1.png",
-      alt: "Client Logo 7",
-      width: 120,
-      height: 120,
-    },
-    {
-      src: "/images/clients/3.png",
-      alt: "Client Logo 8",
-      width: 120,
-      height: 120,
-    },
-    {
-      src: "/images/clients/2.png",
-      alt: "Client Logo 9",
-      width: 120,
-      height: 120,
-    },
-  ];
-
-  // Animation variants for staggered animations
+const OurClients = ({ partners }: { partners: Partner[] }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -114,7 +56,7 @@ const OurClients = () => {
             className="w-full"
           >
             <div className="flex flex-wrap justify-center gap-8">
-              {clientLogos.map((logo, index) => (
+              {partners.map((partner, index) => (
                 <motion.div
                   key={index}
                   variants={itemVariants}
@@ -124,8 +66,8 @@ const OurClients = () => {
                   <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 h-[120px] sm:h-[140px] w-[120px] sm:w-[140px] flex items-center justify-center">
                     <div className="relative w-full h-full">
                       <Image
-                        src={logo.src}
-                        alt={logo.alt}
+                        src={partner.image}
+                        alt={partner.image_alt_description}
                         fill
                         className="object-contain filter group-hover:brightness-110 transition-all duration-300"
                       />

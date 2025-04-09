@@ -9,3 +9,7 @@ export const getServicesDetails = async (slug: string): Promise<ServiceDetailRes
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/${slug}`);
   return response.json();
 };
+
+
+
+

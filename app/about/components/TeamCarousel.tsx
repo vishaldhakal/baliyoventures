@@ -4,48 +4,13 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { TeamMember } from "@/types/about";
 
-interface TeamMember {
-  id: number;
-  name: string;
-  position: string;
-  image: string;
+interface TeamCarouselProps {
+  teamMembers: TeamMember[];
 }
 
-const teamMembers: TeamMember[] = [
-  {
-    id: 1,
-    name: "MD.Anil Singh",
-    position: "Managing Director",
-    image: "/images/team/team-member-5.png",
-  },
-  {
-    id: 2,
-    name: "VISHAL DHAKAL",
-    position: "Backend Developer ",
-    image: "/images/team/team-member-2.png",
-  },
-  {
-    id: 3,
-    name: "Er. Manav Khadka",
-    position: "Electronics & Communication Engineer",
-    image: "/images/team/manav.png",
-  },
-  {
-    id: 4,
-    name: "Prithvi Chaudhary ",
-    position: "Product Manager",
-    image: "/images/team/prithvi.png",
-  },
-  {
-    id: 5,
-    name: "Dipawoli Malla",
-    position: "CEO",
-    image: "/images/team/team-member-8.png",
-  },
-];
-
-const TeamCarousel = () => {
+const TeamCarousel = ({ teamMembers }: TeamCarouselProps) => {
   const [startIndex, setStartIndex] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
@@ -163,8 +128,11 @@ const TeamCarousel = () => {
                       transition={{ duration: 0.2 }}
                     >
                       <Image
-                        src={member.image}
-                        alt={member.name}
+                        src={
+                          (member.image ||
+                            "/path/to/default/image.webp") as string
+                        }
+                        alt={member.image_alt_description || "Image"}
                         fill
                         className="object-cover"
                       />
@@ -181,7 +149,7 @@ const TeamCarousel = () => {
                                 {member.name}
                               </p>
                               <p className="text-base text-gray-300">
-                                {member.position}
+                                {member.designation}
                               </p>
                             </div>
                           </motion.div>
@@ -198,7 +166,7 @@ const TeamCarousel = () => {
                           {member.name}
                         </p>
                         <p className="text-xl text-gray-300 mt-2">
-                          {member.position}
+                          {member.designation}
                         </p>
                       </motion.div>
                     )}

@@ -10,47 +10,13 @@ import {
 } from "@/components/ui/carousel";
 import { type CarouselApi } from "@/components/ui/carousel";
 import Link from "next/link";
+import { Gallery } from "@/types/about";
 
-// Sample work culture images
-const workCultureImages = [
-  {
-    id: 1,
-    src: "/images/workculture/image1.jpg",
-    alt: "Team collaboration",
-  },
-  {
-    id: 2,
-    src: "/images/workculture/image2.jpg",
-    alt: "Team meeting",
-  },
-  {
-    id: 3,
-    src: "/images/workculture/image3.jpg",
-    alt: "Office space",
-  },
-  {
-    id: 4,
-    src: "/images/workculture/image4.jpg",
-    alt: "Team building activity",
-  },
-  {
-    id: 5,
-    src: "/images/workculture/image5.jpg",
-    alt: "Collaboration session",
-  },
-  {
-    id: 6,
-    src: "/images/workculture/image6.jpg",
-    alt: "Team discussion",
-  },
-  {
-    id: 7,
-    src: "/images/workculture/image7.jpg",
-    alt: "Office celebration",
-  },
-];
+interface WorkCultureProps {
+  gallery: Gallery[];
+}
 
-const WorkCulture = () => {
+const WorkCulture = ({ gallery }: WorkCultureProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
@@ -97,7 +63,7 @@ const WorkCulture = () => {
             className="w-full max-w-7xl mx-auto px-4"
           >
             <CarouselContent className="overflow-visible py-10">
-              {workCultureImages.map((image, index) => (
+              {gallery.map((image, index) => (
                 <CarouselItem
                   key={image.id}
                   className="md:basis-1/2 lg:basis-1/3 overflow-visible px-4 sm:px-6"
@@ -114,8 +80,8 @@ const WorkCulture = () => {
                   >
                     <div className="relative aspect-[3/4] w-full">
                       <Image
-                        src={image.src}
-                        alt={image.alt}
+                        src={image.media}
+                        alt={image.media_alt_description}
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -137,7 +103,7 @@ const WorkCulture = () => {
               </button>
 
               <div className="flex gap-2">
-                {workCultureImages.map((_, i) => (
+                {gallery.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => api?.scrollTo(i)}

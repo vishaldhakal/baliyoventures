@@ -3,6 +3,7 @@ import { Oxanium, Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import TopLoader from "nextjs-toploader";
 
 const oxanium = Oxanium({
   variable: "--font-oxanium",
@@ -36,6 +37,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${oxanium.variable} ${inter.variable} antialiased`}>
+        <TopLoader
+          color="#ffff"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+        />
         <Header />
         <main>{children}</main>
         <Footer />

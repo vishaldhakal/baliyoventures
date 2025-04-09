@@ -7,12 +7,16 @@ import OurClients from "./OurClients";
 import ProjectInMind from "./ProjectInMind";
 import LandingContact from "./LandingContact";
 import { ServiceListResponse } from "@/types/services";
+import { getPartner } from "@/services/about.service";
+import { Partner } from "@/types/about";
 
 interface HomePageViewProps {
   services: ServiceListResponse[];
+  partners: Partner[];
 }
 
-const HomePageView = ({ services }: HomePageViewProps) => {
+const HomePageView = async ({ services }: HomePageViewProps) => {
+  const partners = await getPartner();
   return (
     <main className="min-h-screen bg-[#00040C]">
       <Hero />
@@ -20,7 +24,7 @@ const HomePageView = ({ services }: HomePageViewProps) => {
       <Stats />
       <Services services={services} />
       <Innovations />
-      <OurClients />
+      <OurClients partners={partners} />
       <ProjectInMind />
       <LandingContact />
     </main>

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 
 const AboutUs = () => {
   return (
@@ -78,9 +79,11 @@ const AboutUs = () => {
                 exciting journey.
               </p>
               <div className="pt-4">
-                <Button className="bg-black/20 text-white hover:bg-yellow-300 hover:text-black border-2 border-yellow-300 rounded-md px-5 py-3 transition-all duration-300 font-oxanium text-lg hover:shadow-[0_0_15px_rgba(235,181,31,0.5)] shadow-[0_0_25px_rgba(235,181,31,0.7)] hover:scale-105 h-12 cursor-pointer">
-                  Learn More about Baliyo Ventures
-                </Button>
+                <Link href={"/about"}>
+                  <Button className="bg-black/20 text-white hover:bg-yellow-300 hover:text-black border-2 border-yellow-300 rounded-md px-5 py-3 transition-all duration-300 font-oxanium text-lg hover:shadow-[0_0_15px_rgba(235,181,31,0.5)] shadow-[0_0_25px_rgba(235,181,31,0.7)] hover:scale-105 h-12 cursor-pointer">
+                    Learn More about Baliyo Ventures
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

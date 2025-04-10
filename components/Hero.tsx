@@ -1,133 +1,44 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Cpu, Code, Cog, Server, Database, ArrowRight } from "lucide-react";
 
 const Hero = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
-  };
-
-  const floatingAnimation = {
-    y: ["-10px", "10px"],
-    transition: {
-      y: {
-        duration: 2,
-        repeat: Number.POSITIVE_INFINITY,
-        repeatType: "reverse",
-        ease: "easeInOut",
-      },
-    },
-  };
-
-  const rotateAnimation = {
-    rotate: 360,
-    transition: {
-      duration: 20,
-      repeat: Number.POSITIVE_INFINITY,
-      ease: "linear",
-    },
-  };
-
-  const pulseAnimation = {
-    scale: [1, 1.05, 1],
-    opacity: [0.7, 0.9, 0.7],
-    transition: {
-      duration: 3,
-      repeat: Number.POSITIVE_INFINITY,
-      ease: "easeInOut",
-    },
-  };
-
   return (
     <section className="min-h-screen bg-gradient-to-b from-[#00040C] to-[#010714] flex items-center justify-center relative overflow-hidden py-16">
-      {/* Animated Background Elements - Reduced quantity for cleaner look */}
+      {/* Background Elements */}
       <div className="absolute inset-0 z-0">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.15 }}
-          transition={{ duration: 1.5 }}
-          className="absolute top-20 left-40 w-64 h-64 bg-[#EBB51F] rounded-full blur-[100px]"
-        />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.1 }}
-          transition={{ duration: 1.5, delay: 0.3 }}
-          className="absolute bottom-40 right-60 w-80 h-80 bg-[#EBB51F] rounded-full blur-[120px]"
-        />
+        <div className="absolute top-20 left-40 w-64 h-64 bg-[#EBB51F] rounded-full blur-[100px] opacity-15" />
+        <div className="absolute bottom-40 right-60 w-80 h-80 bg-[#EBB51F] rounded-full blur-[120px] opacity-10" />
 
-        {/* Simplified circuit lines */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.1 }}
-          transition={{ duration: 2 }}
-          className="absolute inset-0 z-0"
-        >
+        {/* Circuit lines */}
+        <div className="absolute inset-0 z-0 opacity-10">
           <div className="absolute top-1/3 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-yellow-300/20 to-transparent" />
           <div className="absolute top-2/3 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-yellow-300/20 to-transparent" />
           <div className="absolute left-1/3 top-0 h-full w-[1px] bg-gradient-to-b from-transparent via-yellow-300/20 to-transparent" />
           <div className="absolute left-2/3 top-0 h-full w-[1px] bg-gradient-to-b from-transparent via-yellow-300/20 to-transparent" />
-        </motion.div>
+        </div>
       </div>
 
-      {/* Floating Tech Elements - Reduced and repositioned for better balance */}
+      {/* Tech Elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <motion.div
-          animate={rotateAnimation}
-          className="absolute top-[15%] left-[15%]"
-        >
+        <div className="absolute top-[15%] left-[15%]">
           <Cog className="w-16 h-16 text-yellow-300/10" />
-        </motion.div>
+        </div>
 
-        <motion.div
-          animate={floatingAnimation}
-          className="absolute top-[30%] right-[20%]"
-        >
+        <div className="absolute top-[30%] right-[20%]">
           <Code className="w-14 h-14 text-yellow-300/10" />
-        </motion.div>
+        </div>
 
-        <motion.div
-          animate={pulseAnimation}
-          className="absolute bottom-[25%] left-[20%]"
-        >
+        <div className="absolute bottom-[25%] left-[20%]">
           <Server className="w-10 h-10 text-yellow-300/10" />
-        </motion.div>
+        </div>
 
-        <motion.div
-          animate={pulseAnimation}
-          className="absolute bottom-[15%] right-[25%]"
-        >
+        <div className="absolute bottom-[15%] right-[25%]">
           <Database className="w-8 h-8 text-yellow-300/10" />
-        </motion.div>
+        </div>
       </div>
 
-      {/* Binary code background effect - Reduced opacity for cleaner look */}
+      {/* Binary code background */}
       <div className="absolute inset-0 z-0 opacity-[0.03]">
         <div className="h-full w-full flex flex-wrap overflow-hidden font-mono text-xs">
           {Array.from({ length: 100 }).map((_, i) => (
@@ -142,93 +53,36 @@ const Hero = () => {
       </div>
 
       <div className="container mx-auto px-4 z-10">
-        <motion.div
-          initial="hidden"
-          animate={isLoaded ? "visible" : "hidden"}
-          variants={containerVariants}
-          className="flex flex-col items-center text-center max-w-5xl mx-auto"
-        >
-          <motion.div variants={itemVariants} className="mb-6">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="inline-block bg-gradient-to-r from-yellow-300/10 to-yellow-300/5 backdrop-blur-sm px-4 py-2 rounded-full mb-6"
-            >
+        <div className="flex flex-col items-center text-center max-w-5xl mx-auto">
+          <div className="mb-6">
+            <div className="inline-block bg-gradient-to-r from-yellow-300/10 to-yellow-300/5 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
               <span className="text-yellow-300 font-medium text-sm">
                 Technology Solutions for Nepali Businesses
               </span>
-            </motion.div>
-            <motion.h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight tracking-tight">
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight tracking-tight">
               <span className="block">Baliyo Ventures</span>
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-yellow-100">
                 Building Technology Solutions
               </span>
-            </motion.h1>
-          </motion.div>
+            </h1>
+          </div>
 
-          <motion.p
-            variants={itemVariants}
-            className="text-lg md:text-xl text-gray-300/90 mb-10 max-w-3xl font-light leading-relaxed"
-          >
+          <p className="text-lg md:text-xl text-gray-300/90 mb-10 max-w-3xl font-light leading-relaxed">
             Looking for a reliable partner to build your next big idea? Whether
             you&apos;re a startup or an established company, we&apos;re here to
             help. Baliyo ventures can help you build the best technology whether
             it is{" "}
-            <motion.span
-              animate={{
-                color: ["#EBB51F", "#FFF176", "#EBB51F"],
-                transition: { duration: 3, repeat: Number.POSITIVE_INFINITY },
-              }}
-              className="font-medium"
-            >
-              mechanical
-            </motion.span>
-            ,{" "}
-            <motion.span
-              animate={{
-                color: ["#EBB51F", "#FFF176", "#EBB51F"],
-                transition: {
-                  duration: 3,
-                  repeat: Number.POSITIVE_INFINITY,
-                  delay: 1,
-                },
-              }}
-              className="font-medium"
-            >
-              software
-            </motion.span>{" "}
-            or{" "}
-            <motion.span
-              animate={{
-                color: ["#EBB51F", "#FFF176", "#EBB51F"],
-                transition: {
-                  duration: 3,
-                  repeat: Number.POSITIVE_INFINITY,
-                  delay: 2,
-                },
-              }}
-              className="font-medium"
-            >
-              electronics
-            </motion.span>
-            .
-          </motion.p>
+            <span className="font-medium text-yellow-300">mechanical</span>,{" "}
+            <span className="font-medium text-yellow-300">software</span> or{" "}
+            <span className="font-medium text-yellow-300">electronics</span>.
+          </p>
 
-          <motion.div
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-5"
-          >
+          <div className="flex flex-col sm:flex-row gap-5">
             <Link href={"/contact"}>
               <Button className="bg-yellow-400 hover:bg-yellow-300 text-black font-medium px-8 py-6 rounded-lg text-base transition-all duration-300 shadow-lg hover:shadow-yellow-400/30 group">
                 <span className="mr-2">Have Any Project In Mind?</span>
-                <motion.span
-                  initial={{ x: 0 }}
-                  whileHover={{ x: 5 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <ArrowRight className="w-5 h-5" />
-                </motion.span>
+                <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
 
@@ -240,46 +94,29 @@ const Hero = () => {
                 Explore What We Have Done
               </Button>
             </Link>
-          </motion.div>
+          </div>
 
-          {/* Added feature highlights */}
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-16 w-full max-w-3xl"
-          >
+          {/* Feature highlights */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-16 w-full max-w-3xl">
             {[
               { icon: <Cpu className="w-5 h-5" />, text: "Hardware Solutions" },
               { icon: <Code className="w-5 h-5" />, text: "Custom Software" },
               { icon: <Server className="w-5 h-5" />, text: "Cloud Services" },
             ].map((item, index) => (
-              <motion.div
+              <div
                 key={index}
-                whileHover={{
-                  y: -5,
-                  backgroundColor: "rgba(235, 181, 31, 0.1)",
-                }}
-                className="flex items-center gap-2 bg-white/5 backdrop-blur-sm p-3 rounded-lg"
+                className="flex items-center gap-2 bg-white/5 backdrop-blur-sm p-3 rounded-lg hover:bg-yellow-300/10"
               >
                 <span className="text-yellow-300">{item.icon}</span>
                 <span className="text-sm text-gray-200">{item.text}</span>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
 
-      {/* Animated gear in the corner - Made more subtle */}
-      <motion.div
-        className="absolute bottom-5 right-5 opacity-10"
-        animate={{
-          rotate: 360,
-          transition: {
-            duration: 15,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear",
-          },
-        }}
-      >
+      {/* Static gear in corner */}
+      <div className="absolute bottom-5 right-5 opacity-10">
         <svg
           width="60"
           height="60"
@@ -302,7 +139,7 @@ const Hero = () => {
             strokeLinejoin="round"
           />
         </svg>
-      </motion.div>
+      </div>
     </section>
   );
 };

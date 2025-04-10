@@ -38,9 +38,8 @@ const AboutUs = () => {
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
           {/* Left Side - Image */}
           <div className="w-full lg:w-1/2 h-[400px] md:h-[500px] relative rounded-lg overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
             <Image
-              src="/about-image.jpg"
+              src="/hero.png"
               alt="Baliyo Ventures Team"
               fill
               className="object-cover"

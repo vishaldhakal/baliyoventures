@@ -6,7 +6,7 @@ const Innovations = () => {
     {
       id: 3,
       image: "/images/innovations/project-1.jpg",
-      title: "Smart Hardware System",
+      title: "Sarathi Robot in NTC Nepal",
       description: "Advanced hardware solutions for industrial automation",
       link: "/projects/smart-hardware",
       category: "Innovation",
@@ -14,7 +14,7 @@ const Innovations = () => {
     {
       id: 5,
       image: "/images/innovations/project-5.jpg",
-      title: "Product Development",
+      title: "Technical Partner at Birat Expo 2025",
       description: "End-to-end product development and manufacturing",
       link: "/projects/product-development",
       category: "Development",
@@ -22,7 +22,7 @@ const Innovations = () => {
     {
       id: 6,
       image: "/images/innovations/project-4.jpg",
-      title: "Engineering Solutions",
+      title: "Internation Robo War Competition",
       description: "Comprehensive engineering services for complex challenges",
       link: "/projects/engineering-solutions",
       category: "Engineering",

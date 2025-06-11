@@ -17,7 +17,7 @@ const AboutHero = () => {
             </h2>
             <div className="flex gap-4">
               <Link
-                href="tel:+9779861058997"
+                href="tel:+9779861058990"
                 className="inline-block rounded-md border-2 border-gradient-to-br from-yellow-400 to-yellow-100 bg-black/20 px-6 py-3 text-lg font-medium text-white transition-all hover:bg-yellow-400 hover:text-black"
               >
                 Give us a call

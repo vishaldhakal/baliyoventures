@@ -93,10 +93,10 @@ const Header = () => {
                   </Link>
                 ))}
                 <Link
-                  href="tel:+977 9861058997"
+                  href="tel:+977 9861058990"
                   className="text-white font-medium p-4 hover:bg-[#161616] transition-colors"
                 >
-                  +977 9861058997
+                  +977 9861058990
                 </Link>
               </nav>
             </SheetContent>
@@ -104,9 +104,9 @@ const Header = () => {
         </div>
 
         {/* Contact Button - Hidden on Mobile */}
-        <Link href="tel:+977 9861058997" className="hidden md:block">
+        <Link href="tel:+977 9861058990" className="hidden md:block">
           <Button className="border border-yellow-300 bg-white/5 hover:bg-yellow-300 hover:text-black text-white rounded-[60px] px-6 h-12 transition-all duration-300">
-            +977 9861058997
+            +977 9861058990
           </Button>
         </Link>
       </div>

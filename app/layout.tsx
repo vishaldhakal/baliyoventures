@@ -36,6 +36,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="facebook-domain-verification" content="cj0veik705ng9lr3d4dya8v5sfrhhq" />
+      </head>
       <body className={`${oxanium.variable} ${inter.variable} antialiased`}>
         <TopLoader
           color="#ffff"

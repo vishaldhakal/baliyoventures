@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { ServiceDetailResponse } from "@/types/services";
@@ -41,15 +42,14 @@ export default function ProjectCard({
 
       {/* Learn More Button */}
       <div className="mt-7">
-        <motion.button className="group/btn cursor-pointer flex items-center gap-3 rounded-sm bg-yellow-300/20 px-4 py-2.5 transition-colors hover:bg-yellow-300/30">
-          <a
-            href={`/project-detail/${slug}`}
-            className="font-headings text-sm font-semibold uppercase tracking-[0.03em] text-[#E5E5E5]"
-          >
-            Learn More
-          </a>
-          <ArrowRight className="h-4 w-4 stroke-[1.5px] text-[#E5E5E5] transition-transform group-hover/btn:translate-x-1" />
-        </motion.button>
+        <Link href={`/project/${slug}`}>
+          <motion.button className="group/btn cursor-pointer flex items-center gap-3 rounded-sm bg-yellow-300/20 px-4 py-2.5 transition-colors hover:bg-yellow-300/30">
+            <span className="font-headings text-sm font-semibold uppercase tracking-[0.03em] text-[#E5E5E5]">
+              Learn More
+            </span>
+            <ArrowRight className="h-4 w-4 stroke-[1.5px] text-[#E5E5E5] transition-transform group-hover/btn:translate-x-1" />
+          </motion.button>
+        </Link>
       </div>
     </motion.div>
   );

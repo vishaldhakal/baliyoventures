@@ -8,7 +8,7 @@ const Innovations = () => {
       image: "/images/innovations/project-1.jpg",
       title: "Sarathi Robot in NTC Nepal",
       description: "Advanced hardware solutions for industrial automation",
-      link: "/projects/smart-hardware",
+      link: "/services",
       category: "Innovation",
     },
     {
@@ -16,7 +16,7 @@ const Innovations = () => {
       image: "/images/innovations/project-5.jpg",
       title: "Technical Partner at Birat Expo 2025",
       description: "End-to-end product development and manufacturing",
-      link: "/projects/product-development",
+      link: "/services",
       category: "Development",
     },
     {
@@ -24,7 +24,7 @@ const Innovations = () => {
       image: "/images/innovations/project-4.jpg",
       title: "Internation Robo War Competition",
       description: "Comprehensive engineering services for complex challenges",
-      link: "/projects/engineering-solutions",
+      link: "/services",
       category: "Engineering",
     },
   ];

@@ -4,6 +4,7 @@ import { ArrowLeft, Calendar, Tag, FileText, Download, ArrowRight, ExternalLink 
 import { getProjectDetails } from "@/services/project.service";
 import ResearchOverview from "@/app/services/components/ResearchOverview";
 import { SimilarProject } from "@/types/projects";
+import ShareButtons from "./components/ShareButtons";
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
@@ -220,6 +221,9 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                     )}
                   </div>
                 )}
+
+                {/* Share Project section */}
+                <ShareButtons title={project.title} description={project.description} />
               </div>
             </div>
           </div>

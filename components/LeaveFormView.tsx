@@ -378,11 +378,6 @@ export default function LeaveFormView() {
             </form>
           </Form>
         </div>
-
-        {/* Footer Note */}
-        <p className="text-center text-gray-400 text-xs mt-6 leading-relaxed">
-          A confirmation email will be sent to your registered email address
-        </p>
       </div>
     </div>
   );

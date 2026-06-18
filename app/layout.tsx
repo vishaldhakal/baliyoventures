@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Oxanium, Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import ConditionalLayout from "@/components/layout/ConditionalLayout";
 import TopLoader from "nextjs-toploader";
 
 const oxanium = Oxanium({
@@ -50,9 +49,7 @@ export default function RootLayout({
           easing="ease"
           speed={200}
         />
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>
   );

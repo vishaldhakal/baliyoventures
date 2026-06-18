@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -26,16 +27,15 @@ import {
 import { useState } from "react";
 import { postLeaveForm } from "@/services/leave.service";
 import {
+  CheckCircle2,
+  Loader2,
   User,
   Phone,
   Mail,
   Calendar,
   FileText,
-  CheckCircle2,
-  Loader2,
-  Briefcase,
-  Hash,
   UserCheck,
+  Briefcase,
 } from "lucide-react";
 
 const leaveTypeOptions = [
@@ -53,12 +53,6 @@ const approverOptions = [
   "Sapana Dhakal",
 ];
 
-const inputClass =
-  "w-full bg-white rounded-lg px-4 py-2.5 text-gray-900 text-sm transition-all duration-200";
-
-const labelClass =
-  "absolute -top-2 left-3 px-1.5 text-[11px] font-medium text-gray-500 group-focus-within:text-gray-700 bg-white z-10 transition-colors duration-200";
-
 export default function LeaveFormView() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -74,6 +68,8 @@ export default function LeaveFormView() {
       days: undefined,
       leave_from_date: "",
       leave_to_date: "",
+      reason_of_leave: undefined,
+      approved_by: undefined,
     },
   });
 
@@ -84,7 +80,17 @@ export default function LeaveFormView() {
     try {
       await postLeaveForm(data);
       setSubmitted(true);
-      form.reset();
+      form.reset({
+        employee_name: "",
+        employee_contact_number: "",
+        employee_email: "",
+        brief_reason: "",
+        days: undefined,
+        leave_from_date: "",
+        leave_to_date: "",
+        reason_of_leave: undefined,
+        approved_by: undefined,
+      });
     } catch (err) {
       console.error("Error submitting leave form:", err);
       setError("There was an error submitting your request. Please try again.");
@@ -122,43 +128,51 @@ export default function LeaveFormView() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">
-            Leave Form
-          </h1>
-          <p className="text-gray-600 text-sm">
-            Fill in the details below to submit your Leave Form
-          </p>
-        </div>
-
-        {/* Form */}
-        <div className="sm:bg-white sm:rounded-xl sm:border sm:border-gray-200 sm:-sm sm:overflow-hidden sm:p-8">
-          {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-              <p className="text-red-700 text-sm">{error}</p>
+        {/* Card */}
+        <div className="bg-white rounded-2xl sm:rounded-[32px] sm:border border-gray-200 overflow-hidden">
+          <div className="px-4 py-6 sm:p-8 md:p-10">
+            {/* Header */}
+            <div className="mb-8 ">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                Leave Form
+              </h1>
+              <p className="text-sm text-gray-500">
+                Fill in the details below to submit your leave request
+              </p>
             </div>
-          )}
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Employee Information */}
-              <div>
+            {error && (
+              <div className="mb-6 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+            )}
+
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-2"
+              >
+                {/* Employee Information */}
                 <div className="space-y-4">
                   <FormField
                     control={form.control}
                     name="employee_name"
                     render={({ field }) => (
-                      <FormItem className="relative group">
-                        <FormLabel className={labelClass}>Full Name</FormLabel>
+                      <FormItem className="space-y-1.5">
+                        <FormLabel className="text-sm font-medium text-gray-700">
+                          Full Name <span className="text-red-500">*</span>
+                        </FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder=" "
-                            className={inputClass}
-                            {...field}
-                          />
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                              placeholder="e.g. John Doe"
+                              className="pl-9 h-11 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all"
+                              {...field}
+                            />
+                          </div>
                         </FormControl>
-                        <FormMessage className="text-red-600 text-xs mt-1" />
+                        <FormMessage className="text-xs text-red-500" />
                       </FormItem>
                     )}
                   />
@@ -167,18 +181,21 @@ export default function LeaveFormView() {
                     control={form.control}
                     name="employee_contact_number"
                     render={({ field }) => (
-                      <FormItem className="relative group">
-                        <FormLabel className={labelClass}>
-                          Contact Number
+                      <FormItem className="space-y-1.5">
+                        <FormLabel className="text-sm font-medium text-gray-700">
+                          Contact Number <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder=" "
-                            className={inputClass}
-                            {...field}
-                          />
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                              placeholder="e.g. +977 98XXXXXXXX"
+                              className="pl-9 h-11 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all"
+                              {...field}
+                            />
+                          </div>
                         </FormControl>
-                        <FormMessage className="text-red-600 text-xs mt-1" />
+                        <FormMessage className="text-xs text-red-500" />
                       </FormItem>
                     )}
                   />
@@ -187,196 +204,222 @@ export default function LeaveFormView() {
                     control={form.control}
                     name="employee_email"
                     render={({ field }) => (
-                      <FormItem className="relative group">
-                        <FormLabel className={labelClass}>
-                          Email Address
+                      <FormItem className="space-y-1.5">
+                        <FormLabel className="text-sm font-medium text-gray-700">
+                          Email Address <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type="email"
-                            placeholder=" "
-                            className={inputClass}
-                            {...field}
-                          />
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                              type="email"
+                              placeholder="e.g. john@example.com"
+                              className="pl-9 h-11 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all"
+                              {...field}
+                            />
+                          </div>
                         </FormControl>
-                        <FormMessage className="text-red-600 text-xs mt-1" />
+                        <FormMessage className="text-xs text-red-500" />
                       </FormItem>
                     )}
                   />
                 </div>
-              </div>
 
-              {/* Leave Details */}
-              <div className="space-y-4">
+                {/* Leave Details */}
+                <div className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="reason_of_leave"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormLabel className="text-sm font-medium text-gray-700">
+                            Leave Type <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="h-11 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all cursor-pointer">
+                                <SelectValue placeholder="Select leave type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="rounded-xl border-gray-200">
+                              {leaveTypeOptions.map((opt) => (
+                                <SelectItem
+                                  key={opt.value}
+                                  value={opt.value}
+                                  className="text-sm focus:bg-gray-50 cursor-pointer"
+                                >
+                                  {opt.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="days"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormLabel className="text-sm font-medium text-gray-700">
+                            Number of Days{" "}
+                            <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input
+                                type="number"
+                                placeholder="e.g. 3"
+                                min={1}
+                                className="pl-9 h-11 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="leave_from_date"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormLabel className="text-sm font-medium text-gray-700">
+                            From Date <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input
+                                type="date"
+                                className="pl-9 h-11 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all [color-scheme:light]"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="leave_to_date"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormLabel className="text-sm font-medium text-gray-700">
+                            To Date <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input
+                                type="date"
+                                className="pl-9 h-11 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all [color-scheme:light]"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="brief_reason"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1.5">
+                        <FormLabel className="text-sm font-medium text-gray-700">
+                          Reason for Leave{" "}
+                          <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <FileText className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <Textarea
+                              placeholder="Please provide a brief reason for your leave"
+                              className="pl-9 min-h-[80px] rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all resize-none"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage className="text-xs text-red-500" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Approval */}
                 <FormField
                   control={form.control}
-                  name="reason_of_leave"
+                  name="approved_by"
                   render={({ field }) => (
-                    <FormItem className="relative group">
-                      <FormLabel className={labelClass}>Leave Type</FormLabel>
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Approved By <span className="text-red-500">*</span>
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger
-                            className={`${inputClass} cursor-pointer`}
-                          >
-                            <SelectValue placeholder=" " />
+                          <SelectTrigger className="h-11 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all cursor-pointer">
+                            <SelectValue placeholder="Select approver" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-white border-gray-200 text-gray-900">
-                          {leaveTypeOptions.map((opt) => (
+                        <SelectContent className="rounded-xl border-gray-200">
+                          {approverOptions.map((name) => (
                             <SelectItem
-                              key={opt.value}
-                              value={opt.value}
-                              className="focus:bg-gray-50 focus:text-gray-900 cursor-pointer text-sm"
+                              key={name}
+                              value={name}
+                              className="text-sm focus:bg-gray-50 cursor-pointer"
                             >
-                              {opt.label}
+                              {name}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage className="text-red-600 text-xs mt-1" />
+                      <FormMessage className="text-xs text-red-500" />
                     </FormItem>
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="days"
-                  render={({ field }) => (
-                    <FormItem className="relative group">
-                      <FormLabel className={labelClass}>
-                        Number of Days
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder=" "
-                          min={1}
-                          className={inputClass}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-600 text-xs mt-1" />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="leave_from_date"
-                    render={({ field }) => (
-                      <FormItem className="relative group">
-                        <FormLabel className={labelClass}>From Date</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="date"
-                            className={`${inputClass} [color-scheme:light]`}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-600 text-xs mt-1" />
-                      </FormItem>
+                {/* Submit */}
+                <div className="pt-4 border-t border-gray-100 mt-2">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-12 rounded-xl text-sm font-semibold bg-gray-900 hover:bg-gray-800 text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Submitting...
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        <CheckCircle2 className="h-4 w-4" />
+                        Submit Request
+                      </span>
                     )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="leave_to_date"
-                    render={({ field }) => (
-                      <FormItem className="relative group">
-                        <FormLabel className={labelClass}>To Date</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="date"
-                            className={`${inputClass} [color-scheme:light]`}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-600 text-xs mt-1" />
-                      </FormItem>
-                    )}
-                  />
+                  </Button>
                 </div>
-
-                <FormField
-                  control={form.control}
-                  name="brief_reason"
-                  render={({ field }) => (
-                    <FormItem className="relative group">
-                      <FormLabel className={labelClass}>
-                        Reason for Leave
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder=" "
-                          className={inputClass}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-600 text-xs mt-1" />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="approved_by"
-                render={({ field }) => (
-                  <FormItem className="relative group">
-                    <FormLabel className={labelClass}>Approved By</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger
-                          className={`${inputClass} cursor-pointer`}
-                        >
-                          <SelectValue placeholder=" " />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-white border-gray-200 text-gray-900">
-                        {approverOptions.map((name) => (
-                          <SelectItem
-                            key={name}
-                            value={name}
-                            className="focus:bg-gray-50 focus:text-gray-900 cursor-pointer text-sm"
-                          >
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-red-600 text-xs mt-1" />
-                  </FormItem>
-                )}
-              />
-
-              {/* Submit */}
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-2.5 rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-4 h-4" />
-                    Submit Request
-                  </>
-                )}
-              </Button>
-            </form>
-          </Form>
+              </form>
+            </Form>
+          </div>
         </div>
       </div>
     </div>

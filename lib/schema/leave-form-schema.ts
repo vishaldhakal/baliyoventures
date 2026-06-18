@@ -9,16 +9,14 @@ export const leaveFormSchema = z.object({
     .regex(/^\d+$/, { message: "Contact number must contain digits only." })
     .min(7, { message: "Contact number must be at least 7 digits." })
     .max(15, { message: "Contact number must be at most 15 digits." }),
-  employee_email: z
-    .string()
-    .email({
-      message: "Please enter a valid email address (e.g. name@gmail.com).",
-    }),
+  employee_email: z.string().email({
+    message: "Please enter a valid email address (e.g. name@gmail.com).",
+  }),
   reason_of_leave: z.enum(["paid", "sick", "unpaid", "weekly", "other"], {
     required_error: "Please select a leave type.",
   }),
-  brief_reason: z.string().min(5, {
-    message: "Please provide a brief reason (at least 5 characters).",
+  brief_reason: z.string().min(3, {
+    message: "Please provide a brief reason (at least 3 characters).",
   }),
   days: z.coerce
     .number({ invalid_type_error: "Please enter a valid number." })

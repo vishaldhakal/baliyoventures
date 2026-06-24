@@ -73,6 +73,21 @@ export const monthsInEnglish = [
   "Chaitra",
 ];
 
+export const monthsInNepali = [
+  "बैशाख",
+  "जेठ",
+  "असार",
+  "श्रावण",
+  "भदौ",
+  "असोज",
+  "कार्तिक",
+  "मंसिर",
+  "पुष",
+  "माघ",
+  "फाल्गुन",
+  "चैत्र",
+];
+
 export const formatToNepaliMonthDayYear = (dateStr: string): string => {
   if (!dateStr) return "";
 

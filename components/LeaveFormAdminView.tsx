@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NepaliCalendar from "@sbmdkl/nepali-datepicker-reactjs";
 import "@sbmdkl/nepali-datepicker-reactjs/dist/index.css";
-import { formatToNepaliMonthDayYear, convertAdToBs, monthsInEnglish, toDevanagariNumerals, getBsMonthAdRange } from "@/lib/nepali-date";
+import { formatToNepaliMonthDayYear, convertAdToBs, monthsInEnglish, monthsInNepali, toDevanagariNumerals, getBsMonthAdRange } from "@/lib/nepali-date";
 import { adToBs } from "@sbmdkl/nepali-date-converter";
 import {
   Loader2,
   LogOut,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Mail,
   Phone,
   Calendar,
@@ -74,6 +75,7 @@ export default function LeaveFormAdminView() {
   const [endDateBs, setEndDateBs] = useState("");
   const [endDateAd, setEndDateAd] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
 
   const handleMonthChange = (monthIndexStr: string) => {
     if (!monthIndexStr) {
@@ -237,22 +239,48 @@ export default function LeaveFormAdminView() {
                 className="h-10 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all placeholder-gray-400"
               />
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 relative">
               <label className="text-xs font-semibold text-gray-500">
                 Nepali Month Filter
               </label>
-              <select
-                value={selectedMonth}
-                onChange={(e) => handleMonthChange(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-gray-250 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 outline-none transition-all cursor-pointer text-gray-700"
+              <button
+                type="button"
+                onClick={() => setIsMonthOpen(!isMonthOpen)}
+                className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 outline-none transition-all cursor-pointer text-gray-700 flex items-center justify-between text-left"
               >
-                <option value="">Select Month...</option>
-                {monthsInEnglish.map((name, index) => (
-                  <option key={name} value={String(index + 1)}>
-                    {name}
-                  </option>
-                ))}
-              </select>
+                <span>{selectedMonth ? `${monthsInNepali[parseInt(selectedMonth) - 1]} (${monthsInEnglish[parseInt(selectedMonth) - 1]})` : "Select Month..."}</span>
+                <ChevronDown className="h-4 w-4 opacity-50" />
+              </button>
+              {isMonthOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsMonthOpen(false)} />
+                  <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl -lg z-50 max-h-60 overflow-y-auto py-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleMonthChange("");
+                        setIsMonthOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors text-gray-700 cursor-pointer"
+                    >
+                      Select Month...
+                    </button>
+                    {monthsInNepali.map((name, index) => (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => {
+                          handleMonthChange(String(index + 1));
+                          setIsMonthOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors cursor-pointer ${selectedMonth === String(index + 1) ? 'bg-gray-50 font-semibold text-gray-900' : 'text-gray-700'}`}
+                      >
+                        {name} ({monthsInEnglish[index]})
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-500">
@@ -262,8 +290,7 @@ export default function LeaveFormAdminView() {
                 <NepaliCalendar
                   language="ne"
                   dateFormat="YYYY-MM-DD"
-                  className="w-full"
-                  inputClassName="w-full pl-3 h-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 outline-none transition-all cursor-pointer"
+                  className="w-full pl-3 h-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 outline-none transition-all cursor-pointer text-gray-700"
                   placeholder="YYYY-MM-DD"
                   value={startDateBs}
                   onChange={({ bsDate, adDate }) => {
@@ -285,8 +312,7 @@ export default function LeaveFormAdminView() {
                 <NepaliCalendar
                   language="ne"
                   dateFormat="YYYY-MM-DD"
-                  className="w-full"
-                  inputClassName="w-full pl-3 h-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 outline-none transition-all cursor-pointer"
+                  className="w-full pl-3 h-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 outline-none transition-all cursor-pointer text-gray-700"
                   placeholder="YYYY-MM-DD"
                   value={endDateBs}
                   onChange={({ bsDate, adDate }) => {

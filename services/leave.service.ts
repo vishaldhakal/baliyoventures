@@ -42,8 +42,29 @@ export const postLeaveForm = async (data: LeaveFormValues): Promise<void> => {
   }
 };
 
-export const getLeaveForms = async (page: number = 1): Promise<LeaveFormListResponse> => {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/leave-forms/${page > 1 ? `?page=${page}` : ""}`;
+export const getLeaveForms = async (
+  page: number = 1,
+  search?: string,
+  startDate?: string,
+  endDate?: string
+): Promise<LeaveFormListResponse> => {
+  const params = new URLSearchParams();
+  if (page > 1) {
+    params.append("page", String(page));
+  }
+  if (search) {
+    params.append("search", search);
+  }
+  if (startDate) {
+    params.append("start_date", startDate);
+  }
+  if (endDate) {
+    params.append("end_date", endDate);
+  }
+
+  const queryString = params.toString();
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/leave-forms/${queryString ? `?${queryString}` : ""}`;
+
   const response = await fetch(url, {
     method: "GET",
     headers: {

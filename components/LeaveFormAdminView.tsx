@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getLeaveForms, LeaveFormRecord, LeaveFormListResponse } from "@/services/leave.service";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import NepaliCalendar from "@sbmdkl/nepali-datepicker-reactjs";
+import "@sbmdkl/nepali-datepicker-reactjs/dist/index.css";
+import { formatToNepaliMonthDayYear, convertAdToBs } from "@/lib/nepali-date";
+import { adToBs } from "@sbmdkl/nepali-date-converter";
 import {
   Loader2,
   LogOut,
@@ -20,6 +25,22 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 const leaveTypeLabels: Record<string, string> = {
   paid: "Paid Leave",
@@ -46,11 +67,23 @@ export default function LeaveFormAdminView() {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const router = useRouter();
 
-  const fetchData = async (pageNum: number) => {
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
+  const [startDateBs, setStartDateBs] = useState("");
+  const [startDateAd, setStartDateAd] = useState("");
+  const [endDateBs, setEndDateBs] = useState("");
+  const [endDateAd, setEndDateAd] = useState("");
+
+  const fetchData = async (
+    pageNum: number,
+    searchVal?: string,
+    startAd?: string,
+    endAd?: string
+  ) => {
     setLoading(true);
     setError("");
     try {
-      const res = await getLeaveForms(pageNum);
+      const res = await getLeaveForms(pageNum, searchVal || undefined, startAd || undefined, endAd || undefined);
       setData(res);
       setPage(pageNum);
     } catch (err: any) {
@@ -62,8 +95,12 @@ export default function LeaveFormAdminView() {
   };
 
   useEffect(() => {
-    fetchData(page);
-  }, [page]);
+    fetchData(page, debouncedSearch, startDateAd, endDateAd);
+  }, [page, debouncedSearch, startDateAd, endDateAd]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, startDateAd, endDateAd]);
 
   const handleLogout = async () => {
     setLogoutLoading(true);
@@ -86,15 +123,7 @@ export default function LeaveFormAdminView() {
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "-";
-    try {
-      return new Date(dateStr).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-    } catch (e) {
-      return dateStr;
-    }
+    return formatToNepaliMonthDayYear(dateStr);
   };
 
   const formatDateTime = (dateTimeStr: string) => {
@@ -164,6 +193,86 @@ export default function LeaveFormAdminView() {
             </Button>
           </div>
         </header>
+
+        {/* Filters */}
+        <div className="bg-white border border-gray-200 p-4 sm:p-5 rounded-2xl space-y-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+            <div className="space-y-1.5">
+              <label htmlFor="search" className="text-xs font-semibold text-gray-500">
+                Search Employee Name
+              </label>
+              <Input
+                id="search"
+                type="text"
+                placeholder="Search name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-10 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all placeholder-gray-400"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-500">
+                Start Date (BS)
+              </label>
+              <div className="relative">
+                <NepaliCalendar
+                  language="ne"
+                  dateFormat="YYYY-MM-DD"
+                  className="w-full"
+                  inputClassName="w-full pl-3 h-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 outline-none transition-all cursor-pointer"
+                  placeholder="YYYY-MM-DD"
+                  value={startDateBs}
+                  onChange={({ bsDate, adDate }) => {
+                    setStartDateBs(bsDate);
+                    setStartDateAd(adDate);
+                  }}
+                  theme="deepdark"
+                  defaultDate={startDateBs ? adToBs(startDateAd) : undefined}
+                  hideDefaultValue={!startDateBs}
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-500">
+                End Date (BS)
+              </label>
+              <div className="relative">
+                <NepaliCalendar
+                  language="ne"
+                  dateFormat="YYYY-MM-DD"
+                  className="w-full"
+                  inputClassName="w-full pl-3 h-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 outline-none transition-all cursor-pointer"
+                  placeholder="YYYY-MM-DD"
+                  value={endDateBs}
+                  onChange={({ bsDate, adDate }) => {
+                    setEndDateBs(bsDate);
+                    setEndDateAd(adDate);
+                  }}
+                  theme="deepdark"
+                  defaultDate={endDateBs ? adToBs(endDateAd) : undefined}
+                  hideDefaultValue={!endDateBs}
+                />
+              </div>
+            </div>
+          </div>
+          {(search || startDateBs || endDateBs) && (
+            <div className="flex justify-end pt-1">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearch("");
+                  setStartDateBs("");
+                  setStartDateAd("");
+                  setEndDateBs("");
+                  setEndDateAd("");
+                }}
+                className="h-9 px-4 text-xs font-semibold border-gray-200 hover:bg-gray-50 text-gray-600 rounded-xl transition-all cursor-pointer"
+              >
+                Clear Filters
+              </Button>
+            </div>
+          )}
+        </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-sm flex items-center justify-between gap-2">

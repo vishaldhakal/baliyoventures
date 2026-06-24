@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NepaliCalendar from "@sbmdkl/nepali-datepicker-reactjs";
 import "@sbmdkl/nepali-datepicker-reactjs/dist/index.css";
-import { formatToNepaliMonthDayYear, convertAdToBs } from "@/lib/nepali-date";
+import { formatToNepaliMonthDayYear, convertAdToBs, monthsInEnglish, toDevanagariNumerals, getBsMonthAdRange } from "@/lib/nepali-date";
 import { adToBs } from "@sbmdkl/nepali-date-converter";
 import {
   Loader2,
@@ -73,6 +73,34 @@ export default function LeaveFormAdminView() {
   const [startDateAd, setStartDateAd] = useState("");
   const [endDateBs, setEndDateBs] = useState("");
   const [endDateAd, setEndDateAd] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
+
+  const handleMonthChange = (monthIndexStr: string) => {
+    if (!monthIndexStr) {
+      setStartDateBs("");
+      setStartDateAd("");
+      setEndDateBs("");
+      setEndDateAd("");
+      setSelectedMonth("");
+      return;
+    }
+
+    const monthVal = parseInt(monthIndexStr);
+    const todayBs = adToBs(new Date().toISOString().split("T")[0]);
+    const currentYear = parseInt(todayBs.split("-")[0]);
+
+    const { startDateAd: startAd, endDateAd: endAd } = getBsMonthAdRange(currentYear, monthVal);
+
+    const pad = (n: number) => (n < 10 ? `0${n}` : n);
+    const startBs = toDevanagariNumerals(`${currentYear}-${pad(monthVal)}-01`);
+    const endBs = convertAdToBs(endAd);
+
+    setStartDateBs(startBs);
+    setStartDateAd(startAd);
+    setEndDateBs(endBs);
+    setEndDateAd(endAd);
+    setSelectedMonth(monthIndexStr);
+  };
 
   const fetchData = async (
     pageNum: number,
@@ -129,13 +157,12 @@ export default function LeaveFormAdminView() {
   const formatDateTime = (dateTimeStr: string) => {
     if (!dateTimeStr) return "-";
     try {
-      return new Date(dateTimeStr).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
+      const datePart = formatToNepaliMonthDayYear(dateTimeStr);
+      const timePart = new Date(dateTimeStr).toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
       });
+      return `${datePart}, ${timePart}`;
     } catch (e) {
       return dateTimeStr;
     }
@@ -196,7 +223,7 @@ export default function LeaveFormAdminView() {
 
         {/* Filters */}
         <div className="bg-white border border-gray-200 p-4 sm:p-5 rounded-2xl space-y-4">
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
             <div className="space-y-1.5">
               <label htmlFor="search" className="text-xs font-semibold text-gray-500">
                 Search Employee Name
@@ -209,6 +236,23 @@ export default function LeaveFormAdminView() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="h-10 rounded-xl border-gray-200 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 transition-all placeholder-gray-400"
               />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-500">
+                Nepali Month Filter
+              </label>
+              <select
+                value={selectedMonth}
+                onChange={(e) => handleMonthChange(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-gray-250 bg-gray-50/50 text-sm focus:border-gray-900 focus:ring-0 outline-none transition-all cursor-pointer text-gray-700"
+              >
+                <option value="">Select Month...</option>
+                {monthsInEnglish.map((name, index) => (
+                  <option key={name} value={String(index + 1)}>
+                    {name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-500">
@@ -225,6 +269,7 @@ export default function LeaveFormAdminView() {
                   onChange={({ bsDate, adDate }) => {
                     setStartDateBs(bsDate);
                     setStartDateAd(adDate);
+                    setSelectedMonth(""); // Clear month filter on manual date picker change
                   }}
                   theme="deepdark"
                   defaultDate={startDateBs ? adToBs(startDateAd) : undefined}
@@ -247,6 +292,7 @@ export default function LeaveFormAdminView() {
                   onChange={({ bsDate, adDate }) => {
                     setEndDateBs(bsDate);
                     setEndDateAd(adDate);
+                    setSelectedMonth(""); // Clear month filter on manual date picker change
                   }}
                   theme="deepdark"
                   defaultDate={endDateBs ? adToBs(endDateAd) : undefined}
@@ -255,7 +301,7 @@ export default function LeaveFormAdminView() {
               </div>
             </div>
           </div>
-          {(search || startDateBs || endDateBs) && (
+          {(search || startDateBs || endDateBs || selectedMonth) && (
             <div className="flex justify-end pt-1">
               <Button
                 variant="outline"
@@ -265,6 +311,7 @@ export default function LeaveFormAdminView() {
                   setStartDateAd("");
                   setEndDateBs("");
                   setEndDateAd("");
+                  setSelectedMonth("");
                 }}
                 className="h-9 px-4 text-xs font-semibold border-gray-200 hover:bg-gray-50 text-gray-600 rounded-xl transition-all cursor-pointer"
               >

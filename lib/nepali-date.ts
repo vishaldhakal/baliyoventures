@@ -1,4 +1,4 @@
-import { adToBs } from "@sbmdkl/nepali-date-converter";
+import { adToBs, bsToAd } from "@sbmdkl/nepali-date-converter";
 
 // Helper function to convert Latin numerals to Devanagari numerals
 export const toDevanagariNumerals = (str: string): string => {
@@ -94,4 +94,28 @@ export const formatToNepaliMonthDayYear = (dateStr: string): string => {
     console.error("Error formatting Nepali date:", error);
     return dateStr;
   }
+};
+
+export const getBsMonthAdRange = (
+  year: number,
+  month: number
+): { startDateAd: string; endDateAd: string } => {
+  const pad = (n: number) => (n < 10 ? `0${n}` : n);
+  const startBs = `${year}-${pad(month)}-01`;
+  const startDateAd = bsToAd(startBs);
+
+  let nextYear = year;
+  let nextMonth = month + 1;
+  if (nextMonth > 12) {
+    nextMonth = 1;
+    nextYear = year + 1;
+  }
+  const nextStartBs = `${nextYear}-${pad(nextMonth)}-01`;
+  const nextStartDateAd = bsToAd(nextStartBs);
+
+  const date = new Date(nextStartDateAd);
+  date.setDate(date.getDate() - 1);
+  const endDateAd = date.toISOString().split("T")[0];
+
+  return { startDateAd, endDateAd };
 };

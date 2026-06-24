@@ -1,5 +1,27 @@
 import { LeaveFormValues } from "@/lib/schema/leave-form-schema";
 
+export interface LeaveFormRecord {
+  id: number;
+  employee_name: string;
+  employee_contact_number: string;
+  employee_email: string;
+  reason_of_leave: "paid" | "sick" | "unpaid" | "weekly" | "other";
+  brief_reason: string;
+  days: number;
+  leave_from_date: string;
+  leave_to_date: string;
+  approved_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LeaveFormListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: LeaveFormRecord[];
+}
+
 export const postLeaveForm = async (data: LeaveFormValues): Promise<void> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/leave-forms/`,
@@ -18,4 +40,24 @@ export const postLeaveForm = async (data: LeaveFormValues): Promise<void> => {
       errorData ? JSON.stringify(errorData) : "Network response was not ok"
     );
   }
+};
+
+export const getLeaveForms = async (page: number = 1): Promise<LeaveFormListResponse> => {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/leave-forms/${page > 1 ? `?page=${page}` : ""}`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    next: { revalidate: 0 },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData ? JSON.stringify(errorData) : "Failed to fetch leave forms"
+    );
+  }
+
+  return response.json();
 };

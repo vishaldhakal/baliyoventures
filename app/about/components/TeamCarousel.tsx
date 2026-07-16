@@ -4,7 +4,15 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { TeamMember } from "@/types/about";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Linkedin,
+  Twitter,
+  Instagram,
+  Facebook,
+  Globe,
+} from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -28,6 +36,40 @@ const TeamCarousel = ({ teamMembers }: TeamCarouselProps) => {
       setCurrent(api.selectedScrollSnap());
     });
   }, [api]);
+
+  // Helper function to get social icon
+  const getSocialIcon = (platform: string) => {
+    switch (platform) {
+      case "linkedin":
+        return <Linkedin className="h-4 w-4" />;
+      case "twitter":
+        return <Twitter className="h-4 w-4" />;
+      case "instagram":
+        return <Instagram className="h-4 w-4" />;
+      case "facebook":
+        return <Facebook className="h-4 w-4" />;
+      case "website":
+        return <Globe className="h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
+  // Get available social links
+  const getSocialLinks = (member: TeamMember) => {
+    const links = [];
+    if (member.linkedin)
+      links.push({ platform: "linkedin", url: member.linkedin });
+    if (member.twitter)
+      links.push({ platform: "twitter", url: member.twitter });
+    if (member.instagram)
+      links.push({ platform: "instagram", url: member.instagram });
+    if (member.facebook)
+      links.push({ platform: "facebook", url: member.facebook });
+    if (member.website)
+      links.push({ platform: "website", url: member.website });
+    return links;
+  };
 
   return (
     <section className="relative w-full bg-[#05070D] py-28">
@@ -73,43 +115,64 @@ const TeamCarousel = ({ teamMembers }: TeamCarouselProps) => {
               className="w-full"
             >
               <CarouselContent className="-ml-6 py-4">
-                {teamMembers.map((member) => (
-                  <CarouselItem
-                    key={member.id}
-                    className="pl-6 basis-1/2 lg:basis-1/4"
-                  >
-                    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition-colors duration-300 hover:border-[#E8D974]/40 h-full">
-                      <div className="relative aspect-[4/5] w-full overflow-hidden">
-                        <Image
-                          src={
-                            (member.image ||
-                              "/path/to/default/image.webp") as string
-                          }
-                          alt={
-                            member.image_alt_description ||
-                            member.name ||
-                            "Team member"
-                          }
-                          fill
-                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                      </div>
+                {teamMembers.map((member) => {
+                  const socialLinks = getSocialLinks(member);
+                  return (
+                    <CarouselItem
+                      key={member.id}
+                      className="pl-6 basis-1/2 lg:basis-1/4"
+                    >
+                      <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition-colors duration-300 hover:border-[#E8D974]/40 h-full">
+                        <div className="relative aspect-[4/5] w-full overflow-hidden">
+                          <Image
+                            src={
+                              (member.image ||
+                                "/path/to/default/image.webp") as string
+                            }
+                            alt={
+                              member.image_alt_description ||
+                              member.name ||
+                              "Team member"
+                            }
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                        </div>
 
-                      <div className="flex flex-col gap-0.5 px-4 py-4">
-                        <p className="truncate text-base font-semibold text-white">
-                          {member.name}
-                        </p>
-                        <p className="truncate text-sm text-white/50">
-                          {member.designation}
-                        </p>
-                      </div>
+                        <div className="flex flex-col gap-1 px-4 py-4 flex-1">
+                          <p className="text-base font-semibold text-white">
+                            {member.name}
+                          </p>
+                          <p className="text-sm text-white/50 min-h-[20px]">
+                            {member.designation}
+                          </p>
 
-                      <span className="absolute bottom-[4.25rem] left-4 h-0.5 w-8 rounded-full bg-[#E8D974] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                    </div>
-                  </CarouselItem>
-                ))}
+                          {/* Social Links - Only show if available */}
+                          {socialLinks.length > 0 && (
+                            <div className="flex gap-2 mt-2 pt-2 border-t border-white/5">
+                              {socialLinks.map((link) => (
+                                <a
+                                  key={link.platform}
+                                  href={link.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-white/40 hover:text-[#E8D974] transition-colors duration-200"
+                                  aria-label={`${member.name}'s ${link.platform}`}
+                                >
+                                  {getSocialIcon(link.platform)}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <span className="absolute bottom-[4.25rem] left-4 h-0.5 w-8 rounded-full bg-[#E8D974] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      </div>
+                    </CarouselItem>
+                  );
+                })}
               </CarouselContent>
             </Carousel>
           </div>

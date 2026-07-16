@@ -10,7 +10,8 @@ export interface TeamMember {
   facebook?: string | null; 
   instagram?: string | null; 
   twitter?: string | null;
-  linkedin?: string | null; 
+  linkedin?: string | null;
+  website?: string | null;
   created_at: string;
   updated_at: string;
 }

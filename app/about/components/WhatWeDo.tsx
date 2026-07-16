@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 const WhatWeDo = () => {
   return (
@@ -45,20 +46,7 @@ const WhatWeDo = () => {
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-8 py-3 rounded-xl font-semibold hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-lg hover:shadow-yellow-400/20"
                 >
                   Explore our Services
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
+                  <ChevronRight className="w-5 h-5" />
                 </Link>
               </div>
             </div>

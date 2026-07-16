@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { StatsValueText } from "@/components/StatsValueText";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 const WhoAreWe = () => {
   return (
@@ -28,13 +28,6 @@ const WhoAreWe = () => {
                 their ideas into reality, and we are committed to providing
                 exceptional service and support to every client.
               </p>
-              <Link
-                href="/about"
-                className="flex items-center justify-center gap-2 text-white font-bold text-sm md:text-base px-3 py-3 hover:opacity-80 transition-opacity"
-              >
-                Learn more
-                <ArrowRight className="w-5 h-5" />
-              </Link>
             </div>
           </div>
 

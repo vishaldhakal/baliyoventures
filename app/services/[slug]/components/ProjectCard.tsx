@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { ServiceDetailResponse } from "@/types/services";
 
 export default function ProjectCard({
@@ -47,7 +47,7 @@ export default function ProjectCard({
             <span className="font-headings text-sm font-semibold uppercase tracking-[0.03em] text-[#E5E5E5]">
               Learn More
             </span>
-            <ArrowRight className="h-4 w-4 stroke-[1.5px] text-[#E5E5E5] transition-transform group-hover/btn:translate-x-1" />
+            <ChevronRight className="h-4 w-4 stroke-[1.5px] text-[#E5E5E5] transition-transform group-hover/btn:translate-x-1" />
           </motion.button>
         </Link>
       </div>

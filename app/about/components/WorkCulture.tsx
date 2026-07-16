@@ -130,7 +130,7 @@ const WorkCulture = ({ gallery }: WorkCultureProps) => {
 
         <div className="text-center">
           <Link
-            href="/careers"
+            href="/contact"
             className="inline-flex items-center justify-center px-6 py-3 text-white font-medium bg-black/20 border-2 border-yellow-300 rounded-md hover:bg-yellow-300/10 transition-colors"
           >
             Join Us Now

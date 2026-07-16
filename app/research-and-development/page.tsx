@@ -1,7 +1,15 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Cpu, Bot, Terminal, ArrowRight, Lightbulb, Zap, Rocket } from "lucide-react";
+import {
+  Cpu,
+  Bot,
+  Terminal,
+  ChevronRight,
+  Lightbulb,
+  Zap,
+  Rocket,
+} from "lucide-react";
 import Innovations from "@/components/Innovations";
 import LandingContact from "@/components/LandingContact";
 import ResearchOverview from "@/app/services/components/ResearchOverview";
@@ -11,7 +19,8 @@ export const metadata: Metadata = {
   description:
     "Explore dynamic Research & Development at Baliyo Ventures. From robotics and IoT hardware to advanced AI-driven software, we design tomorrow's technology.",
   openGraph: {
-    title: "Research & Development | Baliyo Ventures - Pioneering Next-Gen Tech",
+    title:
+      "Research & Development | Baliyo Ventures - Pioneering Next-Gen Tech",
     description:
       "Explore dynamic Research & Development at Baliyo Ventures. From robotics and IoT hardware to advanced AI-driven software, we design tomorrow's technology.",
     images: "/images/research/hero-1.jpg",
@@ -24,21 +33,33 @@ const pillars = [
     title: "Robotics & Hardware Prototyping",
     description:
       "Designing state-of-the-art robotic systems and mechanical automation devices. From high-grade CAD models and stress analysis to physical chassis construction and mechanical integration.",
-    features: ["Industrial Automation", "Robo-war Engineering", "Custom Mechanical Arms"],
+    features: [
+      "Industrial Automation",
+      "Robo-war Engineering",
+      "Custom Mechanical Arms",
+    ],
   },
   {
     icon: Cpu,
     title: "Embedded Systems & PCB Design",
     description:
       "Bringing electronics to life with high-performance microcontroller architectures, custom printed circuit board (PCB) designs, sensory arrays, and embedded firmware implementation.",
-    features: ["Custom Circuit Routing", "IoT Sensors Integration", "Real-Time Microcontrollers"],
+    features: [
+      "Custom Circuit Routing",
+      "IoT Sensors Integration",
+      "Real-Time Microcontrollers",
+    ],
   },
   {
     icon: Terminal,
     title: "AI-Powered Systems & Software",
     description:
       "Developing sophisticated machine learning algorithms, high-efficiency software architectures, computer vision systems, and robust web applications backing complex mechanical devices.",
-    features: ["Computer Vision Models", "Intelligent Systems Integration", "High-Throughput Web Backends"],
+    features: [
+      "Computer Vision Models",
+      "Intelligent Systems Integration",
+      "High-Throughput Web Backends",
+    ],
   },
 ];
 
@@ -48,7 +69,7 @@ export default function ResearchAndDevelopmentPage() {
       {/* Hero Section */}
       <section className="relative w-full overflow-hidden pb-16 md:pb-24 border-b border-white/[0.05]">
         <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center opacity-30 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-        
+
         {/* Subtle glowing gradients in the background */}
         <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-yellow-300/10 blur-[120px] pointer-events-none" />
         <div className="absolute top-20 right-0 h-[450px] w-[450px] rounded-full bg-yellow-500/[0.04] blur-[150px] pointer-events-none" />
@@ -72,7 +93,11 @@ export default function ResearchAndDevelopmentPage() {
               </h1>
 
               <p className="font-inter text-base md:text-lg font-light leading-[1.8] text-[#B5B5B5] max-w-2xl">
-                At Baliyo Ventures, our R&D division acts as a bridge between bold conceptual ideas and robust, physical market-ready engineering solutions. We specialize in cross-disciplinary development combining robotics, embedded hardware circuits, and advanced software models.
+                At Baliyo Ventures, our R&D division acts as a bridge between
+                bold conceptual ideas and robust, physical market-ready
+                engineering solutions. We specialize in cross-disciplinary
+                development combining robotics, embedded hardware circuits, and
+                advanced software models.
               </p>
 
               <div className="flex flex-wrap gap-4 mt-4">
@@ -81,7 +106,7 @@ export default function ResearchAndDevelopmentPage() {
                   className="inline-flex items-center gap-2 px-6 py-3 rounded bg-yellow-300 text-[#00040C] font-semibold text-sm hover:bg-yellow-300/90 transition-colors uppercase tracking-[0.03em]"
                 >
                   Collaborate With Us
-                  <ArrowRight className="h-4 w-4" />
+                  <ChevronRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/services"
@@ -103,15 +128,19 @@ export default function ResearchAndDevelopmentPage() {
                   priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                
+
                 <div className="absolute bottom-6 left-6 right-6 p-4 rounded bg-[#00040C]/80 border border-white/[0.06] backdrop-blur-sm">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded bg-yellow-300/10 text-yellow-300">
                       <Zap className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-xs text-[#8F8F8F] uppercase tracking-[0.05em]">R&D Focus</p>
-                      <p className="text-sm font-semibold text-[#E4E4E4] mt-0.5">High-Precision Robotics & IoT</p>
+                      <p className="text-xs text-[#8F8F8F] uppercase tracking-[0.05em]">
+                        R&D Focus
+                      </p>
+                      <p className="text-sm font-semibold text-[#E4E4E4] mt-0.5">
+                        High-Precision Robotics & IoT
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -130,7 +159,9 @@ export default function ResearchAndDevelopmentPage() {
               Our Technical Pillars
             </h2>
             <p className="font-inter text-sm md:text-base text-[#B5B5B5] font-light leading-relaxed">
-              We leverage deeply detailed expertise across three core technology sectors to create innovative solutions that solve real-world problems.
+              We leverage deeply detailed expertise across three core technology
+              sectors to create innovative solutions that solve real-world
+              problems.
             </p>
           </div>
 
@@ -157,7 +188,9 @@ export default function ResearchAndDevelopmentPage() {
                   </div>
 
                   <div className="mt-auto pt-6 border-t border-white/[0.06]">
-                    <p className="text-xs uppercase tracking-[0.05em] text-[#8F8F8F] mb-3">Key Technologies</p>
+                    <p className="text-xs uppercase tracking-[0.05em] text-[#8F8F8F] mb-3">
+                      Key Technologies
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {p.features.map((feat, fIdx) => (
                         <span

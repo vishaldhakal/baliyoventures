@@ -69,14 +69,14 @@ const MessageFromMD = () => {
                   and long-term success. We are more than just a service
                   provider—we are a strategic partner in your digital journey.
                   With expertise in product design, architecture design,
-                  software development, and research & development, we craft
-                  tailored solutions that align with your business needs. Our
-                  team stays at the forefront of industry advancements,
-                  leveraging data-driven strategies to address current
-                  challenges while ensuring future readiness. Your success is
-                  our priority, and we are dedicated to guiding you through
-                  every phase of your transformation. Thankyou for choosing us
-                  to help you achieve your vision.
+                  robotics, and research & development, we craft tailored
+                  solutions that align with your business needs. Our team stays
+                  at the forefront of industry advancements, leveraging
+                  data-driven strategies to address current challenges while
+                  ensuring future readiness. Your success is our priority, and
+                  we are dedicated to guiding you through every phase of your
+                  transformation. Thankyou for choosing us to help you achieve
+                  your vision.
                 </p>
               </div>
               <div>

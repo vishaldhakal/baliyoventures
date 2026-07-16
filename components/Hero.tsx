@@ -1,6 +1,16 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Cpu, Code, Cog, Server, Database, ArrowRight } from "lucide-react";
+import {
+  Cpu,
+  Code,
+  Cog,
+  Server,
+  Database,
+  ChevronRight,
+  RibbonIcon,
+  Bot,
+} from "lucide-react";
+import { text } from "stream/consumers";
 
 const Hero = () => {
   return (
@@ -74,7 +84,7 @@ const Hero = () => {
             help. Baliyo ventures can help you build the best technology whether
             it is{" "}
             <span className="font-medium text-yellow-300">mechanical</span>,{" "}
-            <span className="font-medium text-yellow-300">software</span> or{" "}
+            <span className="font-medium text-yellow-300">robotics</span> or{" "}
             <span className="font-medium text-yellow-300">electronics</span>.
           </p>
 
@@ -82,7 +92,7 @@ const Hero = () => {
             <Link href={"/contact"}>
               <Button className="bg-yellow-400 hover:bg-yellow-300 text-black font-medium px-8 py-6 rounded-lg text-base transition-all duration-300 shadow-lg hover:shadow-yellow-400/30 group">
                 <span className="mr-2">Have Any Project In Mind?</span>
-                <ArrowRight className="w-5 h-5" />
+                <ChevronRight className="w-5 h-5" />
               </Button>
             </Link>
 
@@ -100,8 +110,14 @@ const Hero = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-16 w-full max-w-3xl">
             {[
               { icon: <Cpu className="w-5 h-5" />, text: "Hardware Solutions" },
-              { icon: <Code className="w-5 h-5" />, text: "Custom Software" },
-              { icon: <Server className="w-5 h-5" />, text: "Cloud Services" },
+              {
+                icon: <Bot className="w-5 h-5" />,
+                text: "Robotics & Automation",
+              },
+              {
+                icon: <Cog className="w-5 h-5" />,
+                text: "Re-Engineered Products",
+              },
             ].map((item, index) => (
               <div
                 key={index}

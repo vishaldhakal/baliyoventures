@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const ProjectInMind = () => {
   return (
@@ -27,9 +28,9 @@ const ProjectInMind = () => {
             and implement them into reality with precision and innovation!
           </p>
           <Link href="/contact" passHref>
-            <button className="px-6 py-3 bg-black bg-opacity-20 text-white border-2 border-yellow-300 rounded-md font-oxanium text-lg transition-all duration-300 hover:bg-[rgba(240,209,0,0.7)] hover:shadow-md">
+            <Button className="px-6 py-3 bg-black bg-opacity-20 text-white border-2 border-yellow-300 rounded-md font-oxanium text-lg transition-all duration-300 hover:bg-[rgba(240,209,0,0.7)] hover:shadow-md">
               Discuss your Project
-            </button>
+            </Button>
           </Link>
         </div>
       </div>

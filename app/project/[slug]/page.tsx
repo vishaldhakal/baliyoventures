@@ -1,6 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Tag, FileText, Download, ArrowRight, ExternalLink } from "lucide-react";
+import {
+  ChevronLeft,
+  Calendar,
+  Tag,
+  FileText,
+  Download,
+  ChevronRight,
+  ExternalLink,
+} from "lucide-react";
 import { getProjectDetails } from "@/services/project.service";
 import ResearchOverview from "@/app/services/components/ResearchOverview";
 import { SimilarProject } from "@/types/projects";
@@ -25,18 +33,25 @@ export async function generateMetadata({ params }: ProjectPageProps) {
     const project = await getProjectDetails(slug);
     return {
       title: project.meta_title || `${project.title} - Baliyo Ventures`,
-      description: project.meta_description || `Learn about ${project.title} developed by Baliyo Ventures.`,
+      description:
+        project.meta_description ||
+        `Learn about ${project.title} developed by Baliyo Ventures.`,
       openGraph: {
         title: project.meta_title || `${project.title} - Baliyo Ventures`,
-        description: project.meta_description || `Learn about ${project.title} developed by Baliyo Ventures.`,
-        images: project.thumbnail_image ? [resolveImageUrl(project.thumbnail_image)] : [],
+        description:
+          project.meta_description ||
+          `Learn about ${project.title} developed by Baliyo Ventures.`,
+        images: project.thumbnail_image
+          ? [resolveImageUrl(project.thumbnail_image)]
+          : [],
       },
     };
   } catch (error) {
     console.error("Error generating metadata:", error);
     return {
       title: "Project Details - Baliyo Ventures",
-      description: "Discover innovative engineering and software solutions by Baliyo Ventures.",
+      description:
+        "Discover innovative engineering and software solutions by Baliyo Ventures.",
     };
   }
 }
@@ -85,8 +100,11 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
               }
               className="inline-flex items-center gap-2 group text-sm font-semibold uppercase tracking-[0.05em] text-[#B5B5B5] hover:text-[#FFFCCB] transition-colors"
             >
-              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              Back to {project.category && project.category[0] ? project.category[0].title : "Services"}
+              <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              Back to{" "}
+              {project.category && project.category[0]
+                ? project.category[0].title
+                : "Services"}
             </Link>
           </div>
 
@@ -172,17 +190,25 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                   <div className="flex items-start gap-4">
                     <Calendar className="h-5 w-5 text-yellow-300/80 mt-0.5 shrink-0" />
                     <div>
-                      <p className="text-xs text-[#8F8F8F] uppercase tracking-[0.05em]">Launch Date</p>
-                      <p className="text-sm font-medium text-[#E4E4E4] mt-0.5">{formattedDate}</p>
+                      <p className="text-xs text-[#8F8F8F] uppercase tracking-[0.05em]">
+                        Launch Date
+                      </p>
+                      <p className="text-sm font-medium text-[#E4E4E4] mt-0.5">
+                        {formattedDate}
+                      </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
                     <Tag className="h-5 w-5 text-yellow-300/80 mt-0.5 shrink-0" />
                     <div>
-                      <p className="text-xs text-[#8F8F8F] uppercase tracking-[0.05em]">Category</p>
+                      <p className="text-xs text-[#8F8F8F] uppercase tracking-[0.05em]">
+                        Category
+                      </p>
                       <p className="text-sm font-medium text-[#E4E4E4] mt-0.5">
-                        {project.category && project.category[0] ? project.category[0].title : "Software Development"}
+                        {project.category && project.category[0]
+                          ? project.category[0].title
+                          : "Software Development"}
                       </p>
                     </div>
                   </div>
@@ -223,7 +249,10 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                 )}
 
                 {/* Share Project section */}
-                <ShareButtons title={project.title} description={project.description} />
+                <ShareButtons
+                  title={project.title}
+                  description={project.description}
+                />
               </div>
             </div>
           </div>
@@ -246,7 +275,10 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                     <div className="relative h-[200px] w-full overflow-hidden rounded-sm bg-white/[0.01]">
                       <Image
                         src={resolveImageUrl(simProj.thumbnail_image)}
-                        alt={simProj.thumbnail_image_alt_description || simProj.title}
+                        alt={
+                          simProj.thumbnail_image_alt_description ||
+                          simProj.title
+                        }
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
@@ -265,7 +297,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                     {/* Action Indicator */}
                     <div className="mt-auto pt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.05em] text-yellow-300/80 group-hover:text-yellow-300">
                       Learn More
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                      <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                     </div>
                   </Link>
                 ))}
@@ -287,9 +319,12 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
     return (
       <main className="min-h-screen bg-[#00040C] text-white flex items-center justify-center">
         <div className="text-center flex flex-col gap-4 max-w-md p-6">
-          <h1 className="font-oxanium text-2xl font-bold text-red-400">Unable to load project</h1>
+          <h1 className="font-oxanium text-2xl font-bold text-red-400">
+            Unable to load project
+          </h1>
           <p className="text-[#B5B5B5] font-inter text-sm">
-            There was a problem fetching this project's details from our servers. Please try again later.
+            There was a problem fetching this project's details from our
+            servers. Please try again later.
           </p>
           <Link
             href="/services"

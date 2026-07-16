@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -161,7 +161,9 @@ const ContactHero = () => {
                   disabled={loading}
                 >
                   {loading ? "Sending..." : "Send Message"}
-                  {loading && <ArrowRight size={16} className="animate-spin" />}
+                  {loading && (
+                    <ChevronRight size={16} className="animate-spin" />
+                  )}
                 </Button>
               </form>
             </Form>

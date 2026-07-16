@@ -1,5 +1,5 @@
 import { ServiceListResponse } from "@/types/services";
-import { ArrowRightIcon, Link } from "lucide-react";
+import { ChevronRightIcon, Link } from "lucide-react";
 import Image from "next/image";
 import {
   Card,
@@ -51,7 +51,7 @@ const ServiceCard = ({
               className="w-full flex items-center justify-between text-[#E5E5E5] text-xs uppercase font-semibold tracking-widest font-saira group hover:bg-[rgba(240,209,0,0.2)] hover:text-white"
             >
               <span>Learn More</span>
-              <ArrowRightIcon className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ChevronRightIcon className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Button>
           </Link>
         </div>

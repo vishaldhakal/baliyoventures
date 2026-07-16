@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import {
   Form,
@@ -153,7 +153,7 @@ const LandingContact = () => {
                     className="bg-[#EBB51F] hover:bg-[#d9a71c] text-black font-bold py-6 rounded-md mt-4 flex items-center justify-center gap-2 w-full md:w-auto md:self-start cursor-pointer"
                   >
                     Send Message
-                    <ArrowRight size={16} />
+                    <ChevronRight size={16} />
                   </Button>
                 </form>
               </Form>

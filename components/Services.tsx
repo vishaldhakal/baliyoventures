@@ -61,45 +61,6 @@ const ServiceCard = ({
 };
 
 const Services = ({ services }: { services: ServiceListResponse[] }) => {
-  // const services = [
-  //   {
-  //     icon: "/images/services/product-dev-icon.svg",
-  //     title: "Product Development",
-  //     description:
-  //       "Web development is the process of creating websites and web applications for the internet or intranet.",
-  //   },
-  //   {
-  //     icon: "/images/services/product-dev-icon.svg",
-  //     title: "software Development",
-  //     description:
-  //       "Cloud solutions refer to the use of cloud computing technology to provide services and solutions over the internet.",
-  //   },
-  //   {
-  //     icon: "/images/services/research-dev-icon.svg",
-  //     title: "Research & Development",
-  //     description:
-  //       "Revolutionize your Digital Presence with Cutting-Edge Mobile App Development, Design, and Innovation Services.",
-  //   },
-  //   {
-  //     icon: "/images/services/product-dev-icon.svg",
-  //     title: "Manufacturing Process",
-  //     description:
-  //       "Optimize your manufacturing processes with our technical expertise and innovative approaches.",
-  //   },
-  //   {
-  //     icon: "/images/services/research-dev-icon.svg",
-  //     title: "Baliyo Marketing",
-  //     description:
-  //       "Strategic digital marketing solutions to enhance your brand presence and customer reach.",
-  //   },
-  //   {
-  //     icon: "/images/services/product-dev-icon.svg",
-  //     title: "Mobile Solutions",
-  //     description:
-  //       "Cross-platform mobile applications designed for performance and exceptional user experience.",
-  //   },
-  // ];
-
   return (
     <section className="py-16 md:py-24 bg-[#212121] relative overflow-hidden">
       <div className="container mx-auto px-4">

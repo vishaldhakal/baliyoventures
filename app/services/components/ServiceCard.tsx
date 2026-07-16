@@ -4,6 +4,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { ServiceListResponse } from "@/types/services";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface ServiceCardProps extends ServiceListResponse {
   index: number;
@@ -46,15 +48,15 @@ export default function ServiceCard({
 
       {/* Learn More Button */}
       <div className="mt-7">
-        <motion.button className="group/btn cursor-pointer flex items-center gap-3 rounded-sm bg-yellow-300/20 px-4 py-2.5 transition-colors hover:bg-yellow-300/30">
-          <a
-            href={`/services/${slug}`}
-            className="font-headings text-sm font-semibold uppercase tracking-[0.03em] text-[#E5E5E5]"
-          >
+        <Link
+          href={`/services/${slug}`}
+          className="font-headings text-sm font-semibold uppercase tracking-[0.03em] text-[#E5E5E5] flex items-center gap-2"
+        >
+          <Button className="bg-yellow-300/20 hover:bg-yellow-300/30">
             Learn More
-          </a>
-          <ChevronRight className="h-4 w-4 stroke-[1.5px] text-[#E5E5E5] transition-transform group-hover/btn:translate-x-1" />
-        </motion.button>
+            <ChevronRight className="h-4 w-4 stroke-[1.5px] text-[#E5E5E5] transition-transform group-hover/btn:translate-x-1" />
+          </Button>
+        </Link>
       </div>
     </motion.div>
   );

@@ -17,10 +17,18 @@ export interface SimilarProject {
   meta_description: string;
   meta_title: string;
 }
-
+export interface Project {
+  id: number;
+  title: string;
+  slug: string;
+  thumbnail_image: string | null;
+  thumbnail_image_alt_description: string | null;
+  meta_description: string;
+  meta_title: string;
+}
 export interface ProjectDetailResponse {
   id: number;
-  images: { id: number; image: string }[] | string[] | any[]; // Backend might return full objects or string URLs, let's keep it flexible
+  images: { id: number; image: string }[] | string[] | any[];
   category: ProjectCategory[];
   title: string;
   slug: string;
@@ -34,4 +42,11 @@ export interface ProjectDetailResponse {
   created_at: string;
   updated_at: string;
   similar_projects: SimilarProject[];
+}
+
+export interface ProjectsListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: SimilarProject[];
 }

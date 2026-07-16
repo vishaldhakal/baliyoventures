@@ -1,33 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
+import { getProjects } from "@/services/project.service";
 
-const Innovations = () => {
-  const projects = [
-    {
-      id: 3,
-      image: "/images/innovations/project-1.jpg",
-      title: "Sarathi Robot in NTC Nepal",
-      description: "Advanced hardware solutions for industrial automation",
-      link: "/services",
-      category: "Innovation",
-    },
-    {
-      id: 5,
-      image: "/images/innovations/project-5.jpg",
-      title: "Technical Partner at Birat Expo 2025",
-      description: "End-to-end product development and manufacturing",
-      link: "/services",
-      category: "Development",
-    },
-    {
-      id: 6,
-      image: "/images/innovations/project-4.jpg",
-      title: "Internation Robo War Competition",
-      description: "Comprehensive engineering services for complex challenges",
-      link: "/services",
-      category: "Engineering",
-    },
-  ];
+// This is a Server Component by default
+const Innovations = async () => {
+  // Fetch first 6 projects for the homepage
+  const projectsData = await getProjects(1, 10);
+  const projects = projectsData.results.slice(0, 6);
 
   return (
     <section className="bg-[#00040C] py-16 md:py-24">
@@ -47,44 +26,60 @@ const Innovations = () => {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-          {projects.map((project) => (
-            <div key={project.id} className="group">
-              <Link href={project.link} className="block">
-                <div className="relative aspect-[4/3] mb-4 rounded-xl overflow-hidden">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-yellow-300 text-sm font-saira tracking-wider">
-                      {project.category}
-                    </span>
-                    <span className="text-white/60 text-sm font-saira">
-                      View Project →
-                    </span>
+        {projects.length === 0 ? (
+          <div className="text-center text-white/60 py-12">
+            No projects found.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+            {projects.map((project) => (
+              <div key={project.id} className="group">
+                <Link href={`/project/${project.slug}`} className="block">
+                  <div className="relative aspect-[4/3] mb-4 rounded-xl overflow-hidden bg-gray-800">
+                    {project.thumbnail_image ? (
+                      <Image
+                        src={project.thumbnail_image}
+                        alt={
+                          project.thumbnail_image_alt_description ||
+                          project.title
+                        }
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                        No Image
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-                  <h3 className="text-white font-oxanium text-xl font-semibold group-hover:text-yellow-300 transition-colors duration-300">
-                    {project.title}
-                  </h3>
-                  <p className="text-[#F3EEE0]/80 text-sm font-saira line-clamp-2">
-                    {project.description}
-                  </p>
-                </div>
-              </Link>
-            </div>
-          ))}
-        </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-yellow-300 text-sm font-saira tracking-wider">
+                        Innovation
+                      </span>
+                      <span className="text-white/60 text-sm font-saira">
+                        View Project →
+                      </span>
+                    </div>
+                    <h3 className="text-white font-oxanium text-xl font-semibold group-hover:text-yellow-300 transition-colors duration-300">
+                      {project.title}
+                    </h3>
+                    <p className="text-[#F3EEE0]/80 text-sm font-saira line-clamp-2">
+                      {project.meta_description ||
+                        "Innovative project delivered by Baliyo Ventures"}
+                    </p>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* View All Works button */}
         <div className="flex justify-center mt-12 md:mt-16">
           <Link
-            href="/services"
+            href="/project"
             className="inline-flex items-center gap-3 px-8 py-4 bg-yellow-300/10 border border-yellow-300/20 rounded-full text-yellow-300 font-saira text-base hover:bg-yellow-300/20 transition-all duration-300"
           >
             <span>View All Works</span>

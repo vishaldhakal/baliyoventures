@@ -22,7 +22,7 @@ export const getProjects = async (
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/projects/?page=${page}&page_size=${pageSize}`,
     {
-      next: { revalidate: 3600 },
+      cache: "no-store",
     },
   );
   if (!response.ok) {

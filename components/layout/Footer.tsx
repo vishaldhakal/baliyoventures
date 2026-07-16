@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Instagram, Linkedin } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -27,25 +27,36 @@ const Footer = () => {
               </p>
               <div className="flex space-x-4">
                 <Link
-                  href="/"
+                  href="https://www.facebook.com/baliyocha"
                   className="text-white hover:text-[#F0D100] transition flex items-center gap-1"
+                  target="_blank"
                 >
                   <Facebook size={16} />
                   <span>Facebook</span>
                 </Link>
                 <Link
-                  href="/"
+                  href="https://www.instagram.com/baliyoventures"
+                  target="_blank"
                   className="text-white hover:text-[#F0D100] transition flex items-center gap-1"
                 >
                   <Instagram size={16} />
                   <span>Instagram</span>
                 </Link>
                 <Link
-                  href="/"
+                  href="https://www.linkedin.com/company/baliyo-ventures"
+                  target="_blank"
                   className="text-white hover:text-[#F0D100] transition flex items-center gap-1"
                 >
                   <Linkedin size={16} />
                   <span>Linkedin</span>
+                </Link>
+                <Link
+                  href="https://www.youtube.com/@BaliyoVentures"
+                  target="_blank"
+                  className="text-white hover:text-[#F0D100] transition flex items-center gap-1"
+                >
+                  <Youtube size={16} />
+                  <span>Youtube</span>
                 </Link>
               </div>
             </div>
@@ -58,7 +69,7 @@ const Footer = () => {
               <ul className="space-y-2">
                 <li>
                   <Link
-                    href="/"
+                    href="/services/product-development"
                     className="text-white hover:text-[#F0D100] transition"
                   >
                     Product Development
@@ -66,26 +77,19 @@ const Footer = () => {
                 </li>
                 <li>
                   <Link
-                    href="/"
+                    href="/services/research-development"
                     className="text-white hover:text-[#F0D100] transition"
                   >
-                    Baliyo Architecture
+                    Research & Development
                   </Link>
                 </li>
+
                 <li>
                   <Link
-                    href="/"
+                    href="/services/robotics"
                     className="text-white hover:text-[#F0D100] transition"
                   >
-                    Baliyo Software
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/"
-                    className="text-white hover:text-[#F0D100] transition"
-                  >
-                    Baliyo Marketing
+                    Robotics
                   </Link>
                 </li>
               </ul>

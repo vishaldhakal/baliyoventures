@@ -140,7 +140,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
               href={
                 project.category && project.category[0]
                   ? `/services/${project.category[0].slug}`
-                  : "/projects"
+                  : "/project"
               }
               className="inline-flex items-center gap-2 group text-sm font-semibold uppercase tracking-[0.05em] text-[#B5B5B5] hover:text-[#FFFCCB] transition-colors"
             >
@@ -475,7 +475,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {project.similar_projects.map((simProj: SimilarProject) => (
                   <Link
-                    href={`/projects/${simProj.slug}`}
+                    href={`/project/${simProj.slug}`}
                     key={simProj.slug}
                     className="group flex flex-col gap-6 rounded-[5px] border border-white/[0.07] bg-[#12151C] p-6 hover:border-yellow-300/20 transition-all hover:-translate-y-1 duration-300"
                   >

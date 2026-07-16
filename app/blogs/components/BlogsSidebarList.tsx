@@ -1,26 +1,29 @@
 import { BlogsSidebarListProps } from "@/types/blogs";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function BlogsSidebarList({ blogs }: BlogsSidebarListProps) {
   return (
     <div className="flex flex-col gap-4 p-4 bg-[#010714] rounded-lg">
       {blogs.map((blog) => (
         <div key={blog.id} className="group cursor-pointer">
-          <div className="flex gap-4">
-            <div className="relative w-[120px] h-[90px] rounded-lg overflow-hidden flex-shrink-0">
-              <Image
-                src={blog.thumbnail_image || ""}
-                alt={blog.title}
-                fill
-                className="object-cover"
-              />
+          <Link href={`/blogs/${blog.slug}`}>
+            <div className="flex gap-4">
+              <div className="relative w-[120px] h-[90px] rounded-lg overflow-hidden flex-shrink-0">
+                <Image
+                  src={blog.thumbnail_image || ""}
+                  alt={blog.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex flex-col gap-2 flex-1 min-w-0">
+                <h4 className="text-base font-bold text-[#CDCDCD] leading-[1.67] tracking-[-0.03em] group-hover:text-yellow-300 line-clamp-2">
+                  {blog.title}
+                </h4>
+              </div>
             </div>
-            <div className="flex flex-col gap-2 flex-1 min-w-0">
-              <h4 className="text-base font-bold text-[#CDCDCD] leading-[1.67] tracking-[-0.03em] group-hover:text-yellow-300 line-clamp-2">
-                {blog.title}
-              </h4>
-            </div>
-          </div>
+          </Link>
           <div className="h-px bg-[#DEE1E6] mt-4" />
         </div>
       ))}

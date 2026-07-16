@@ -12,14 +12,15 @@ import {
 } from "@/components/ui/pagination";
 
 interface ProjectsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
-  };
+  }>;
 }
 
 const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
-  const currentPage = parseInt(searchParams.page || "1", 10);
-  const pageSize = 10;
+  const resolvedSearchParams = await searchParams;
+  const currentPage = parseInt(resolvedSearchParams.page || "1", 10);
+  const pageSize = 9;
 
   const projectsData = await getProjects(currentPage, pageSize);
   const totalPages = Math.ceil(projectsData.count / pageSize);
@@ -71,10 +72,6 @@ const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
             Explore our complete portfolio of innovations and projects delivered
             by Baliyo Ventures.
           </p>
-          <p className="text-[#F3EEE0]/60 font-saira text-sm mt-2">
-            Showing {projectsData.results.length} of {projectsData.count}{" "}
-            projects
-          </p>
         </div>
 
         {/* Projects Grid */}
@@ -86,7 +83,7 @@ const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
             {projectsData.results.map((project) => (
               <div key={project.id} className="group">
-                <Link href={`/projects/${project.slug}`} className="block">
+                <Link href={`/project/${project.slug}`} className="block">
                   <div className="relative aspect-[4/3] mb-4 rounded-xl overflow-hidden bg-gray-800">
                     {project.thumbnail_image ? (
                       <Image
@@ -132,7 +129,7 @@ const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
               <PaginationContent className="gap-2">
                 <PaginationItem>
                   <PaginationPrevious
-                    href={`/projects?page=${currentPage - 1}`}
+                    href={`/project?page=${currentPage - 1}&page_size=9`}
                     className={
                       currentPage === 1
                         ? "pointer-events-none opacity-50"
@@ -147,7 +144,7 @@ const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
                       <PaginationEllipsis className="text-white/60" />
                     ) : (
                       <PaginationLink
-                        href={`/projects?page=${pageNumber}`}
+                        href={`/project?page=${pageNumber}&page_size=9`}
                         isActive={pageNumber === currentPage}
                         className={
                           pageNumber === currentPage
@@ -163,7 +160,7 @@ const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
 
                 <PaginationItem>
                   <PaginationNext
-                    href={`/projects?page=${currentPage + 1}`}
+                    href={`/project?page=${currentPage + 1}&page_size=9`}
                     className={
                       currentPage === totalPages
                         ? "pointer-events-none opacity-50"

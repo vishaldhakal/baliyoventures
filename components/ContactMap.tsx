@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import {
   Phone,
@@ -6,7 +7,7 @@ import {
   Youtube,
   Instagram,
   Facebook,
-  Twitter,
+  Linkedin,
 } from "lucide-react";
 
 const ContactMap = () => {
@@ -104,7 +105,11 @@ const ContactMap = () => {
             Connect With Us
           </h4>
           <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-            <Link href="#" className="relative group">
+            <Link
+              href="https://www.youtube.com/@BaliyoVentures"
+              className="relative group"
+              target="_blank"
+            >
               <div className="absolute inset-0 bg-[#EBB51F]/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="bg-[#00040C] border-2 border-[#7D7D7D] rounded-full w-16 h-16 flex items-center justify-center transform transition-all duration-500 hover:scale-110 hover:border-[#EBB51F] hover:bg-[#EBB51F]/10 relative">
                 <Youtube
@@ -113,7 +118,11 @@ const ContactMap = () => {
                 />
               </div>
             </Link>
-            <Link href="#" className="relative group">
+            <Link
+              href="https://www.instagram.com/baliyoventures"
+              className="relative group"
+              target="_blank"
+            >
               <div className="absolute inset-0 bg-[#EBB51F]/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="bg-[#00040C] border-2 border-[#7D7D7D] rounded-full w-16 h-16 flex items-center justify-center transform transition-all duration-500 hover:scale-110 hover:border-[#EBB51F] hover:bg-[#EBB51F]/10 relative">
                 <Instagram
@@ -122,7 +131,11 @@ const ContactMap = () => {
                 />
               </div>
             </Link>
-            <Link href="#" className="relative group">
+            <Link
+              href="https://www.facebook.com/baliyocha"
+              className="relative group"
+              target="_blank"
+            >
               <div className="absolute inset-0 bg-[#EBB51F]/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="bg-[#00040C] border-2 border-[#7D7D7D] rounded-full w-16 h-16 flex items-center justify-center transform transition-all duration-500 hover:scale-110 hover:border-[#EBB51F] hover:bg-[#EBB51F]/10 relative">
                 <Facebook
@@ -131,10 +144,14 @@ const ContactMap = () => {
                 />
               </div>
             </Link>
-            <Link href="#" className="relative group">
+            <Link
+              href="https://www.linkedin.com/company/baliyo-ventures"
+              className="relative group"
+              target="_blank"
+            >
               <div className="absolute inset-0 bg-[#EBB51F]/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="bg-[#00040C] border-2 border-[#7D7D7D] rounded-full w-16 h-16 flex items-center justify-center transform transition-all duration-500 hover:scale-110 hover:border-[#EBB51F] hover:bg-[#EBB51F]/10 relative">
-                <Twitter
+                <Linkedin
                   size={28}
                   className="text-[#7D7D7D] group-hover:text-[#EBB51F] transition-colors duration-500"
                 />

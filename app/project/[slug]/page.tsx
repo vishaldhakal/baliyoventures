@@ -154,19 +154,6 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
 
           {/* Hero Section */}
           <div className="flex flex-col gap-6 mb-12">
-            <div className="flex flex-wrap items-center gap-3">
-              {project.category?.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/services/${cat.slug}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] hover:bg-yellow-300/10 hover:border-yellow-300/20 text-xs font-medium text-[#FFFCCB] tracking-[0.03em] transition-all"
-                >
-                  <Tag className="h-3.5 w-3.5 text-yellow-300" />
-                  {cat.title}
-                </Link>
-              ))}
-            </div>
-
             <h1 className="font-oxanium text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.1] tracking-[-0.02em] text-[#CDCDCD]">
               {project.title}
             </h1>

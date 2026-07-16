@@ -24,12 +24,12 @@ const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
   const projectsData = await getProjects(currentPage, pageSize);
   const totalPages = Math.ceil(projectsData.count / pageSize);
 
-  // Generate page numbers to display
-  const getPageNumbers = () => {
+  // Generate page numbers to display with proper types
+  const getPageNumbers = (): (number | string)[] => {
     const delta = 2;
-    const range = [];
-    const rangeWithDots = [];
-    let l;
+    const range: number[] = [];
+    const rangeWithDots: (number | string)[] = [];
+    let l: number | undefined;
 
     for (let i = 1; i <= totalPages; i++) {
       if (
@@ -42,7 +42,7 @@ const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
     }
 
     range.forEach((i) => {
-      if (l) {
+      if (l !== undefined) {
         if (i - l === 2) {
           rangeWithDots.push(l + 1);
         } else if (i - l !== 1) {
@@ -86,7 +86,7 @@ const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
             {projectsData.results.map((project) => (
               <div key={project.id} className="group">
-                <Link href={`/project/${project.slug}`} className="block">
+                <Link href={`/projects/${project.slug}`} className="block">
                   <div className="relative aspect-[4/3] mb-4 rounded-xl overflow-hidden bg-gray-800">
                     {project.thumbnail_image ? (
                       <Image

@@ -17,7 +17,7 @@ export const getProjectDetails = async (
 
 export const getProjects = async (
   page = 1,
-  pageSize = 10,
+  pageSize = 12,
 ): Promise<ProjectsListResponse> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/projects/?page=${page}&page_size=${pageSize}`,

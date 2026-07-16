@@ -49,6 +49,11 @@ const getYouTubeEmbedUrl = (url: string): string | null => {
   return null;
 };
 
+// Safe HTML content renderer
+const renderHTML = (content: string | null | undefined): string => {
+  return content || "";
+};
+
 export async function generateMetadata({ params }: ProjectPageProps) {
   const { slug } = await params;
   try {
@@ -190,7 +195,9 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                   </h2>
                   <div
                     className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5] space-y-6 [&>p]:leading-[2.0] [&>p>strong]:text-[#E5E5E5] [&>p>strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2"
-                    dangerouslySetInnerHTML={{ __html: project.description }}
+                    dangerouslySetInnerHTML={{
+                      __html: renderHTML(project.description),
+                    }}
                   />
                 </div>
               )}
@@ -205,7 +212,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                   <div
                     className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5] space-y-6 [&>p]:leading-[2.0] [&>p>strong]:text-[#E5E5E5] [&>p>strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2"
                     dangerouslySetInnerHTML={{
-                      __html: project.problem_it_solves,
+                      __html: renderHTML(project.problem_it_solves),
                     }}
                   />
                 </div>
@@ -220,7 +227,9 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                   </h2>
                   <div
                     className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5] space-y-6 [&>p]:leading-[2.0] [&>p>strong]:text-[#E5E5E5] [&>p>strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2"
-                    dangerouslySetInnerHTML={{ __html: project.specs }}
+                    dangerouslySetInnerHTML={{
+                      __html: renderHTML(project.specs),
+                    }}
                   />
                 </div>
               )}
@@ -234,7 +243,9 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                   </h2>
                   <div
                     className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5] space-y-6 [&>p]:leading-[2.0] [&>p>strong]:text-[#E5E5E5] [&>p>strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2"
-                    dangerouslySetInnerHTML={{ __html: project.case_study }}
+                    dangerouslySetInnerHTML={{
+                      __html: renderHTML(project.case_study),
+                    }}
                   />
                 </div>
               )}
@@ -248,7 +259,9 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                   </h2>
                   <div
                     className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5]"
-                    dangerouslySetInnerHTML={{ __html: project.team_member }}
+                    dangerouslySetInnerHTML={{
+                      __html: renderHTML(project.team_member),
+                    }}
                   />
                 </div>
               )}
@@ -475,7 +488,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {project.similar_projects.map((simProj: SimilarProject) => (
                   <Link
-                    href={`/project/${simProj.slug}`}
+                    href={`/projects/${simProj.slug}`}
                     key={simProj.slug}
                     className="group flex flex-col gap-6 rounded-[5px] border border-white/[0.07] bg-[#12151C] p-6 hover:border-yellow-300/20 transition-all hover:-translate-y-1 duration-300"
                   >

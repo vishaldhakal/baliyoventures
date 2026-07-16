@@ -86,7 +86,7 @@ const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
             {projectsData.results.map((project) => (
               <div key={project.id} className="group">
-                <Link href={`/projects/${project.slug}`} className="block">
+                <Link href={`/project/${project.slug}`} className="block">
                   <div className="relative aspect-[4/3] mb-4 rounded-xl overflow-hidden bg-gray-800">
                     {project.thumbnail_image ? (
                       <Image
@@ -109,9 +109,6 @@ const ProjectsPage = async ({ searchParams }: ProjectsPageProps) => {
                     <div className="flex items-center justify-between">
                       <span className="text-yellow-300 text-sm font-saira tracking-wider">
                         Project
-                      </span>
-                      <span className="text-white/60 text-sm font-saira">
-                        View Details →
                       </span>
                     </div>
                     <h3 className="text-white font-oxanium text-xl font-semibold group-hover:text-yellow-300 transition-colors duration-300">

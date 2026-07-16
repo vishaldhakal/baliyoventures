@@ -8,6 +8,13 @@ import {
   Download,
   ChevronRight,
   ExternalLink,
+  Users,
+  Play,
+  Video,
+  Image as ImageIcon,
+  Lightbulb,
+  FileCheck,
+  ClipboardList,
 } from "lucide-react";
 import { getProjectDetails } from "@/services/project.service";
 import ResearchOverview from "@/app/services/components/ResearchOverview";
@@ -25,6 +32,21 @@ const resolveImageUrl = (url: string | null): string => {
     return url;
   }
   return `http://yachu.baliyoventures.com${url}`;
+};
+
+// Extract YouTube video ID from URL
+const getYouTubeEmbedUrl = (url: string): string | null => {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
+    /youtube\.com\/embed\/([^&\n?#]+)/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) {
+      return `https://www.youtube.com/embed/${match[1]}`;
+    }
+  }
+  return null;
 };
 
 export async function generateMetadata({ params }: ProjectPageProps) {
@@ -84,8 +106,25 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
       ? new Date(project.created_at).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
+          day: "numeric",
         })
       : "April 2025";
+
+    // Check if there are any demos
+    const hasDemos = project.demos && project.demos.length > 0;
+
+    // Check if there are any rendering images
+    const hasRenderingImages =
+      project.rendering_images && project.rendering_images.length > 0;
+
+    // Check if there are any additional sections
+    const hasSpecs = project.specs && project.specs.trim().length > 0;
+    const hasProblem =
+      project.problem_it_solves && project.problem_it_solves.trim().length > 0;
+    const hasCaseStudy =
+      project.case_study && project.case_study.trim().length > 0;
+    const hasTeam =
+      project.team_member && project.team_member.trim().length > 0;
 
     return (
       <main className="min-h-screen bg-[#00040C] text-white pt-24 md:pt-32">
@@ -96,7 +135,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
               href={
                 project.category && project.category[0]
                   ? `/services/${project.category[0].slug}`
-                  : "/services"
+                  : "/projects"
               }
               className="inline-flex items-center gap-2 group text-sm font-semibold uppercase tracking-[0.05em] text-[#B5B5B5] hover:text-[#FFFCCB] transition-colors"
             >
@@ -104,7 +143,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
               Back to{" "}
               {project.category && project.category[0]
                 ? project.category[0].title
-                : "Services"}
+                : "Projects"}
             </Link>
           </div>
 
@@ -143,21 +182,136 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                 />
               </div>
 
-              {/* Project Description (safely rendered HTML with curated design system style) */}
-              <div className="flex flex-col gap-6">
-                <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3">
-                  Overview
-                </h2>
-                <div
-                  className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5] space-y-6 [&>p]:leading-[2.0] [&>p>strong]:text-[#E5E5E5] [&>p>strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2"
-                  dangerouslySetInnerHTML={{ __html: project.description }}
-                />
-              </div>
-
-              {/* Gallery Images (if available) */}
-              {galleryImages.length > 0 && (
-                <div className="flex flex-col gap-6 mt-4">
+              {/* Project Description */}
+              {project.description && (
+                <div className="flex flex-col gap-6">
                   <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3">
+                    Overview
+                  </h2>
+                  <div
+                    className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5] space-y-6 [&>p]:leading-[2.0] [&>p>strong]:text-[#E5E5E5] [&>p>strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2"
+                    dangerouslySetInnerHTML={{ __html: project.description }}
+                  />
+                </div>
+              )}
+
+              {/* Problem It Solves */}
+              {hasProblem && (
+                <div className="flex flex-col gap-6">
+                  <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3 flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5 text-yellow-300" />
+                    Problem It Solves
+                  </h2>
+                  <div
+                    className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5] space-y-6 [&>p]:leading-[2.0] [&>p>strong]:text-[#E5E5E5] [&>p>strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2"
+                    dangerouslySetInnerHTML={{
+                      __html: project.problem_it_solves,
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Specifications */}
+              {hasSpecs && (
+                <div className="flex flex-col gap-6">
+                  <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3 flex items-center gap-2">
+                    <ClipboardList className="h-5 w-5 text-yellow-300" />
+                    Specifications
+                  </h2>
+                  <div
+                    className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5] space-y-6 [&>p]:leading-[2.0] [&>p>strong]:text-[#E5E5E5] [&>p>strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2"
+                    dangerouslySetInnerHTML={{ __html: project.specs }}
+                  />
+                </div>
+              )}
+
+              {/* Case Study */}
+              {hasCaseStudy && (
+                <div className="flex flex-col gap-6">
+                  <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3 flex items-center gap-2">
+                    <FileCheck className="h-5 w-5 text-yellow-300" />
+                    Case Study
+                  </h2>
+                  <div
+                    className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5] space-y-6 [&>p]:leading-[2.0] [&>p>strong]:text-[#E5E5E5] [&>p>strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2"
+                    dangerouslySetInnerHTML={{ __html: project.case_study }}
+                  />
+                </div>
+              )}
+
+              {/* Team Members */}
+              {hasTeam && (
+                <div className="flex flex-col gap-6">
+                  <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3 flex items-center gap-2">
+                    <Users className="h-5 w-5 text-yellow-300" />
+                    Team Members
+                  </h2>
+                  <div
+                    className="font-inter text-base font-light leading-[2.0] tracking-[0.03em] text-[#B5B5B5]"
+                    dangerouslySetInnerHTML={{ __html: project.team_member }}
+                  />
+                </div>
+              )}
+
+              {/* Demos / Videos */}
+              {hasDemos && (
+                <div className="flex flex-col gap-6">
+                  <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3 flex items-center gap-2">
+                    <Video className="h-5 w-5 text-yellow-300" />
+                    Demos & Videos
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {project.demos.map((demo, index) => {
+                      // Check if it's a YouTube video
+                      const youtubeEmbedUrl = demo.video_url
+                        ? getYouTubeEmbedUrl(demo.video_url)
+                        : null;
+                      const videoFileUrl = demo.video_file
+                        ? resolveImageUrl(demo.video_file)
+                        : null;
+
+                      return (
+                        <div
+                          key={demo.id || index}
+                          className="relative aspect-video w-full overflow-hidden rounded-md border border-white/[0.08] bg-white/[0.01] group"
+                        >
+                          {youtubeEmbedUrl ? (
+                            <iframe
+                              src={youtubeEmbedUrl}
+                              title={`${project.title} Demo ${index + 1}`}
+                              className="w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          ) : videoFileUrl ? (
+                            <video
+                              src={videoFileUrl}
+                              controls
+                              className="w-full h-full object-cover"
+                              poster={project.thumbnail_image || undefined}
+                            >
+                              Your browser does not support the video tag.
+                            </video>
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                              <Play className="h-12 w-12 opacity-20" />
+                            </div>
+                          )}
+                          <div className="absolute bottom-2 right-2 bg-black/60 px-2 py-1 rounded text-xs text-white/80">
+                            Demo {index + 1}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Gallery Images */}
+              {galleryImages.length > 0 && (
+                <div className="flex flex-col gap-6">
+                  <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3 flex items-center gap-2">
+                    <ImageIcon className="h-5 w-5 text-yellow-300" />
                     Project Gallery
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -169,6 +323,31 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                         <Image
                           src={resolveImageUrl(imgUrl)}
                           alt={`${project.title} Gallery ${index + 1}`}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Rendering Images */}
+              {hasRenderingImages && (
+                <div className="flex flex-col gap-6">
+                  <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3 flex items-center gap-2">
+                    <ImageIcon className="h-5 w-5 text-yellow-300" />
+                    Rendering Images
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {project.rendering_images.map((render, index) => (
+                      <div
+                        key={render.id || index}
+                        className="group relative aspect-[4/3] w-full overflow-hidden rounded-md border border-white/[0.08] bg-white/[0.01]"
+                      >
+                        <Image
+                          src={resolveImageUrl(render.image)}
+                          alt={`${project.title} Rendering ${index + 1}`}
                           fill
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
@@ -212,6 +391,24 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                       </p>
                     </div>
                   </div>
+
+                  {hasTeam && (
+                    <div className="flex items-start gap-4">
+                      <Users className="h-5 w-5 text-yellow-300/80 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-xs text-[#8F8F8F] uppercase tracking-[0.05em]">
+                          Team
+                        </p>
+                        <p className="text-sm font-medium text-[#E4E4E4] mt-0.5 line-clamp-2">
+                          {project.team_member
+                            ?.replace(/<[^>]*>/g, "")
+                            .split("\n")
+                            .filter(Boolean)
+                            .join(", ")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Catalogue / Quotation PDF download buttons */}
@@ -248,10 +445,21 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                   </div>
                 )}
 
+                {/* Demo Count Badge */}
+                {hasDemos && (
+                  <div className="flex items-center gap-2 px-3 py-2 rounded bg-white/[0.04] border border-white/[0.06]">
+                    <Video className="h-4 w-4 text-yellow-300/80" />
+                    <span className="text-xs text-[#B5B5B5]">
+                      {project.demos.length} Demo
+                      {project.demos.length > 1 ? "s" : ""} Available
+                    </span>
+                  </div>
+                )}
+
                 {/* Share Project section */}
                 <ShareButtons
                   title={project.title}
-                  description={project.description}
+                  description={project.meta_description || project.description}
                 />
               </div>
             </div>
@@ -327,10 +535,10 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
             servers. Please try again later.
           </p>
           <Link
-            href="/services"
+            href="/projects"
             className="inline-flex items-center justify-center gap-2 mt-4 px-6 py-2.5 rounded bg-yellow-300 text-[#00040C] font-semibold text-sm hover:bg-yellow-300/90 transition-colors uppercase tracking-[0.03em]"
           >
-            Back to Services
+            Back to Projects
           </Link>
         </div>
       </main>

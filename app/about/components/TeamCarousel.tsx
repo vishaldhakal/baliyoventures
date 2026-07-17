@@ -184,8 +184,6 @@ const TeamCarousel = ({ teamMembers }: TeamCarouselProps) => {
                             </div>
                           )}
                         </div>
-
-                        <span className="absolute bottom-[4.25rem] left-4 h-0.5 w-8 rounded-full bg-[#E8D974] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                       </div>
                     </CarouselItem>
                   );

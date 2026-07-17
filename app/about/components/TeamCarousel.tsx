@@ -12,6 +12,7 @@ import {
   Instagram,
   Facebook,
   Globe,
+  User,
 } from "lucide-react";
 import {
   Carousel,
@@ -27,6 +28,7 @@ interface TeamCarouselProps {
 const TeamCarousel = ({ teamMembers }: TeamCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!api) return;
@@ -69,6 +71,11 @@ const TeamCarousel = ({ teamMembers }: TeamCarouselProps) => {
     if (member.website)
       links.push({ platform: "website", url: member.website });
     return links;
+  };
+
+  // Handle image error
+  const handleImageError = (memberId: string) => {
+    setImageErrors((prev) => ({ ...prev, [memberId]: true }));
   };
 
   return (
@@ -117,27 +124,35 @@ const TeamCarousel = ({ teamMembers }: TeamCarouselProps) => {
               <CarouselContent className="-ml-6 py-4">
                 {teamMembers.map((member) => {
                   const socialLinks = getSocialLinks(member);
+                  const hasImageError = imageErrors[member.id];
+
                   return (
                     <CarouselItem
                       key={member.id}
                       className="pl-6 basis-1/2 lg:basis-1/4"
                     >
                       <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition-colors duration-300 hover:border-[#E8D974]/40 h-full">
-                        <div className="relative aspect-[4/5] w-full overflow-hidden">
-                          <Image
-                            src={
-                              (member.image ||
-                                "/path/to/default/image.webp") as string
-                            }
-                            alt={
-                              member.image_alt_description ||
-                              member.name ||
-                              "Team member"
-                            }
-                            fill
-                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                          />
+                        <div className="relative aspect-[4/5] w-full overflow-hidden bg-white/5">
+                          {/* Image or Placeholder */}
+                          {member.image && !hasImageError ? (
+                            <Image
+                              src={member.image}
+                              alt={
+                                member.image_alt_description ||
+                                member.name ||
+                                "Team member"
+                              }
+                              fill
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                              onError={() => handleImageError(member.id)}
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-white/5 to-white/10">
+                              <User className="h-20 w-20 text-white/20" />
+                            </div>
+                          )}
+
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                         </div>
 

@@ -145,7 +145,9 @@ const TeamCarousel = ({ teamMembers }: TeamCarouselProps) => {
                               fill
                               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                               className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                              onError={() => handleImageError(member.id)}
+                              onError={() =>
+                                handleImageError(String(member.id))
+                              }
                             />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-white/5 to-white/10">

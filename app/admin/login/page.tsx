@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import AdminLoginView from "@/components/admin/AdminLoginView";
+import AdminLoginView from "@/components/admin/auth/AdminLoginView";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

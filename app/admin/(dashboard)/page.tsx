@@ -1,5 +1,5 @@
 import { getProjects } from "@/services/project.service";
-import AdminProjectsView from "@/components/admin/AdminProjectsView";
+import AdminProjectsView from "@/components/admin/projects/AdminProjectsView";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

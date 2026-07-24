@@ -160,12 +160,8 @@ export default function AdminProjectsView({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div>
           <h1 className="text-3xl font-extrabold text-[#FCE8C6] font-oxanium tracking-tight">
-            Product Development Console
+            Product Development
           </h1>
-          <p className="text-gray-400 text-sm font-saira mt-1">
-            Displaying website portfolio entries filter: Product Development.
-            Create, edit, and delete projects below.
-          </p>
         </div>
         <button
           onClick={() => handleOpenForm(null)}
@@ -250,7 +246,6 @@ export default function AdminProjectsView({
                     <td className="px-6 py-4 font-bold text-white font-oxanium text-sm truncate max-w-[200px]">
                       {project.title}
                     </td>
-
 
                     {/* Project Meta Description */}
                     <td className="px-6 py-4 max-w-xs truncate text-gray-400">

@@ -106,7 +106,7 @@ export default function AdminSidebar() {
                     onClick={() => setIsOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all group font-saira ${
                       item.active
-                        ? "bg-gradient-to-r from-yellow-300/10 to-[#FFFCCB]/5 text-yellow-300 border-l-2 border-yellow-300"
+                        ? "bg-gradient-to-r from-yellow-300/10 to-[#FFFCCB]/5 text-yellow-300 "
                         : "text-gray-400 hover:text-white hover:bg-white/5"
                     }`}
                   >

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Save, Box, FileText, Image as ImageIcon, Globe, Sparkles, Loader2 } from "lucide-react";
 import { ProjectDetailResponse } from "@/types/projects";
+import RichTextEditor from "./RichTextEditor";
 
 interface ProjectFormModalProps {
   isOpen: boolean;
@@ -294,13 +295,11 @@ export default function ProjectFormModal({
 
 
                       <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Brief Description</label>
-                        <textarea
-                          rows={4}
+                        <label className="text-gray-300 font-semibold">Brief Description (Rich Text)</label>
+                        <RichTextEditor
                           placeholder="Write a clear summary of what this project accomplished..."
                           value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          className="w-full p-4 rounded-xl border border-white/10 bg-[#0c1222]/80 text-white placeholder-gray-500 focus:border-yellow-300/40 focus:ring-0 outline-none transition-all resize-none leading-relaxed"
+                          onChange={setDescription}
                         />
                       </div>
                     </motion.div>
@@ -314,46 +313,38 @@ export default function ProjectFormModal({
                       className="space-y-4"
                     >
                       <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Technical Specifications (HTML allowed)</label>
-                        <textarea
-                          rows={3}
-                          placeholder="<table><thead><tr><th>Specs</th><th>Details</th>... (supports html)"
+                        <label className="text-gray-300 font-semibold">Technical Specifications (Rich Text)</label>
+                        <RichTextEditor
+                          placeholder="List key specifications, dimensions, features..."
                           value={specs}
-                          onChange={(e) => setSpecs(e.target.value)}
-                          className="w-full p-4 rounded-xl border border-white/10 bg-[#0c1222]/80 text-white placeholder-gray-500 focus:border-yellow-300/40 focus:ring-0 outline-none transition-all font-mono text-xs leading-relaxed"
+                          onChange={setSpecs}
                         />
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Problem It Solves (HTML allowed)</label>
-                        <textarea
-                          rows={3}
+                        <label className="text-gray-300 font-semibold">Problem It Solves (Rich Text)</label>
+                        <RichTextEditor
                           placeholder="Detail the issues solved by this innovation..."
                           value={problemItSolves}
-                          onChange={(e) => setProblemItSolves(e.target.value)}
-                          className="w-full p-4 rounded-xl border border-white/10 bg-[#0c1222]/80 text-white placeholder-gray-500 focus:border-yellow-300/40 focus:ring-0 outline-none transition-all font-mono text-xs leading-relaxed"
+                          onChange={setProblemItSolves}
                         />
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Case Study Details (HTML allowed)</label>
-                        <textarea
-                          rows={3}
+                        <label className="text-gray-300 font-semibold">Case Study Details (Rich Text)</label>
+                        <RichTextEditor
                           placeholder="Comprehensive case study content..."
                           value={caseStudy}
-                          onChange={(e) => setCaseStudy(e.target.value)}
-                          className="w-full p-4 rounded-xl border border-white/10 bg-[#0c1222]/80 text-white placeholder-gray-500 focus:border-yellow-300/40 focus:ring-0 outline-none transition-all font-mono text-xs leading-relaxed"
+                          onChange={setCaseStudy}
                         />
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Team Members (HTML allowed)</label>
-                        <textarea
-                          rows={3}
+                        <label className="text-gray-300 font-semibold">Team Members (Rich Text)</label>
+                        <RichTextEditor
                           placeholder="Key people involved in design, planning, or delivery..."
                           value={teamMember}
-                          onChange={(e) => setTeamMember(e.target.value)}
-                          className="w-full p-4 rounded-xl border border-white/10 bg-[#0c1222]/80 text-white placeholder-gray-500 focus:border-yellow-300/40 focus:ring-0 outline-none transition-all font-mono text-xs leading-relaxed"
+                          onChange={setTeamMember}
                         />
                       </div>
                     </motion.div>

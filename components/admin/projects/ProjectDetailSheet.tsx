@@ -141,9 +141,16 @@ export default function ProjectDetailSheet({
                     <h4 className="text-xs font-bold text-[#FCE8C6] font-oxanium uppercase tracking-wider flex items-center gap-2">
                       <Layers className="h-4 w-4" /> Description
                     </h4>
-                    <p className="text-gray-300 text-sm font-saira leading-relaxed whitespace-pre-wrap">
-                      {project.description || "No description provided."}
-                    </p>
+                    {project.description ? (
+                      <div
+                        className="text-gray-300 text-sm font-saira leading-relaxed prose prose-invert max-w-none prose-sm"
+                        dangerouslySetInnerHTML={{ __html: project.description }}
+                      />
+                    ) : (
+                      <p className="text-gray-400 text-sm font-saira italic">
+                        No description provided.
+                      </p>
+                    )}
                   </div>
 
                   {/* HTML Content Rich Fields (specs, problem solves, case study, team member) */}

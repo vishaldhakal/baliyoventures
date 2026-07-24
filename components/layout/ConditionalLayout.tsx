@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import Header from "./Header";
 import Footer from "./Footer";
 
-const EXCLUDED_PATHS = ["/leave-form"];
+const EXCLUDED_PATHS = ["/leave-form", "/admin"];
 
 export default function ConditionalLayout({
   children,

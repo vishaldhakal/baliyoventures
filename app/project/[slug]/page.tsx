@@ -25,13 +25,20 @@ type ProjectPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-// Base URL helper to resolve relative media paths from backend APIs
 const resolveImageUrl = (url: string | null): string => {
   if (!url) return "/default-image.jpg";
   if (url.startsWith("http://") || url.startsWith("https://")) {
     return url;
   }
-  return `http://yachu.baliyoventures.com${url}`;
+  let baseDomain = "https://yachu.baliyoventures.com";
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    try {
+      baseDomain = new URL(process.env.NEXT_PUBLIC_API_URL).origin;
+    } catch (e) {
+      // fallback
+    }
+  }
+  return `${baseDomain}${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
 // Extract YouTube video ID from URL
@@ -261,7 +268,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                     Demos & Videos
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {project.demos.map((demo, index) => {
+                    {project.demos?.map((demo, index) => {
                       // Check if it's a YouTube video
                       const youtubeEmbedUrl = demo.video_url
                         ? getYouTubeEmbedUrl(demo.video_url)
@@ -340,7 +347,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                     Rendering Images
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {project.rendering_images.map((render, index) => (
+                    {project.rendering_images?.map((render, index) => (
                       <div
                         key={render.id || index}
                         className="group relative aspect-[4/3] w-full overflow-hidden rounded-md border border-white/[0.08] bg-white/[0.01]"
@@ -450,8 +457,8 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                   <div className="flex items-center gap-2 px-3 py-2 rounded bg-white/[0.04] border border-white/[0.06]">
                     <Video className="h-4 w-4 text-yellow-300/80" />
                     <span className="text-xs text-[#B5B5B5]">
-                      {project.demos.length} Demo
-                      {project.demos.length > 1 ? "s" : ""} Available
+                      {project.demos?.length || 0} Demo
+                      {(project.demos?.length || 0) > 1 ? "s" : ""} Available
                     </span>
                   </div>
                 )}

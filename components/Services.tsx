@@ -1,6 +1,7 @@
 import { ServiceListResponse } from "@/types/services";
-import { ChevronRightIcon, Link } from "lucide-react";
+import { ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -15,7 +16,7 @@ const ServiceCard = ({
   title,
   description,
 }: {
-  icon: string;
+  icon?: string | null;
   title: string;
   description: string;
 }) => {
@@ -23,13 +24,15 @@ const ServiceCard = ({
     <Card className="bg-[#171717] border-[rgba(255,255,255,0.07)] h-full transition-all duration-300 hover:border-yellow-300/20 hover:shadow-[0_0_15px_rgba(240,209,0,0.1)]">
       <CardHeader className="pb-4">
         <div className="w-12 h-12 flex items-center justify-center">
-          <Image
-            src={icon}
-            alt={title}
-            width={48}
-            height={48}
-            className="object-contain"
-          />
+          {icon ? (
+            <Image
+              src={icon}
+              alt={title}
+              width={48}
+              height={48}
+              className="object-contain"
+            />
+          ) : null}
         </div>
       </CardHeader>
 

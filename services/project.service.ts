@@ -1,12 +1,16 @@
 import { ProjectDetailResponse, ProjectsListResponse } from "@/types/projects";
 
+const getApiBase = () =>
+  process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
+
 export const getProjectDetails = async (
   slug: string,
 ): Promise<ProjectDetailResponse> => {
+  const apiBase = getApiBase();
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/projects/${slug}/`,
+    `${apiBase}/projects/${slug}/`,
     {
-      next: { revalidate: 3600 }, // Cache/revalidate every hour
+      cache: "no-store",
     },
   );
   if (!response.ok) {
@@ -18,9 +22,10 @@ export const getProjectDetails = async (
 export const getProjects = async (
   page = 1,
   pageSize = 12,
-  category?: string,
+  category = "product-development",
 ): Promise<ProjectsListResponse> => {
-  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/projects/`);
+  const apiBase = getApiBase();
+  const url = new URL(`${apiBase}/projects/`);
   url.searchParams.set("page", page.toString());
   url.searchParams.set("page_size", pageSize.toString());
   if (category) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Save, Box, FileText, Image as ImageIcon, Globe, Sparkles, Loader2 } from "lucide-react";
+import { X, Save, Box, FileText, Image as ImageIcon, Globe, Loader2, Plus } from "lucide-react";
 import { ProjectDetailResponse } from "@/types/projects";
 import RichTextEditor from "./RichTextEditor";
 
@@ -10,7 +10,7 @@ interface ProjectFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  projectSlug: string | null; // If null, we are in CREATE mode. If provided, we are in EDIT mode.
+  projectSlug: string | null; // If null = CREATE mode. If provided = EDIT mode.
 }
 
 type TabType = "basic" | "details" | "assets" | "seo";
@@ -70,17 +70,6 @@ export default function ProjectFormModal({
     setError("");
   };
 
-  // Auto-generate slug from title
-  const generateSlug = () => {
-    const generated = title
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "") // Remove non-word chars
-      .replace(/[\s_]+/g, "-") // Replace spaces/underscores with hyphens
-      .replace(/-+/g, "-"); // Replace multiple hyphens
-    setSlug(generated);
-  };
-
   // Fetch project details for editing
   useEffect(() => {
     if (!isOpen) return;
@@ -92,8 +81,9 @@ export default function ProjectFormModal({
     const fetchDetails = async () => {
       setFetchLoading(true);
       setError("");
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
       try {
-        const res = await fetch(`https://yachu.baliyoventures.com/api/baliyo/projects/${projectSlug}/`);
+        const res = await fetch(`${apiBase}/projects/${projectSlug}/`);
         if (!res.ok) throw new Error("Could not retrieve project data for editing.");
         const data: ProjectDetailResponse = await res.json();
         
@@ -122,9 +112,8 @@ export default function ProjectFormModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title) {
+    if (!title.trim()) {
       setError("Project Title is required.");
-      setActiveTab("basic");
       return;
     }
 
@@ -132,46 +121,41 @@ export default function ProjectFormModal({
     setError("");
 
     try {
-      const formData = new FormData();
-      formData.append("title", title);
       const computedSlug = slug || title
         .toLowerCase()
         .trim()
         .replace(/[^\w\s-]/g, "")
         .replace(/[\s_]+/g, "-")
         .replace(/-+/g, "-");
+
+      const formData = new FormData();
+      formData.append("title", title);
       formData.append("slug", computedSlug);
-      formData.append("description", description);
-      formData.append("specs", specs);
-      formData.append("problem_it_solves", problemItSolves);
-      formData.append("case_study", caseStudy);
-      formData.append("team_member", teamMember);
-      formData.append("meta_title", metaTitle);
-      formData.append("meta_description", metaDescription);
 
-      // Append files if selected
-      if (thumbnailFile) {
-        formData.append("thumbnail_image", thumbnailFile);
-      }
-      if (catalogueFile) {
-        formData.append("catalogue", catalogueFile);
-      }
-      if (quotationFile) {
-        formData.append("quotation", quotationFile);
+      if (isEdit) {
+        formData.append("description", description);
+        formData.append("specs", specs);
+        formData.append("problem_it_solves", problemItSolves);
+        formData.append("case_study", caseStudy);
+        formData.append("team_member", teamMember);
+        formData.append("meta_title", metaTitle);
+        formData.append("meta_description", metaDescription);
+
+        if (thumbnailFile) formData.append("thumbnail_image", thumbnailFile);
+        if (catalogueFile) formData.append("catalogue", catalogueFile);
+        if (quotationFile) formData.append("quotation", quotationFile);
       }
 
-      // If category list was writable, we would append it here.
-      // But we know categories are read-only on projects endpoint.
-
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
       const url = isEdit
-        ? `https://yachu.baliyoventures.com/api/baliyo/projects/${projectSlug}/`
-        : `https://yachu.baliyoventures.com/api/baliyo/projects/`;
+        ? `${apiBase}/projects/${projectSlug}/`
+        : `${apiBase}/projects/?category=product-development`;
 
       const method = isEdit ? "PATCH" : "POST";
 
       const res = await fetch(url, {
         method: method,
-        body: formData, // Fetch automatically sets multipart/form-data boundaries for FormData
+        body: formData,
       });
 
       if (!res.ok) {
@@ -187,7 +171,7 @@ export default function ProjectFormModal({
       onClose();
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "An error occurred while saving the project.");
+      setError(err.message || "An error occurred while saving.");
     } finally {
       setLoading(false);
     }
@@ -200,289 +184,148 @@ export default function ProjectFormModal({
           {/* Backdrop Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.6 }}
+            animate={{ opacity: 0.4 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/80 backdrop-blur-xs z-40 cursor-pointer"
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 cursor-pointer"
           />
 
-          {/* Form Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 15 }}
-            transition={{ type: "spring", duration: 0.35 }}
-            className="fixed inset-0 m-auto w-full max-w-2xl h-[85vh] bg-[#030a1c] border border-white/10 z-50 rounded-3xl overflow-hidden flex flex-col justify-between shadow-2xl"
-          >
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#050e26]">
-              <div className="flex items-center gap-2.5">
-                <Box className="h-5 w-5 text-yellow-300" />
-                <h2 className="text-xl font-bold font-oxanium text-[#FCE8C6] tracking-tight">
-                  {isEdit ? "Update Project Details" : "Register Product Development"}
-                </h2>
+          {/* Form Modal Backdrop */}
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: "spring", duration: 0.35 }}
+              className="relative w-full max-w-lg max-h-[92vh] bg-white border border-slate-200 z-10 rounded-2xl overflow-hidden shadow-2xl font-sans text-slate-900 flex flex-col"
+            >
+              {/* Header */}
+              <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Box className="h-5 w-5 text-slate-800 shrink-0" />
+                  <h2 className="text-base font-bold text-slate-900 truncate">
+                    {!isEdit ? "Create Product Project" : "Edit Project Metadata"}
+                  </h2>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200/60 transition-all cursor-pointer shrink-0"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-all cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
 
             {/* Error banner */}
             {error && (
-              <div className="px-6 py-3 bg-red-950/40 border-b border-red-500/20 text-red-200 text-xs font-saira flex items-start gap-2 max-h-20 overflow-y-auto">
+              <div className="px-6 py-3 bg-rose-50 border-b border-rose-200 text-rose-700 text-xs flex items-start gap-2">
                 <span className="font-bold">Error:</span>
                 <span className="break-all">{error}</span>
               </div>
             )}
 
-            {/* Tab navigation */}
-            <div className="flex border-b border-white/10 bg-[#040b1e]/80 text-xs font-semibold font-saira">
-              {[
-                { id: "basic", label: "1. Primary Info", icon: Box },
-                { id: "details", label: "2. Technical Info", icon: FileText },
-                { id: "assets", label: "3. Media & Files", icon: ImageIcon },
-                { id: "seo", label: "4. SEO Meta", icon: Globe },
-              ].map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as TabType)}
-                    type="button"
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-3 border-b-2 transition-all cursor-pointer ${
-                      activeTab === tab.id
-                        ? "border-yellow-300 text-yellow-300 bg-white/5"
-                        : "border-transparent text-gray-400 hover:text-white hover:bg-white/2"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    <span className="hidden sm:inline">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Form Scroll Body */}
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar text-sm font-saira">
-              {fetchLoading ? (
-                <div className="h-full flex flex-col items-center justify-center gap-3 py-20">
-                  <div className="h-8 w-8 border-2 border-yellow-300 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-gray-400">Loading details from server...</span>
+            {/* CREATE MODE: Title Only */}
+            {!isEdit ? (
+              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-slate-900 font-bold text-xs block">
+                    Product / Project Title *
+                  </label>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Enter the title for your new product development project.
+                  </p>
+                  <input
+                    type="text"
+                    required
+                    autoFocus
+                    placeholder="e.g. BALIYO Automated Feed Mixer"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-semibold placeholder-slate-400 focus:bg-white focus:border-slate-400 outline-none transition-all text-xs"
+                  />
                 </div>
-              ) : (
-                <>
-                  {/* TAB 1: BASIC INFO */}
-                  {activeTab === "basic" && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="space-y-4"
-                    >
-                      <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Project Title *</label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="e.g. BALIYO Vertical Feed Mixer"
-                          value={title}
-                          onChange={(e) => setTitle(e.target.value)}
-                          className="w-full h-11 px-4 rounded-xl border border-white/10 bg-[#0c1222]/80 text-white placeholder-gray-500 focus:border-yellow-300/40 focus:ring-0 outline-none transition-all"
-                        />
-                      </div>
 
-
-                      <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Brief Description (Rich Text)</label>
-                        <RichTextEditor
-                          placeholder="Write a clear summary of what this project accomplished..."
-                          value={description}
-                          onChange={setDescription}
-                        />
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* TAB 2: RICH DETAILS */}
-                  {activeTab === "details" && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="space-y-4"
-                    >
-                      <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Technical Specifications (Rich Text)</label>
-                        <RichTextEditor
-                          placeholder="List key specifications, dimensions, features..."
-                          value={specs}
-                          onChange={setSpecs}
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Problem It Solves (Rich Text)</label>
-                        <RichTextEditor
-                          placeholder="Detail the issues solved by this innovation..."
-                          value={problemItSolves}
-                          onChange={setProblemItSolves}
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Case Study Details (Rich Text)</label>
-                        <RichTextEditor
-                          placeholder="Comprehensive case study content..."
-                          value={caseStudy}
-                          onChange={setCaseStudy}
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">Team Members (Rich Text)</label>
-                        <RichTextEditor
-                          placeholder="Key people involved in design, planning, or delivery..."
-                          value={teamMember}
-                          onChange={setTeamMember}
-                        />
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* TAB 3: MEDIA & FILES */}
-                  {activeTab === "assets" && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="space-y-5"
-                    >
-                      {/* Thumbnail upload */}
-                      <div className="bg-white/3 border border-white/5 p-4 rounded-2xl space-y-3">
-                        <label className="text-gray-300 font-bold block">Thumbnail Image</label>
-                        {existingThumbnail && !thumbnailFile && (
-                          <div className="flex items-center gap-3 bg-[#0a0f1d] p-3 rounded-xl border border-white/10 mb-2">
-                            <div className="relative h-10 w-16 rounded overflow-hidden">
-                              <img src={existingThumbnail} alt="Thumbnail preview" className="object-cover w-full h-full" />
-                            </div>
-                            <span className="text-xs text-gray-400 truncate flex-1">Currently: {existingThumbnail.split("/").pop()}</span>
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => setThumbnailFile(e.target.files ? e.target.files[0] : null)}
-                          className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-yellow-300/10 file:text-yellow-300 hover:file:bg-yellow-300/20 file:transition-all file:cursor-pointer"
-                        />
-                        {thumbnailFile && (
-                          <div className="text-xs text-yellow-300 font-semibold">Ready to upload: {thumbnailFile.name}</div>
-                        )}
-                      </div>
-
-                      {/* Catalogue file */}
-                      <div className="bg-white/3 border border-white/5 p-4 rounded-2xl space-y-3">
-                        <label className="text-gray-300 font-bold block">Project Catalogue PDF</label>
-                        {existingCatalogue && !catalogueFile && (
-                          <div className="flex items-center justify-between bg-[#0a0f1d] p-3 rounded-xl border border-white/10 mb-2 text-xs">
-                            <span className="text-gray-400 truncate flex-1">Currently: {existingCatalogue.split("/").pop()}</span>
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          accept="application/pdf,application/msword"
-                          onChange={(e) => setCatalogueFile(e.target.files ? e.target.files[0] : null)}
-                          className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-yellow-300/10 file:text-yellow-300 hover:file:bg-yellow-300/20 file:transition-all file:cursor-pointer"
-                        />
-                        {catalogueFile && (
-                          <div className="text-xs text-yellow-300 font-semibold">Ready to upload: {catalogueFile.name}</div>
-                        )}
-                      </div>
-
-                      {/* Quotation file */}
-                      <div className="bg-white/3 border border-white/5 p-4 rounded-2xl space-y-3">
-                        <label className="text-gray-300 font-bold block">Quotation Details PDF</label>
-                        {existingQuotation && !quotationFile && (
-                          <div className="flex items-center justify-between bg-[#0a0f1d] p-3 rounded-xl border border-white/10 mb-2 text-xs">
-                            <span className="text-gray-400 truncate flex-1">Currently: {existingQuotation.split("/").pop()}</span>
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          accept="application/pdf,application/msword"
-                          onChange={(e) => setQuotationFile(e.target.files ? e.target.files[0] : null)}
-                          className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-yellow-300/10 file:text-yellow-300 hover:file:bg-yellow-300/20 file:transition-all file:cursor-pointer"
-                        />
-                        {quotationFile && (
-                          <div className="text-xs text-yellow-300 font-semibold">Ready to upload: {quotationFile.name}</div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* TAB 4: SEO METADATA */}
-                  {activeTab === "seo" && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="space-y-4"
-                    >
-                      <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">SEO Meta Title</label>
-                        <input
-                          type="text"
-                          placeholder="e.g. Innovative Bowling Machine in Nepal | Baliyo Ventures"
-                          value={metaTitle}
-                          onChange={(e) => setMetaTitle(e.target.value)}
-                          className="w-full h-11 px-4 rounded-xl border border-white/10 bg-[#0c1222]/80 text-white placeholder-gray-500 focus:border-yellow-300/40 focus:ring-0 outline-none transition-all"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-gray-300 font-semibold">SEO Meta Description</label>
-                        <textarea
-                          rows={4}
-                          placeholder="Add meta tags description for google searches..."
-                          value={metaDescription}
-                          onChange={(e) => setMetaDescription(e.target.value)}
-                          className="w-full p-4 rounded-xl border border-white/10 bg-[#0c1222]/80 text-white placeholder-gray-500 focus:border-yellow-300/40 focus:ring-0 outline-none transition-all resize-none leading-relaxed"
-                        />
-                      </div>
-                    </motion.div>
-                  )}
-                </>
-              )}
-            </form>
-
-            {/* Footer */}
-            <div className="px-6 py-4 border-t border-white/10 bg-[#050e26] flex justify-between items-center">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold transition-all cursor-pointer font-saira text-gray-300 hover:text-white"
-              >
-                Cancel
-              </button>
-              
-              <button
-                type="button"
-                disabled={loading || fetchLoading}
-                onClick={handleSubmit}
-                className="px-6 py-2 rounded-xl bg-gradient-to-r from-yellow-300 to-[#FFFCCB] text-[#00040C] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm transition-all cursor-pointer font-oxanium flex items-center gap-1.5 shadow-lg shadow-yellow-500/10"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin text-[#00040C]" />
-                    Saving...
-                  </>
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-semibold text-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading || !title.trim()}
+                    className="px-5 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 disabled:opacity-50 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4 text-white" />
+                        Create Project
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              /* EDIT METADATA MODE */
+              <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs text-slate-800">
+                {fetchLoading ? (
+                  <div className="flex flex-col items-center justify-center gap-3 py-12">
+                    <Loader2 className="h-8 w-8 text-slate-700 animate-spin" />
+                    <span className="text-slate-500">Loading metadata...</span>
+                  </div>
                 ) : (
                   <>
-                    <Save className="h-4 w-4 text-[#00040C]" />
-                    Save Project
+                    <div className="space-y-1.5">
+                      <label className="text-slate-900 font-bold block">SEO Meta Title</label>
+                      <input
+                        type="text"
+                        placeholder="Enter meta title..."
+                        value={metaTitle}
+                        onChange={(e) => setMetaTitle(e.target.value)}
+                        className="w-full h-10 px-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 outline-none focus:bg-white focus:border-slate-400 font-medium"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-slate-900 font-bold block">SEO Meta Description</label>
+                      <textarea
+                        rows={4}
+                        placeholder="Enter meta description..."
+                        value={metaDescription}
+                        onChange={(e) => setMetaDescription(e.target.value)}
+                        className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 outline-none focus:bg-white focus:border-slate-400 resize-none font-medium"
+                      />
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="flex justify-between items-center pt-3 border-t border-slate-100">
+                      <button
+                        type="button"
+                        onClick={onClose}
+                        className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-semibold text-slate-700"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={loading || fetchLoading}
+                        className="px-5 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 flex items-center gap-1.5 shadow-xs cursor-pointer"
+                      >
+                        {loading ? <Loader2 className="h-4 w-4 animate-spin text-white" /> : <Save className="h-4 w-4 text-white" />}
+                        Save Metadata
+                      </button>
+                    </div>
                   </>
                 )}
-              </button>
-            </div>
-          </motion.div>
+              </form>
+            )}
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

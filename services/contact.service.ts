@@ -1,7 +1,8 @@
 import {Contact} from "@/types/contact"
 
 export const postContactForm = async (data: Contact): Promise<void> => {
-  const response = await fetch(`https://yachu.baliyoventures.com/api/baliyo/contacts/`, {
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
+  const response = await fetch(`${apiBase}/contacts/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

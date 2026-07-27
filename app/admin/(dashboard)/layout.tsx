@@ -1,6 +1,6 @@
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 
 export default async function AdminDashboardLayout({
   children,
@@ -15,10 +15,10 @@ export default async function AdminDashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#00040C] text-white flex flex-col md:flex-row">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col md:flex-row font-sans">
       <AdminSidebar />
       <main className="flex-1 overflow-y-auto max-h-screen">
-        <div className="p-6 md:p-10 container mx-auto">
+        <div className="p-6 md:p-8 container mx-auto">
           {children}
         </div>
       </main>

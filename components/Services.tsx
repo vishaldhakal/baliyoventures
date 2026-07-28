@@ -1,13 +1,13 @@
-import { ServiceListResponse } from "@/types/services";
-import { ChevronRightIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { ServiceListResponse } from "@/types/services";
+import { ChevronRightIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 

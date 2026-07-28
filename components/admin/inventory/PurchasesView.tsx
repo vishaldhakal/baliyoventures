@@ -1,5 +1,6 @@
 "use client";
 
+import PaginationControls from "@/components/admin/PaginationControls";
 import {
   Component,
   ComponentModel,
@@ -12,8 +13,6 @@ import {
   AlertTriangle,
   Building2,
   Calendar,
-  ChevronLeft,
-  ChevronRight,
   Cpu,
   Eye,
   FileText,
@@ -356,6 +355,16 @@ export default function PurchasesView() {
         />
       </div>
 
+      {/* Top Pagination Controls */}
+      <PaginationControls
+        currentPage={currentPage}
+        totalCount={totalCount}
+        pageSize={pageSize}
+        onPageChange={(page) => fetchPurchases(page)}
+        loading={loading}
+        itemLabel="orders"
+      />
+
       {/* Main Purchases Table Container */}
       <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
         {/* Table Header */}
@@ -461,44 +470,6 @@ export default function PurchasesView() {
                 ))}
               </tbody>
             </table>
-          </div>
-        )}
-
-        {/* Pagination Controls */}
-        {!loading && totalCount > pageSize && (
-          <div className="px-5 py-3.5 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <span className="text-[11px] text-slate-500">
-              Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} orders
-            </span>
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => fetchPurchases(currentPage - 1)}
-                disabled={!hasPrev || loading}
-                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-              >
-                <ChevronLeft className="h-3.5 w-3.5" />
-              </button>
-              {Array.from({ length: Math.ceil(totalCount / pageSize) }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => fetchPurchases(p)}
-                  className={`min-w-[28px] h-7 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
-                    p === currentPage
-                      ? "bg-slate-900 text-white border-slate-900"
-                      : "border-slate-200 text-slate-600 hover:bg-slate-100"
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-              <button
-                onClick={() => fetchPurchases(currentPage + 1)}
-                disabled={!hasNext || loading}
-                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-              >
-                <ChevronRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
           </div>
         )}
       </div>

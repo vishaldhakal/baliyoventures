@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import PaginationControls from "@/components/admin/PaginationControls";
 import { ProjectsListResponse } from "@/types/projects";
 import { AnimatePresence } from "framer-motion";
 import {
@@ -220,6 +212,15 @@ export default function AdminProjectsView({
         />
       </div>
 
+      {/* Top Pagination Controls */}
+      <PaginationControls
+        currentPage={currentPage}
+        totalCount={projectsData.count}
+        pageSize={pageSize}
+        onPageChange={(page) => router.push(`/admin/projects?page=${page}`)}
+        itemLabel="projects"
+      />
+
       {/* Projects Table Layout */}
       <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
@@ -378,57 +379,6 @@ export default function AdminProjectsView({
           )}
         </div>
       </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="pt-2 flex justify-center">
-          <Pagination>
-            <PaginationContent className="gap-1.5">
-              <PaginationItem>
-                <PaginationPrevious
-                  href={`/admin?page=${currentPage - 1}`}
-                  className={
-                    currentPage === 1
-                      ? "pointer-events-none opacity-40 text-slate-400 border-slate-200"
-                      : "text-slate-700 hover:bg-slate-100 border-slate-200 bg-white"
-                  }
-                />
-              </PaginationItem>
-
-              {getPageNumbers().map((pageNumber, index) => (
-                <PaginationItem key={index}>
-                  {pageNumber === "..." ? (
-                    <PaginationEllipsis className="text-slate-400" />
-                  ) : (
-                    <PaginationLink
-                      href={`/admin?page=${pageNumber}`}
-                      isActive={pageNumber === currentPage}
-                      className={
-                        pageNumber === currentPage
-                          ? "bg-slate-900 text-white font-bold border-slate-900"
-                          : "text-slate-700 hover:bg-slate-100 border-slate-200 bg-white"
-                      }
-                    >
-                      {pageNumber}
-                    </PaginationLink>
-                  )}
-                </PaginationItem>
-              ))}
-
-              <PaginationItem>
-                <PaginationNext
-                  href={`/admin?page=${currentPage + 1}`}
-                  className={
-                    currentPage === totalPages
-                      ? "pointer-events-none opacity-40 text-slate-400 border-slate-200"
-                      : "text-slate-700 hover:bg-slate-100 border-slate-200 bg-white"
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
 
       {/* RENDER MODALS */}
       <ProjectFormModal

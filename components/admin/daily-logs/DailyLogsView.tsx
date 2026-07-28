@@ -1,12 +1,11 @@
 "use client";
 
+import PaginationControls from "@/components/admin/PaginationControls";
 import { ProjectDailyUpdate } from "@/types/projects";
 import {
   AlertTriangle,
   CheckCircle2,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Clock,
   FileText,
   FolderGit2,
@@ -332,6 +331,16 @@ export default function DailyLogsView() {
         </div>
       </div>
 
+      {/* Top Pagination Controls */}
+      <PaginationControls
+        currentPage={currentPage}
+        totalCount={totalCount}
+        pageSize={pageSize}
+        onPageChange={(page) => fetchLogs(selectedProjectId, searchTerm, page)}
+        loading={loading}
+        itemLabel="logs"
+      />
+
       {/* Timeline */}
       {loading ? (
         <div className="flex justify-center py-20">
@@ -477,44 +486,6 @@ export default function DailyLogsView() {
                 </div>
               );
             })}
-          </div>
-        </div>
-      )}
-
-      {/* Pagination Controls */}
-      {!loading && totalCount > pageSize && (
-        <div className="px-5 py-3.5 bg-white border border-slate-200 rounded-xl flex items-center justify-between shadow-xs">
-          <span className="text-[11px] text-slate-500">
-            Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} logs
-          </span>
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => fetchLogs(selectedProjectId, searchTerm, currentPage - 1)}
-              disabled={!hasPrev || loading}
-              className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-            </button>
-            {Array.from({ length: Math.ceil(totalCount / pageSize) }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => fetchLogs(selectedProjectId, searchTerm, p)}
-                className={`min-w-[28px] h-7 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
-                  p === currentPage
-                    ? "bg-slate-900 text-white border-slate-900"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-100"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-            <button
-              onClick={() => fetchLogs(selectedProjectId, searchTerm, currentPage + 1)}
-              disabled={!hasNext || loading}
-              className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-            >
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
           </div>
         </div>
       )}

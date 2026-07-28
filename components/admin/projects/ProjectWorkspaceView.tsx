@@ -14,12 +14,15 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Edit,
   ExternalLink,
   FileCode,
   FileText,
   HelpCircle,
+  Images,
   Layers,
   Loader2,
   Maximize2,
@@ -118,6 +121,7 @@ type TabType =
   | "overview"
   | "daily_updates"
   | "demos"
+  | "images"
   | "inventory"
   | "tools"
   | "docs";
@@ -139,10 +143,10 @@ export default function ProjectWorkspaceView({
   const [invSearch, setInvSearch] = useState("");
 
   useEffect(() => {
-    if (project?.tools) {
-      setSelectedToolIds(project.tools.map(t => t.id));
+    if (project?.tools_used) {
+      setSelectedToolIds(project.tools_used.map(tu => tu.tool));
     }
-  }, [project?.tools]);
+  }, [project?.tools_used]);
 
   useEffect(() => {
     const tab = searchParams.get("tab") as TabType;
@@ -164,13 +168,53 @@ export default function ProjectWorkspaceView({
   const [editTeam, setEditTeam] = useState("");
   const [editThumbnailAlt, setEditThumbnailAlt] = useState("");
   const [editThumbnailFile, setEditThumbnailFile] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewImagesList, setPreviewImagesList] = useState<string[]>([]);
+  const [previewImageIndex, setPreviewImageIndex] = useState<number | null>(null);
   const [previewVideo, setPreviewVideo] = useState<{
     embedUrl: string;
     name: string;
     type: string;
     directUrl: string;
   } | null>(null);
+
+  const openImagePreview = (images: string[], index: number = 0) => {
+    setPreviewImagesList(images);
+    setPreviewImageIndex(index);
+  };
+
+  const handlePrevImage = () => {
+    if (previewImageIndex === null || previewImagesList.length === 0) return;
+    setPreviewImageIndex((prev) =>
+      prev === null ? 0 : (prev - 1 + previewImagesList.length) % previewImagesList.length
+    );
+  };
+
+  const handleNextImage = () => {
+    if (previewImageIndex === null || previewImagesList.length === 0) return;
+    setPreviewImageIndex((prev) =>
+      prev === null ? 0 : (prev + 1) % previewImagesList.length
+    );
+  };
+
+  useEffect(() => {
+    if (previewImageIndex === null) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handlePrevImage();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handleNextImage();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        setPreviewImageIndex(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [previewImageIndex, previewImagesList]);
 
   // Demo Edit / Delete State
   const [editingDemoId, setEditingDemoId] = useState<number | null>(null);
@@ -190,6 +234,14 @@ export default function ProjectWorkspaceView({
 
   // Inventory list for "Inventory Used" tab
   const [inventoryList, setInventoryList] = useState<Inventory[]>([]);
+
+  // Images Modal & Delete State
+  const [isAddImagesModalOpen, setIsAddImagesModalOpen] = useState(false);
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [addingImages, setAddingImages] = useState(false);
+  const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
+  const [deleteImageTarget, setDeleteImageTarget] = useState<{ id: number; url: string } | null>(null);
 
   // Modal States
   const [isAddLogModalOpen, setIsAddLogModalOpen] = useState(false);
@@ -217,6 +269,7 @@ export default function ProjectWorkspaceView({
   const [allTools, setAllTools] = useState<ProjectTool[]>([]);
   const [selectedToolIds, setSelectedToolIds] = useState<number[]>([]);
   const [toolSearch, setToolSearch] = useState("");
+  const [newToolQuantity, setNewToolQuantity] = useState<number | "">("");
 
   // 4. Tag Inventory Used Form
   const [selectedInventoryId, setSelectedInventoryId] = useState<number | "">("");
@@ -234,8 +287,11 @@ export default function ProjectWorkspaceView({
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
     try {
       // Also fetch all tools
-      const toolsRes = await fetch(`${apiBase}/project-tools/`, { cache: "no-store" });
-      if (toolsRes.ok) setAllTools(await toolsRes.json());
+      const toolsRes = await fetch(`${apiBase}/project-tools/?page_size=100`, { cache: "no-store" });
+      if (toolsRes.ok) {
+        const toolsData = await toolsRes.json();
+        setAllTools(Array.isArray(toolsData) ? toolsData : toolsData.results || []);
+      }
       
       const response = await fetch(`${apiBase}/projects/${projectSlug}/`, { cache: "no-store" });
       if (!response.ok) {
@@ -558,6 +614,71 @@ export default function ProjectWorkspaceView({
     }
   };
 
+  // Multiple Images Upload & Delete Handlers
+  const handleImageFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const files = Array.from(e.target.files);
+    setNewImageFiles((prev) => [...prev, ...files]);
+
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews((prev) => [...prev, ...newPreviews]);
+  };
+
+  const handleRemoveImageFile = (index: number) => {
+    setImagePreviews((prev) => {
+      if (prev[index]) URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
+    setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddImages = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!project || newImageFiles.length === 0) return;
+    setAddingImages(true);
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
+    try {
+      const uploadPromises = newImageFiles.map((file) => {
+        const formData = new FormData();
+        formData.append("project", project.id.toString());
+        formData.append("image", file);
+        return fetch(`${apiBase}/images/`, {
+          method: "POST",
+          body: formData,
+        });
+      });
+
+      await Promise.all(uploadPromises);
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+      setNewImageFiles([]);
+      setImagePreviews([]);
+      setIsAddImagesModalOpen(false);
+      fetchDetails();
+    } catch (err) {
+      console.error("Error uploading images:", err);
+    } finally {
+      setAddingImages(false);
+    }
+  };
+
+  const handleDeleteImage = async (imageId: number) => {
+    if (!project) return;
+    setDeletingImageId(imageId);
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
+    try {
+      const res = await fetch(`${apiBase}/images/${imageId}/`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        fetchDetails();
+      }
+    } catch (err) {
+      console.error("Error deleting image:", err);
+    } finally {
+      setDeletingImageId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3 font-sans">
@@ -621,8 +742,9 @@ export default function ProjectWorkspaceView({
             { id: "overview", label: "Details & Specs", shortLabel: "Overview", icon: FileText, count: null },
             { id: "daily_updates", label: "Daily Engineering Logs", shortLabel: "Daily Logs", icon: Clock, count: project.daily_updates?.length || 0 },
             { id: "demos", label: "Video Demos", shortLabel: "Demos", icon: Video, count: project.demos?.length || 0 },
+            { id: "images", label: "Project Gallery", shortLabel: "Gallery", icon: Images, count: project.images?.length || 0 },
             { id: "inventory", label: "Hardware Inventory Used", shortLabel: "Inventory", icon: Package, count: project.components_used?.length || 0 },
-            { id: "tools", label: "Tools & Tech Stack", shortLabel: "Tools & Tech", icon: Wrench, count: project.tools?.length || 0 },
+            { id: "tools", label: "Tools & Tech Stack", shortLabel: "Tools & Tech", icon: Wrench, count: project.tools_used?.length || 0 },
             { id: "docs", label: "Technical Documents", shortLabel: "Tech Docs", icon: FileCode, count: project.technical_documents?.length || project.technical_document?.length || 0 },
           ];
 
@@ -832,7 +954,7 @@ export default function ProjectWorkspaceView({
                             const src = editThumbnailFile
                               ? URL.createObjectURL(editThumbnailFile)
                               : project.thumbnail_image;
-                            if (src) setPreviewImage(src);
+                            if (src) openImagePreview([src], 0);
                           }}
                           className="relative w-full max-w-sm sm:w-52 h-44 sm:h-32 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 shadow-xs cursor-pointer group"
                         >
@@ -877,7 +999,13 @@ export default function ProjectWorkspaceView({
                   ) : project.thumbnail_image ? (
                     <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                       <div
-                        onClick={() => setPreviewImage(project.thumbnail_image)}
+                        onClick={() => {
+                          const allImgs = [
+                            ...(project.thumbnail_image ? [project.thumbnail_image] : []),
+                            ...(project.images ? project.images.map((i) => i.image) : []),
+                          ];
+                          openImagePreview(allImgs.length > 0 ? allImgs : [project.thumbnail_image!], 0);
+                        }}
                         className="relative w-full max-w-sm sm:w-52 h-44 sm:h-32 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 shadow-xs shrink-0 cursor-pointer group"
                       >
                         <Image
@@ -1478,6 +1606,102 @@ export default function ProjectWorkspaceView({
             </div>
           )}
 
+          {/* TAB: PROJECT GALLERY / IMAGES */}
+          {activeTab === "images" && (
+            <div>
+              {/* Top Header Panel */}
+              <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold text-slate-800 mb-0.5 flex items-center gap-2">
+                    <Images className="h-4 w-4 text-slate-700" /> Project Gallery ({project.images?.length || 0})
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Upload and manage high-resolution images & diagrams for this project.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsAddImagesModalOpen(true)}
+                  className="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0 self-start sm:self-auto"
+                >
+                  <Plus className="h-3.5 w-3.5" /> Upload Images
+                </button>
+              </div>
+
+              {/* Images Grid */}
+              <div className="p-4 sm:p-6 md:p-8">
+                {!project.images || project.images.length === 0 ? (
+                  <div className="text-center py-12 px-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 space-y-3">
+                    <div className="h-12 w-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto text-slate-400">
+                      <Images className="h-6 w-6" />
+                    </div>
+                    <div className="space-y-1 max-w-sm mx-auto">
+                      <h4 className="text-xs font-bold text-slate-800">No project images yet</h4>
+                      <p className="text-[11px] text-slate-500">
+                        Upload photos, circuit diagrams, hardware renders, or schematics for this project.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setIsAddImagesModalOpen(true)}
+                      className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-all cursor-pointer inline-flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Plus className="h-3.5 w-3.5" /> Upload First Images
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                    {project.images.map((imgItem, idx) => (
+                      <div
+                        key={imgItem.id || idx}
+                        className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col"
+                      >
+                        {/* Image Thumbnail Container */}
+                        <div
+                          onClick={() => openImagePreview(project.images!.map((i) => i.image), idx)}
+                          className="relative aspect-4/3 w-full bg-slate-100 overflow-hidden cursor-pointer"
+                        >
+                          <Image
+                            src={imgItem.image}
+                            alt={`Project image ${idx + 1}`}
+                            fill
+                            unoptimized
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          
+                          {/* Overlay actions on hover */}
+                          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2 p-3">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openImagePreview(project.images!.map((i) => i.image), idx);
+                              }}
+                              className="p-2 rounded-xl bg-white/90 hover:bg-white text-slate-800 transition-transform active:scale-95 shadow-md cursor-pointer"
+                              title="View full screen"
+                            >
+                              <Maximize2 className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteImageTarget({ id: imgItem.id, url: imgItem.image });
+                              }}
+                              className="p-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white transition-transform active:scale-95 shadow-md cursor-pointer"
+                              title="Delete image"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* TAB 4: HARDWARE INVENTORY USED */}
           {activeTab === "inventory" && (
             <div className="space-y-0">
@@ -1589,7 +1813,7 @@ export default function ProjectWorkspaceView({
 
           {/* TAB 7: TOOLS ATTACHED */}
           {activeTab === "tools" && (() => {
-            const currentToolIds = new Set((project.tools || []).map(t => t.id));
+            const attachedToolIds = new Set((project.tools_used || []).map(tu => tu.tool));
             const searchLower = toolSearch.toLowerCase().trim();
             const filtered = allTools.filter(t =>
               t.name.toLowerCase().includes(searchLower)
@@ -1597,47 +1821,69 @@ export default function ProjectWorkspaceView({
             const exactMatch = allTools.some(t => t.name.toLowerCase() === searchLower);
             const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
 
-            // Attach an existing tool by id — optimistic local update, no full refetch
-            const attachToolById = async (toolId: number, tool: ProjectTool) => {
-              if (currentToolIds.has(toolId) || addingTool) return;
+            // Attach an existing tool by id — POST to project-tool-used
+            const attachToolById = async (toolId: number, tool: ProjectTool, quantity?: number | null) => {
+              if (attachedToolIds.has(toolId) || addingTool) return;
               setAddingTool(true);
-              // Optimistic update
-              setProject(prev => prev ? { ...prev, tools: [...(prev.tools || []), tool] } : prev);
               setToolSearch("");
+              setNewToolQuantity("");
               try {
-                await fetch(`${apiBase}/projects/${project.slug}/`, {
-                  method: "PATCH",
+                const res = await fetch(`${apiBase}/project-tool-used/`, {
+                  method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ tool_ids: [...Array.from(currentToolIds), toolId] }),
+                  body: JSON.stringify({
+                    project: project.id,
+                    tool: toolId,
+                    quantity: quantity ?? null,
+                  }),
                 });
+                if (res.ok) {
+                  fetchDetails();
+                }
               } catch (err) {
                 console.error(err);
-                // Revert on failure
                 fetchDetails();
               } finally {
                 setAddingTool(false);
               }
             };
 
-            // Create by name (backend handles get_or_create) — optimistic local update
-            const attachToolByName = async (name: string) => {
+            // Create tool by name then attach — creates ProjectTool first, then attaches
+            const attachToolByName = async (name: string, quantity?: number | null) => {
               if (!name.trim() || addingTool) return;
               setAddingTool(true);
               setToolSearch("");
+              setNewToolQuantity("");
               try {
-                const res = await fetch(`${apiBase}/projects/${project.slug}/`, {
-                  method: "PATCH",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ tool_names: [name.trim()] }),
-                });
-                if (res.ok) {
-                  const updated = await res.json();
-                  // Update tools from the response — no full reload
-                  setProject(prev => prev ? { ...prev, tools: updated.tools ?? prev.tools } : prev);
-                  // Also refresh allTools list in case a new tool was created
-                  fetch(`${apiBase}/project-tools/`, { cache: "no-store" })
-                    .then(r => r.ok ? r.json() : null)
-                    .then(d => d && setAllTools(d));
+                // Get or create the ProjectTool
+                let toolObj = allTools.find(t => t.name.toLowerCase() === name.trim().toLowerCase());
+                if (!toolObj) {
+                  const createRes = await fetch(`${apiBase}/project-tools/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: name.trim() }),
+                  });
+                  if (createRes.ok) {
+                    toolObj = await createRes.json();
+                    // Refresh tools list
+                    fetch(`${apiBase}/project-tools/`, { cache: "no-store" })
+                      .then(r => r.ok ? r.json() : null)
+                      .then(d => d && setAllTools(d));
+                  }
+                }
+                if (toolObj) {
+                  const res = await fetch(`${apiBase}/project-tool-used/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      project: project.id,
+                      tool: toolObj.id,
+                      quantity: quantity ?? null,
+                    }),
+                  });
+                  if (res.ok) {
+                    fetchDetails();
+                  }
                 }
               } catch (err) {
                 console.error(err);
@@ -1646,18 +1892,40 @@ export default function ProjectWorkspaceView({
               }
             };
 
-            // Remove a tool — optimistic local update
-            const removeToolById = async (toolId: number) => {
+            // Update inline tool quantity via PATCH on project-tool-used
+            const updateToolQuantity = async (toolUsedId: number, quantity: number | null) => {
+              setProject((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      tools_used: (prev.tools_used || []).map((tu) =>
+                        tu.id === toolUsedId ? { ...tu, quantity } : tu
+                      ),
+                    }
+                  : prev
+              );
+
+              try {
+                await fetch(`${apiBase}/project-tool-used/${toolUsedId}/`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ quantity }),
+                });
+              } catch (err) {
+                console.error("Error updating tool quantity:", err);
+                fetchDetails();
+              }
+            };
+
+            // Remove a tool — DELETE /project-tool-used/<id>/
+            const removeToolUsed = async (toolUsedId: number) => {
               if (addingTool) return;
               setAddingTool(true);
               // Optimistic update
-              setProject(prev => prev ? { ...prev, tools: (prev.tools || []).filter(t => t.id !== toolId) } : prev);
+              setProject(prev => prev ? { ...prev, tools_used: (prev.tools_used || []).filter(tu => tu.id !== toolUsedId) } : prev);
               try {
-                const newIds = (project.tools || []).filter(t => t.id !== toolId).map(t => t.id);
-                await fetch(`${apiBase}/projects/${project.slug}/`, {
-                  method: "PATCH",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ tool_ids: newIds }),
+                await fetch(`${apiBase}/project-tool-used/${toolUsedId}/`, {
+                  method: "DELETE",
                 });
               } catch (err) {
                 console.error(err);
@@ -1669,114 +1937,83 @@ export default function ProjectWorkspaceView({
 
             return (
             <div className="space-y-0">
-              {/* Search & Add Panel */}
+              {/* Header Panel with Add Button */}
               <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50/60">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
                     <p className="text-xs font-bold text-slate-800 mb-0.5">Tools & Technologies</p>
                     <p className="text-[11px] text-slate-500">
-                      Search to attach an existing tool, or type a new name and press{" "}
-                      <kbd className="px-1 py-0.5 bg-slate-200 rounded text-[10px] font-mono">Enter</kbd>{" "}
-                      to create & attach.
+                      Manage tools, frameworks, and equipment used in this project.
                     </p>
                   </div>
-                  <div className="relative w-full sm:w-auto sm:min-w-[280px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 z-10" />
-                    {addingTool && (
-                      <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 animate-spin z-10" />
-                    )}
-                    <input
-                      type="text"
-                      placeholder="Search or create new tool..."
-                      value={toolSearch}
-                      onChange={(e) => setToolSearch(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          if (filtered.length === 1 && !currentToolIds.has(filtered[0].id)) {
-                            attachToolById(filtered[0].id, filtered[0]);
-                          } else if (searchLower && !exactMatch) {
-                            attachToolByName(toolSearch.trim());
-                          } else if (exactMatch) {
-                            const match = allTools.find(t => t.name.toLowerCase() === searchLower);
-                            if (match) attachToolById(match.id, match);
-                          }
-                        }
-                        if (e.key === "Escape") setToolSearch("");
-                      }}
-                      className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200 transition-all shadow-sm"
-                    />
-                    {/* Dropdown */}
-                    {searchLower && (
-                      <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden max-h-48 overflow-y-auto">
-                        {filtered.map(t => {
-                          const isAttached = currentToolIds.has(t.id);
-                          return (
-                            <button
-                              key={t.id}
-                              disabled={isAttached || addingTool}
-                              onClick={() => attachToolById(t.id, t)}
-                              className="w-full flex items-center justify-between px-3.5 py-2.5 text-xs hover:bg-slate-50 transition-colors disabled:opacity-60 border-b border-slate-100 last:border-0"
-                            >
-                              <div className="flex items-center gap-2">
-                                <Wrench className="h-3 w-3 text-slate-400 shrink-0" />
-                                <span className="font-medium text-slate-800">{t.name}</span>
-                              </div>
-                              {isAttached ? (
-                                <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
-                                  ✓ Attached
-                                </span>
-                              ) : (
-                                <span className="text-[10px] text-slate-400 shrink-0">+ Add</span>
-                              )}
-                            </button>
-                          );
-                        })}
-                        {!exactMatch && searchLower && (
-                          <button
-                            disabled={addingTool}
-                            onClick={() => attachToolByName(toolSearch.trim())}
-                            className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs hover:bg-indigo-50 transition-colors text-indigo-700 font-semibold border-t border-indigo-100"
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                            Create & attach "{toolSearch.trim()}"
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddToolModalOpen(true)}
+                    className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 shadow-xs"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> Attach Tool
+                  </button>
                 </div>
               </div>
 
               {/* Attached Tools List */}
-              {project.tools && project.tools.length > 0 ? (
+              {project.tools_used && project.tools_used.length > 0 ? (
                 <div>
-                  {project.tools.map((t) => (
-                    <div
-                      key={t.id}
-                      className="flex items-center gap-3 sm:gap-4 p-4 sm:px-5 sm:py-3.5 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors group"
-                    >
-                      {/* Icon */}
-                      <div className="h-7 w-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
-                        <Wrench className="h-3.5 w-3.5 text-slate-500" />
-                      </div>
-                      {/* Name */}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-slate-800 truncate">{t.name}</p>
-                        <p className="text-[10px] text-slate-400 font-mono">{t.slug || t.name.toLowerCase().replace(/\s+/g, "-")}</p>
-                      </div>
-                      {/* Remove */}
-                      <button
-                        onClick={() => removeToolById(t.id)}
-                        disabled={addingTool}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-30 shrink-0"
-                        title="Remove tool"
+                  {project.tools_used.map((tu) => {
+                    const toolFromAll = allTools.find((t) => t.id === tu.tool);
+                    const hasQuantity = toolFromAll ? toolFromAll.quantity != null : tu.tool_details?.quantity != null;
+
+                    return (
+                      <div
+                        key={tu.id}
+                        className="flex items-center justify-between gap-3 sm:gap-4 p-4 sm:px-5 sm:py-3.5 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors group"
                       >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          {/* Icon */}
+                          <div className="h-7 w-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+                            <Wrench className="h-3.5 w-3.5 text-slate-500" />
+                          </div>
+                          {/* Name & Slug */}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-slate-800 truncate">{tu.tool_name}</p>
+                            <p className="text-[10px] text-slate-400 font-mono">{tu.tool_slug || (tu.tool_name || "").toLowerCase().replace(/\s+/g, "-")}</p>
+                          </div>
+                        </div>
+
+                        {/* Quantity Controls & Remove */}
+                        <div className="flex items-center gap-3 shrink-0">
+                          {/* Inline Quantity Modifier - Only if tool has quantity specified in allTools API */}
+                          {hasQuantity && (
+                            <div className="flex items-center gap-1.5 bg-slate-100/80 border border-slate-200 rounded-lg px-2 py-1">
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Qty:</span>
+                              <input
+                              type="number"
+                              min="1"
+                              placeholder="—"
+                              value={tu.quantity != null ? tu.quantity : ""}
+                              onChange={(e) => {
+                                const val = e.target.value === "" ? null : Math.max(1, parseInt(e.target.value) || 1);
+                                updateToolQuantity(tu.id, val);
+                              }}
+                              className="w-12 text-center text-xs font-bold text-slate-900 bg-white border border-slate-200 rounded px-1 py-0.5 outline-none focus:border-slate-400"
+                            />
+                          </div>
+                        )}
+
+                        {/* Remove Button */}
+                        <button
+                          onClick={() => removeToolUsed(tu.id)}
+                          disabled={addingTool}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-30 shrink-0"
+                          title="Remove tool"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
+              </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-14 text-center">
                   <div className="h-12 w-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-3">
@@ -2331,33 +2568,82 @@ export default function ProjectWorkspaceView({
             </motion.div>
           </div>
         )}
-        {/* Image Preview Lightbox Modal */}
-        {previewImage && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
+        {/* Image Preview Lightbox Modal with Key & Button Navigation */}
+        {previewImageIndex !== null && previewImagesList.length > 0 && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
+            {/* Backdrop click to close */}
             <div
               className="fixed inset-0"
-              onClick={() => setPreviewImage(null)}
+              onClick={() => setPreviewImageIndex(null)}
             />
+
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              key={previewImageIndex}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="relative max-w-4xl max-h-[90vh] z-10 flex flex-col items-center justify-center pointer-events-auto"
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="relative max-w-5xl w-full max-h-[90vh] z-10 flex flex-col items-center justify-center pointer-events-auto"
             >
-              <button
-                type="button"
-                onClick={() => setPreviewImage(null)}
-                className="absolute -top-10 right-0 sm:-top-12 sm:right-0 p-2 text-white hover:text-slate-300 bg-slate-800/80 rounded-full transition-all cursor-pointer shadow-lg z-20"
-              >
-                <X className="h-5 w-5" />
-              </button>
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-700/50 max-h-[85vh]">
-                <img
-                  src={previewImage}
-                  alt="Full size preview"
-                  className="max-h-[85vh] max-w-full object-contain rounded-2xl"
-                />
+              {/* Top Header / Counter Bar */}
+              <div className="w-full flex items-center justify-between mb-3 px-1 text-white">
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-slate-800/90 border border-slate-700 text-xs font-mono font-semibold text-slate-200 shadow-md">
+                    Image {previewImageIndex + 1} of {previewImagesList.length}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPreviewImageIndex(null)}
+                  className="p-2 text-slate-300 hover:text-white bg-slate-800/90 hover:bg-slate-700 rounded-full transition-all cursor-pointer shadow-lg border border-slate-700"
+                  title="Close (Esc)"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
+
+              {/* Main Image Display with Navigation Buttons */}
+              <div className="relative w-full flex items-center justify-center group">
+                {/* Previous Image Button */}
+                {previewImagesList.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={handlePrevImage}
+                    className="absolute left-2 sm:left-4 z-20 p-2.5 sm:p-3 rounded-full bg-slate-900/80 hover:bg-slate-900 border border-slate-700/80 text-white transition-all transform active:scale-90 shadow-xl cursor-pointer hover:scale-105"
+                    title="Previous image (Left Arrow)"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                )}
+
+                {/* Current Image */}
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-800 bg-slate-900/60 max-h-[78vh] flex items-center justify-center">
+                  <img
+                    src={previewImagesList[previewImageIndex]}
+                    alt={`Preview image ${previewImageIndex + 1}`}
+                    className="max-h-[78vh] max-w-full object-contain select-none"
+                  />
+                </div>
+
+                {/* Next Image Button */}
+                {previewImagesList.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={handleNextImage}
+                    className="absolute right-2 sm:right-4 z-20 p-2.5 sm:p-3 rounded-full bg-slate-900/80 hover:bg-slate-900 border border-slate-700/80 text-white transition-all transform active:scale-90 shadow-xl cursor-pointer hover:scale-105"
+                    title="Next image (Right Arrow)"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                )}
+              </div>
+
+              {/* Key Help Legend */}
+              {previewImagesList.length > 1 && (
+                <div className="mt-3 text-[11px] text-slate-400 font-medium flex items-center gap-3">
+                  <span>Use <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[10px]">←</kbd> <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[10px]">→</kbd> arrow keys or side buttons to navigate</span>
+                </div>
+              )}
             </motion.div>
           </div>
         )}
@@ -2396,6 +2682,445 @@ export default function ProjectWorkspaceView({
                     className="w-full h-full border-0"
                   />
                 )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+        {/* Modal for Uploading Project Images */}
+        <AnimatePresence>
+          {isAddImagesModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-xs">
+              <div
+                className="fixed inset-0"
+                onClick={() => {
+                  setIsAddImagesModalOpen(false);
+                  imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+                  setNewImageFiles([]);
+                  setImagePreviews([]);
+                }}
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-lg bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-2xl z-10 space-y-5"
+              >
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-slate-100 text-slate-700">
+                      <Images className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">Upload Project Images</h3>
+                      <p className="text-[11px] text-slate-500">Select one or multiple images to add to this project.</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsAddImagesModalOpen(false);
+                      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+                      setNewImageFiles([]);
+                      setImagePreviews([]);
+                    }}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleAddImages} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                      Select Image Files
+                    </label>
+                    <div className="relative border-2 border-dashed border-slate-200 hover:border-slate-400 rounded-xl p-4 text-center bg-slate-50/50 transition-colors cursor-pointer group">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageFilesChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                      />
+                      <div className="space-y-1">
+                        <Images className="h-8 w-8 text-slate-400 group-hover:text-slate-600 mx-auto transition-colors" />
+                        <p className="text-xs font-semibold text-slate-700">
+                          Click or drag images to upload
+                        </p>
+                        <p className="text-[10px] text-slate-400">PNG, JPG, WEBP, GIF (multiple allowed)</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Selected File Previews */}
+                  {imagePreviews.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600">
+                          Selected Images ({imagePreviews.length})
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+                            setNewImageFiles([]);
+                            setImagePreviews([]);
+                          }}
+                          className="text-[10px] font-semibold text-rose-600 hover:underline cursor-pointer"
+                        >
+                          Clear All
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-48 overflow-y-auto p-1 border border-slate-100 rounded-xl">
+                        {imagePreviews.map((previewUrl, i) => (
+                          <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group bg-slate-100">
+                            <img src={previewUrl} alt={`Selected ${i}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImageFile(i)}
+                              className="absolute top-1 right-1 p-1 rounded-full bg-slate-900/80 text-white hover:bg-rose-600 transition-colors cursor-pointer"
+                              title="Remove"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAddImagesModalOpen(false);
+                        imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+                        setNewImageFiles([]);
+                        setImagePreviews([]);
+                      }}
+                      disabled={addingImages}
+                      className="px-4 py-2 rounded-xl text-slate-600 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={addingImages || newImageFiles.length === 0}
+                      className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                    >
+                      {addingImages ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Plus className="h-3.5 w-3.5" />
+                      )}
+                      {addingImages ? "Uploading..." : `Upload ${newImageFiles.length > 0 ? `${newImageFiles.length} ` : ""}Images`}
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* --- ATTACH TOOL MODAL --- */}
+        <AnimatePresence>
+          {isAddToolModalOpen && (() => {
+            const searchLower = toolSearch.toLowerCase().trim();
+            const attachedToolIds = new Set((project?.tools_used || []).map(tu => tu.tool));
+            const filteredTools = allTools.filter(t => t.name.toLowerCase().includes(searchLower));
+            const selectedToolObj = allTools.find(t => t.id === Number(selectedToolIds[0] || selectedToolIds));
+
+            const handleAttachTool = async (e: React.FormEvent) => {
+              e.preventDefault();
+              if (!project || (!selectedToolIds[0] && !toolSearch.trim())) return;
+              setAddingTool(true);
+              const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
+              const qtyNum = newToolQuantity !== "" ? Number(newToolQuantity) : null;
+
+              try {
+                let toolIdToAttach = selectedToolIds[0] ? Number(selectedToolIds[0]) : null;
+
+                // If user typed a tool name that doesn't exist in dropdown, create tool first
+                if (!toolIdToAttach && toolSearch.trim()) {
+                  const match = allTools.find(t => t.name.toLowerCase() === toolSearch.trim().toLowerCase());
+                  if (match) {
+                    toolIdToAttach = match.id;
+                  } else {
+                    const createRes = await fetch(`${apiBase}/project-tools/`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ name: toolSearch.trim() }),
+                    });
+                    if (createRes.ok) {
+                      const newTool = await createRes.json();
+                      toolIdToAttach = newTool.id;
+                      fetch(`${apiBase}/project-tools/`, { cache: "no-store" })
+                        .then(r => r.ok ? r.json() : null)
+                        .then(d => d && setAllTools(d));
+                    }
+                  }
+                }
+
+                if (toolIdToAttach) {
+                  const res = await fetch(`${apiBase}/project-tool-used/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      project: project.id,
+                      tool: toolIdToAttach,
+                      quantity: qtyNum,
+                    }),
+                  });
+                  if (res.ok) {
+                    setIsAddToolModalOpen(false);
+                    setToolSearch("");
+                    setNewToolQuantity("");
+                    setSelectedToolIds([]);
+                    setInvDropdownOpen(false);
+                    fetchDetails();
+                  }
+                }
+              } catch (err) {
+                console.error(err);
+              } finally {
+                setAddingTool(false);
+              }
+            };
+
+            return (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 font-sans">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs cursor-pointer"
+                  onClick={() => {
+                    setIsAddToolModalOpen(false);
+                    setToolSearch("");
+                    setNewToolQuantity("");
+                    setSelectedToolIds([]);
+                    setInvDropdownOpen(false);
+                  }}
+                />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  className="relative w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl z-10 overflow-visible"
+                >
+                  <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl">
+                    <div className="flex items-center gap-2">
+                      <Wrench className="h-4 w-4 text-slate-700" />
+                      <h3 className="text-sm font-bold text-slate-900">Attach Tool to Project</h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAddToolModalOpen(false);
+                        setToolSearch("");
+                        setNewToolQuantity("");
+                        setSelectedToolIds([]);
+                        setInvDropdownOpen(false);
+                      }}
+                      className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleAttachTool} className="p-4 sm:p-5 space-y-4">
+                    {/* Tool Select Dropdown with Search */}
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                        Select Tool / Technology <span className="text-rose-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div
+                          onClick={() => setInvDropdownOpen(!invDropdownOpen)}
+                          className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 cursor-pointer hover:bg-white focus:border-slate-400 transition-all"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Wrench className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            <span className={selectedToolObj ? "text-slate-900 font-semibold truncate" : "text-slate-400 truncate"}>
+                              {selectedToolObj ? selectedToolObj.name : "Select or search tool..."}
+                            </span>
+                          </div>
+                          <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${invDropdownOpen ? "rotate-180" : ""}`} />
+                        </div>
+
+                        {invDropdownOpen && (
+                          <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden max-h-56 flex flex-col">
+                            <div className="p-2 border-b border-slate-100 bg-slate-50/50">
+                              <div className="relative">
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                                <input
+                                  type="text"
+                                  placeholder="Search tools..."
+                                  value={toolSearch}
+                                  onChange={(e) => setToolSearch(e.target.value)}
+                                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg outline-none focus:border-slate-400"
+                                  autoFocus
+                                />
+                              </div>
+                            </div>
+                            <div className="overflow-y-auto max-h-40 divide-y divide-slate-100">
+                              {filteredTools.map((t) => {
+                                const isAttached = attachedToolIds.has(t.id);
+                                const isSelected = selectedToolIds[0] === t.id;
+                                return (
+                                  <button
+                                    key={t.id}
+                                    type="button"
+                                    disabled={isAttached}
+                                    onClick={() => {
+                                      setSelectedToolIds([t.id]);
+                                      setInvDropdownOpen(false);
+                                    }}
+                                    className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-left transition-colors cursor-pointer disabled:opacity-50 ${
+                                      isSelected ? "bg-slate-100 font-bold" : "hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span className="text-slate-800 truncate">{t.name}</span>
+                                      {t.quantity != null && (
+                                        <span className="text-[10px] text-slate-400 font-mono">
+                                          (Qty: {t.quantity})
+                                        </span>
+                                      )}
+                                    </div>
+                                    {isAttached && (
+                                      <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
+                                        Attached
+                                      </span>
+                                    )}
+                                  </button>
+                                );
+                              })}
+                              {filteredTools.length === 0 && toolSearch.trim() && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedToolIds([]);
+                                    setInvDropdownOpen(false);
+                                  }}
+                                  className="w-full p-3 text-xs text-indigo-600 font-semibold text-center hover:bg-indigo-50"
+                                >
+                                  + Create & attach "{toolSearch.trim()}"
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Quantity Field - Only shown if selected tool has quantity */}
+                    {selectedToolObj && selectedToolObj.quantity != null && (
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                          Quantity to Use <span className="text-rose-500">*</span>
+                          <span className="text-slate-400 font-normal normal-case ml-1">
+                            (Available in stock: {selectedToolObj.quantity})
+                          </span>
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          max={selectedToolObj.quantity}
+                          required
+                          placeholder={`Enter quantity (max ${selectedToolObj.quantity})`}
+                          value={newToolQuantity}
+                          onChange={(e) =>
+                            setNewToolQuantity(e.target.value === "" ? "" : Math.max(1, parseInt(e.target.value) || 1))
+                          }
+                          className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:bg-white focus:border-slate-400 transition-all"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAddToolModalOpen(false);
+                          setToolSearch("");
+                          setNewToolQuantity("");
+                          setSelectedToolIds([]);
+                          setInvDropdownOpen(false);
+                        }}
+                        className="px-4 py-2 rounded-xl text-slate-600 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={addingTool || (!selectedToolIds[0] && !toolSearch.trim())}
+                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                      >
+                        {addingTool ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                        Attach Tool
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              </div>
+            );
+          })()}
+        </AnimatePresence>
+        {/* Custom Delete Image Confirmation Modal */}
+        {deleteImageTarget && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-xs">
+            <div
+              className="fixed inset-0"
+              onClick={() => setDeleteImageTarget(null)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="relative w-full max-w-md bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-2xl z-10 space-y-5"
+            >
+              <div className="flex items-start gap-3.5 sm:gap-4">
+                <div className="h-10 w-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="h-5 w-5 text-rose-600" />
+                </div>
+                <div className="space-y-1 min-w-0 flex-1">
+                  <h3 className="text-base font-bold text-slate-900">Delete Project Image</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Are you sure you want to delete this image? This action cannot be undone.
+                  </p>
+                  {deleteImageTarget.url && (
+                    <div className="mt-3 relative w-32 h-24 rounded-lg overflow-hidden border border-slate-200 bg-slate-100">
+                      <img src={deleteImageTarget.url} alt="To delete" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setDeleteImageTarget(null)}
+                  disabled={deletingImageId === deleteImageTarget.id}
+                  className="px-4 py-2 rounded-xl text-slate-600 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await handleDeleteImage(deleteImageTarget.id);
+                    setDeleteImageTarget(null);
+                  }}
+                  disabled={deletingImageId === deleteImageTarget.id}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  {deletingImageId === deleteImageTarget.id ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3.5 w-3.5" />
+                  )}
+                  Delete Image
+                </button>
               </div>
             </motion.div>
           </div>

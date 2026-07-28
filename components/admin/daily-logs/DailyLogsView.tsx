@@ -5,6 +5,8 @@ import {
   AlertTriangle,
   CheckCircle2,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   FileText,
   FolderGit2,
@@ -66,6 +68,13 @@ export default function DailyLogsView() {
   const apiBase =
     process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
+  const pageSize = 10;
+
   // Fetch all Product Development projects for the filter dropdown
   useEffect(() => {
     const fetchAllProjects = async () => {
@@ -91,22 +100,30 @@ export default function DailyLogsView() {
   }, [apiBase]);
 
   // Build the API URL based on active filters
-  const buildUrl = (projectId: number | null, search: string) => {
+  const buildUrl = (projectId: number | null, search: string, page = 1) => {
     const params = new URLSearchParams();
     params.set("category", "product-development");
+    params.set("page", String(page));
+    params.set("page_size", String(pageSize));
     if (projectId) params.set("project", String(projectId));
     if (search.trim()) params.set("search", search.trim());
     return `${apiBase}/project-daily-updates/?${params.toString()}`;
   };
 
-  const fetchLogs = async (projectId: number | null, search: string) => {
+  const fetchLogs = async (projectId: number | null, search: string, page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(buildUrl(projectId, search), { cache: "no-store" });
+      const res = await fetch(buildUrl(projectId, search, page), { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
-        const results: ProjectDailyUpdate[] = data.results || data;
+        const results: ProjectDailyUpdate[] = Array.isArray(data) ? data : data.results || [];
         setLogs(results);
+        if (!Array.isArray(data)) {
+          setTotalCount(data.count || 0);
+          setHasNext(!!data.next);
+          setHasPrev(!!data.previous);
+        }
+        setCurrentPage(page);
 
         // Build ordered project list from returned logs — deduplicated, order = first appearance
         if (projectId === null) {
@@ -134,7 +151,7 @@ export default function DailyLogsView() {
 
   // Initial load
   useEffect(() => {
-    fetchLogs(null, "");
+    fetchLogs(null, "", 1);
   }, []);
 
   // Close dropdown on outside click
@@ -151,7 +168,7 @@ export default function DailyLogsView() {
   // When project filter changes → immediate API call
   const handleSelectProject = (id: number | null) => {
     setSelectedProjectId(id);
-    fetchLogs(id, searchTerm);
+    fetchLogs(id, searchTerm, 1);
   };
 
   // Search with debounce → API call
@@ -159,7 +176,7 @@ export default function DailyLogsView() {
     setSearchTerm(value);
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     searchTimeout.current = setTimeout(() => {
-      fetchLogs(selectedProjectId, value);
+      fetchLogs(selectedProjectId, value, 1);
     }, 350);
   };
 
@@ -170,7 +187,7 @@ export default function DailyLogsView() {
         method: "DELETE",
       });
       if (res.ok) {
-        setLogs((prev) => prev.filter((item) => item.id !== id));
+        fetchLogs(selectedProjectId, searchTerm, currentPage);
       }
     } catch (err) {
       console.error("Failed to delete daily log:", err);
@@ -309,7 +326,7 @@ export default function DailyLogsView() {
                 <Loader2 className="h-3 w-3 animate-spin" /> loading…
               </span>
             ) : (
-              `${logs.length} ${logs.length === 1 ? "entry" : "entries"}`
+              `${totalCount || logs.length} ${(totalCount || logs.length) === 1 ? "entry" : "entries"}`
             )}
           </span>
         </div>
@@ -460,6 +477,44 @@ export default function DailyLogsView() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {!loading && totalCount > pageSize && (
+        <div className="px-5 py-3.5 bg-white border border-slate-200 rounded-xl flex items-center justify-between shadow-xs">
+          <span className="text-[11px] text-slate-500">
+            Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} logs
+          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => fetchLogs(selectedProjectId, searchTerm, currentPage - 1)}
+              disabled={!hasPrev || loading}
+              className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+            {Array.from({ length: Math.ceil(totalCount / pageSize) }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => fetchLogs(selectedProjectId, searchTerm, p)}
+                className={`min-w-[28px] h-7 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                  p === currentPage
+                    ? "bg-slate-900 text-white border-slate-900"
+                    : "border-slate-200 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+            <button
+              onClick={() => fetchLogs(selectedProjectId, searchTerm, currentPage + 1)}
+              disabled={!hasNext || loading}
+              className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
       )}

@@ -8,6 +8,8 @@ import {
   Boxes,
   Check,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   ChevronDown,
   Loader2,
   Package,
@@ -52,15 +54,27 @@ export default function InventoryView({
 
   const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
+  const pageSize = 10;
+
   // Fetch Inventory Data directly from GET /api/baliyo/inventory/
-  const fetchInventory = async () => {
+  const fetchInventory = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/inventory/`, { cache: "no-store" });
+      const res = await fetch(`${apiBase}/inventory/?page=${page}&page_size=${pageSize}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
-        const rawList = Array.isArray(data) ? data : data.results || [];
-        setItems(rawList);
+        setItems(Array.isArray(data) ? data : data.results || []);
+        if (!Array.isArray(data)) {
+          setTotalCount(data.count || 0);
+          setHasNext(!!data.next);
+          setHasPrev(!!data.previous);
+        }
+        setCurrentPage(page);
       }
     } catch (err) {
       console.error("Failed to fetch inventory:", err);
@@ -168,7 +182,7 @@ export default function InventoryView({
       });
       if (res.ok) {
         setDeletingItem(null);
-        fetchInventory();
+        fetchInventory(currentPage);
       }
     } catch (err) {
       console.error("Failed to delete inventory stock:", err);
@@ -253,8 +267,13 @@ export default function InventoryView({
         {/* Table Header */}
         <div className="p-4 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between">
           <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-            Inventory Stock Items ({filteredStock.length})
+            Inventory Stock Items ({totalCount})
           </h3>
+          {totalCount > 0 && (
+            <span className="text-[10px] text-slate-400 font-mono">
+              Page {currentPage} of {Math.ceil(totalCount / pageSize)}
+            </span>
+          )}
         </div>
 
         {/* Table Content */}
@@ -335,6 +354,44 @@ export default function InventoryView({
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && totalCount > pageSize && (
+          <div className="px-5 py-3.5 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <span className="text-[11px] text-slate-500">
+              Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} items
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => fetchInventory(currentPage - 1)}
+                disabled={!hasPrev || loading}
+                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              {Array.from({ length: Math.ceil(totalCount / pageSize) }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => fetchInventory(p)}
+                  className={`min-w-[28px] h-7 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                    p === currentPage
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => fetchInventory(currentPage + 1)}
+                disabled={!hasNext || loading}
+                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         )}
       </div>

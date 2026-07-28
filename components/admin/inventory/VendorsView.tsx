@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
   Building2,
+  ChevronLeft,
+  ChevronRight,
   Loader2,
   MapPin,
   Pencil,
@@ -41,13 +43,26 @@ export default function VendorsView() {
 
   const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
 
-  const fetchVendors = async () => {
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
+  const pageSize = 10;
+
+  const fetchVendors = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/vendors/`, { cache: "no-store" });
+      const res = await fetch(`${apiBase}/vendors/?page=${page}&page_size=${pageSize}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
-        setVendors(data.results || data);
+        setVendors(Array.isArray(data) ? data : data.results || []);
+        if (!Array.isArray(data)) {
+          setTotalCount(data.count || 0);
+          setHasNext(!!data.next);
+          setHasPrev(!!data.previous);
+        }
+        setCurrentPage(page);
       }
     } catch (err) {
       console.error("Failed to fetch vendors:", err);
@@ -57,7 +72,7 @@ export default function VendorsView() {
   };
 
   useEffect(() => {
-    fetchVendors();
+    fetchVendors(1);
   }, []);
 
   const handleCreateVendor = async (e: React.FormEvent) => {
@@ -79,7 +94,7 @@ export default function VendorsView() {
         setVendorPhone("");
         setVendorAddress("");
         setShowAddVendorForm(false);
-        fetchVendors();
+        fetchVendors(1);
       }
     } catch (err) {
       console.error(err);
@@ -112,7 +127,7 @@ export default function VendorsView() {
       });
       if (res.ok) {
         setEditingVendor(null);
-        fetchVendors();
+        fetchVendors(currentPage);
       }
     } catch (err) {
       console.error("Failed to update vendor:", err);
@@ -131,7 +146,7 @@ export default function VendorsView() {
       });
       if (res.ok) {
         setDeletingVendor(null);
-        fetchVendors();
+        fetchVendors(currentPage);
       }
     } catch (err) {
       console.error("Failed to delete vendor:", err);
@@ -250,6 +265,44 @@ export default function VendorsView() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && totalCount > pageSize && (
+          <div className="px-5 py-3.5 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <span className="text-[11px] text-slate-500">
+              Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} vendors
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => fetchVendors(currentPage - 1)}
+                disabled={!hasPrev || loading}
+                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              {Array.from({ length: Math.ceil(totalCount / pageSize) }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => fetchVendors(p)}
+                  className={`min-w-[28px] h-7 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                    p === currentPage
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => fetchVendors(currentPage + 1)}
+                disabled={!hasNext || loading}
+                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -79,7 +79,22 @@ export interface ProjectTool {
   id: number;
   name: string;
   slug?: string;
+  quantity?: number | null;
   created_at: string;
+  updated_at?: string;
+}
+
+export interface ProjectToolUsed {
+  id: number;
+  project: number;
+  project_title?: string;
+  tool: number;
+  tool_name?: string;
+  tool_slug?: string;
+  tool_details?: ProjectTool | null;
+  quantity?: number | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SimilarProject {
@@ -162,7 +177,7 @@ export interface ProjectDetailResponse {
   images?: ProjectImage[];
   category?: ProjectCategory[];
   demos?: ProjectDemo[];
-  tools?: ProjectTool[];
+  tools_used?: ProjectToolUsed[];
   daily_updates?: ProjectDailyUpdate[];
   technical_documents?: TechnicalDocument[];
   technical_document?: TechnicalDocument[];

@@ -51,9 +51,9 @@ export default function CreatePurchaseView() {
       setLoadingMeta(true);
       try {
         const [vRes, cRes, cmRes] = await Promise.all([
-          fetch(`${apiBase}/vendors/`, { cache: "no-store" }),
-          fetch(`${apiBase}/components/`, { cache: "no-store" }),
-          fetch(`${apiBase}/component-models/`, { cache: "no-store" }),
+        fetch(`${apiBase}/vendors/?page_size=100`, { cache: "no-store" }),
+          fetch(`${apiBase}/components/?page_size=100`, { cache: "no-store" }),
+          fetch(`${apiBase}/component-models/?page_size=100`, { cache: "no-store" }),
         ]);
         if (vRes.ok) {
           const d = await vRes.json();

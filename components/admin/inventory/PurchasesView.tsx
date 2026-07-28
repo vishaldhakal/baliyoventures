@@ -12,6 +12,8 @@ import {
   AlertTriangle,
   Building2,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   Cpu,
   Eye,
   FileText,
@@ -74,15 +76,28 @@ export default function PurchasesView() {
     useState<ComponentPurchase | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const fetchPurchases = useCallback(async () => {
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
+  const pageSize = 10;
+
+  const fetchPurchases = useCallback(async (page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/component-purchases/`, {
+      const res = await fetch(`${apiBase}/component-purchases/?page=${page}&page_size=${pageSize}`, {
         cache: "no-store",
       });
       if (res.ok) {
         const data = await res.json();
-        setPurchases(data.results || data);
+        setPurchases(Array.isArray(data) ? data : data.results || []);
+        if (!Array.isArray(data)) {
+          setTotalCount(data.count || 0);
+          setHasNext(!!data.next);
+          setHasPrev(!!data.previous);
+        }
+        setCurrentPage(page);
       }
     } catch (err) {
       console.error("Failed to fetch purchases:", err);
@@ -92,7 +107,7 @@ export default function PurchasesView() {
   }, [apiBase]);
 
   useEffect(() => {
-    fetchPurchases();
+    fetchPurchases(1);
   }, [fetchPurchases]);
 
   const handleSelectBill = async (p: ComponentPurchase) => {
@@ -117,9 +132,9 @@ export default function PurchasesView() {
     setLoadingMeta(true);
     try {
       const [vRes, cRes, cmRes] = await Promise.all([
-        fetch(`${apiBase}/vendors/`, { cache: "no-store" }),
-        fetch(`${apiBase}/components/`, { cache: "no-store" }),
-        fetch(`${apiBase}/component-models/`, { cache: "no-store" }),
+        fetch(`${apiBase}/vendors/?page_size=100`, { cache: "no-store" }),
+        fetch(`${apiBase}/components/?page_size=100`, { cache: "no-store" }),
+        fetch(`${apiBase}/component-models/?page_size=100`, { cache: "no-store" }),
       ]);
       if (vRes.ok) {
         const d = await vRes.json();
@@ -254,7 +269,7 @@ export default function PurchasesView() {
         if (viewingBill && viewingBill.id === editingBillId) {
           setViewingBill(savedData);
         }
-        fetchPurchases();
+        fetchPurchases(currentPage);
       }
     } catch (err) {
       console.error("Save error:", err);
@@ -274,7 +289,7 @@ export default function PurchasesView() {
       if (res.ok) {
         setDeletingPurchase(null);
         setViewingBill(null);
-        fetchPurchases();
+        fetchPurchases(currentPage);
       }
     } catch (err) {
       console.error(err);
@@ -346,8 +361,13 @@ export default function PurchasesView() {
         {/* Table Header */}
         <div className="p-4 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between">
           <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-            All Purchase Orders ({filteredPurchases.length})
+            All Purchase Orders ({totalCount})
           </h3>
+          {totalCount > 0 && (
+            <span className="text-[10px] text-slate-400 font-mono">
+              Page {currentPage} of {Math.ceil(totalCount / pageSize)}
+            </span>
+          )}
         </div>
 
         {/* Content */}
@@ -441,6 +461,44 @@ export default function PurchasesView() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && totalCount > pageSize && (
+          <div className="px-5 py-3.5 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <span className="text-[11px] text-slate-500">
+              Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} orders
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => fetchPurchases(currentPage - 1)}
+                disabled={!hasPrev || loading}
+                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              {Array.from({ length: Math.ceil(totalCount / pageSize) }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => fetchPurchases(p)}
+                  className={`min-w-[28px] h-7 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                    p === currentPage
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => fetchPurchases(currentPage + 1)}
+                disabled={!hasNext || loading}
+                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         )}
       </div>

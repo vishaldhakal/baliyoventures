@@ -2,7 +2,7 @@
 
 import { ProjectTool } from "@/types/projects";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, Loader2, Pencil, Plus, Save, Search, Trash2, Wrench, X } from "lucide-react";
+import { AlertTriangle, ChevronLeft, ChevronRight, Loader2, Pencil, Plus, Save, Search, Trash2, Wrench, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function ToolsView() {
@@ -13,11 +13,13 @@ export default function ToolsView() {
   // Create Modal State
   const [showAddForm, setShowAddForm] = useState(false);
   const [newToolName, setNewToolName] = useState("");
+  const [newToolQuantity, setNewToolQuantity] = useState<number | "">("");
   const [addingTool, setAddingTool] = useState(false);
 
   // Edit Modal State
   const [editingTool, setEditingTool] = useState<ProjectTool | null>(null);
   const [editToolName, setEditToolName] = useState("");
+  const [editToolQuantity, setEditToolQuantity] = useState<number | "">("");
   const [updatingTool, setUpdatingTool] = useState(false);
 
   // Delete Modal State
@@ -26,16 +28,29 @@ export default function ToolsView() {
 
   const [error, setError] = useState("");
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
+  const pageSize = 10;
+
   const apiBase =
     process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
 
-  const fetchTools = async () => {
+  const fetchTools = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/project-tools/`, { cache: "no-store" });
+      const res = await fetch(`${apiBase}/project-tools/?page=${page}&page_size=${pageSize}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
-        setTools(data);
+        setTools(Array.isArray(data) ? data : data.results || []);
+        if (!Array.isArray(data)) {
+          setTotalCount(data.count || 0);
+          setHasNext(!!data.next);
+          setHasPrev(!!data.previous);
+        }
+        setCurrentPage(page);
       }
     } catch (err) {
       console.error(err);
@@ -46,7 +61,7 @@ export default function ToolsView() {
   };
 
   useEffect(() => {
-    fetchTools();
+    fetchTools(1);
   }, []);
 
   const handleAddTool = async (e: React.FormEvent) => {
@@ -57,12 +72,16 @@ export default function ToolsView() {
       const res = await fetch(`${apiBase}/project-tools/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newToolName }),
+        body: JSON.stringify({
+          name: newToolName,
+          quantity: newToolQuantity !== "" ? Number(newToolQuantity) : null,
+        }),
       });
       if (res.ok) {
         setNewToolName("");
+        setNewToolQuantity("");
         setShowAddForm(false);
-        fetchTools();
+        fetchTools(1);
       }
     } catch (err) {
       console.error(err);
@@ -74,6 +93,7 @@ export default function ToolsView() {
   const handleOpenEditTool = (tool: ProjectTool) => {
     setEditingTool(tool);
     setEditToolName(tool.name);
+    setEditToolQuantity(tool.quantity != null ? tool.quantity : "");
   };
 
   const handleUpdateTool = async (e: React.FormEvent) => {
@@ -84,11 +104,14 @@ export default function ToolsView() {
       const res = await fetch(`${apiBase}/project-tools/${editingTool.slug || editingTool.id}/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: editToolName }),
+        body: JSON.stringify({
+          name: editToolName,
+          quantity: editToolQuantity !== "" ? Number(editToolQuantity) : null,
+        }),
       });
       if (res.ok) {
         setEditingTool(null);
-        fetchTools();
+        fetchTools(currentPage);
       }
     } catch (err) {
       console.error("Failed to update tool:", err);
@@ -106,7 +129,7 @@ export default function ToolsView() {
       });
       if (res.ok) {
         setDeletingTool(null);
-        fetchTools();
+        fetchTools(currentPage);
       }
     } catch (err) {
       console.error("Failed to delete tool:", err);
@@ -162,8 +185,13 @@ export default function ToolsView() {
         {/* Table Header */}
         <div className="p-4 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between">
           <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-            All Tools ({filteredTools.length})
+            All Tools ({totalCount})
           </h3>
+          {totalCount > 0 && (
+            <span className="text-[10px] text-slate-400 font-mono">
+              Page {currentPage} of {Math.ceil(totalCount / pageSize)}
+            </span>
+          )}
         </div>
 
         {/* Content */}
@@ -181,6 +209,7 @@ export default function ToolsView() {
               <thead>
                 <tr className="bg-white border-b border-slate-100 text-slate-400">
                   <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider">Tool Name</th>
+                  <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-center">Default Qty</th>
                   <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider">Date Added</th>
                   <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-center">Actions</th>
                 </tr>
@@ -188,7 +217,7 @@ export default function ToolsView() {
               <tbody className="divide-y divide-slate-100 text-xs">
                 {filteredTools.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="px-5 py-12 text-center text-slate-400 italic">
+                    <td colSpan={4} className="px-5 py-12 text-center text-slate-400 italic">
                       No tools found matching your criteria.
                     </td>
                   </tr>
@@ -197,6 +226,15 @@ export default function ToolsView() {
                     <tr key={tool.id} className="hover:bg-slate-50/50 transition-colors group">
                       <td className="px-5 py-3.5">
                         <span className="font-semibold text-slate-800 text-sm">{tool.name}</span>
+                      </td>
+                      <td className="px-5 py-3.5 text-center">
+                        {tool.quantity != null ? (
+                          <span className="text-xs font-bold text-slate-700 font-mono">
+                            {tool.quantity}
+                          </span>
+                        ) : (
+                          <span className="text-slate-300 text-xs">—</span>
+                        )}
                       </td>
                       <td className="px-5 py-3.5 text-slate-500 font-mono text-[11px]">
                         {new Date(tool.created_at).toLocaleDateString("en-US", {
@@ -228,6 +266,44 @@ export default function ToolsView() {
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && !error && totalCount > pageSize && (
+          <div className="px-5 py-3.5 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <span className="text-[11px] text-slate-500">
+              Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} tools
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => fetchTools(currentPage - 1)}
+                disabled={!hasPrev || loading}
+                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              {Array.from({ length: Math.ceil(totalCount / pageSize) }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => fetchTools(p)}
+                  className={`min-w-[28px] h-7 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                    p === currentPage
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => fetchTools(currentPage + 1)}
+                disabled={!hasNext || loading}
+                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -279,6 +355,21 @@ export default function ToolsView() {
                     placeholder="e.g. Next.js, SolidWorks, Python, React Native"
                     value={newToolName}
                     onChange={(e) => setNewToolName(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:bg-white focus:border-slate-400 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    Default Quantity <span className="text-slate-400 font-normal normal-case">(optional)</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 2"
+                    value={newToolQuantity}
+                    onChange={(e) =>
+                      setNewToolQuantity(e.target.value === "" ? "" : Math.max(1, parseInt(e.target.value) || 1))
+                    }
                     className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:bg-white focus:border-slate-400 transition-all"
                   />
                 </div>
@@ -354,6 +445,21 @@ export default function ToolsView() {
                     required
                     value={editToolName}
                     onChange={(e) => setEditToolName(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:bg-white focus:border-slate-400 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    Default Quantity <span className="text-slate-400 font-normal normal-case">(optional)</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 2"
+                    value={editToolQuantity}
+                    onChange={(e) =>
+                      setEditToolQuantity(e.target.value === "" ? "" : Math.max(1, parseInt(e.target.value) || 1))
+                    }
                     className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:bg-white focus:border-slate-400 transition-all"
                   />
                 </div>

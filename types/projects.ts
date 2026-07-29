@@ -101,7 +101,7 @@ export interface SimilarProject {
   id: number;
   title: string;
   slug: string;
-  status?: "in_progress" | "completed";
+  status?: "in_progress" | "completed" | "published";
   thumbnail_image: string | null;
   thumbnail_image_alt_description: string | null;
   meta_description?: string;
@@ -196,6 +196,7 @@ export interface ProjectDetailResponse {
   thumbnail_image_alt_description: string | null;
   catalogue: string | null;
   quotation: string | null;
+  status?: "in_progress" | "completed" | "published";
   created_at: string;
   updated_at: string;
   similar_projects?: SimilarProject[];

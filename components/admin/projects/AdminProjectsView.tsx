@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Circle,
   Eye,
+  Globe,
   Loader2,
   Pencil,
   Plus,
@@ -51,7 +52,7 @@ export default function AdminProjectsView({
   const [deleting, setDeleting] = useState(false);
 
   // Status change state — optimistic update map
-  const [statusMap, setStatusMap] = useState<Record<string, "in_progress" | "completed">>({});
+  const [statusMap, setStatusMap] = useState<Record<string, "in_progress" | "completed" | "published">>({});
   const [updatingStatus, setUpdatingStatus] = useState<Record<string, boolean>>({});
   const [openStatusSlug, setOpenStatusSlug] = useState<string | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number } | null>(null);
@@ -81,7 +82,7 @@ export default function AdminProjectsView({
 
   const handleStatusChange = async (
     slug: string,
-    newStatus: "in_progress" | "completed"
+    newStatus: "in_progress" | "completed" | "published"
   ) => {
     setStatusMap((prev) => ({ ...prev, [slug]: newStatus }));
     setUpdatingStatus((prev) => ({ ...prev, [slug]: true }));
@@ -302,39 +303,49 @@ export default function AdminProjectsView({
                     >
                       <div className="relative inline-block">
                         {/* Trigger pill */}
-                        <button
-                          onClick={(e) => {
-                            if (openStatusSlug === project.slug) {
-                              setOpenStatusSlug(null);
-                            } else {
-                              const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
-                              setDropdownPos({ top: rect.bottom + 6, left: rect.left });
-                              setOpenStatusSlug(project.slug);
-                            }
-                          }}
-                          disabled={updatingStatus[project.slug]}
-                          className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-all cursor-pointer select-none ${
-                            (statusMap[project.slug] ?? project.status ?? "in_progress") === "completed"
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-                              : "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
-                          } disabled:opacity-60 disabled:cursor-not-allowed`}
-                        >
-                          {updatingStatus[project.slug] ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (statusMap[project.slug] ?? project.status ?? "in_progress") === "completed" ? (
-                            <CheckCircle2 className="h-3 w-3" />
-                          ) : (
-                            <Circle className="h-3 w-3" />
-                          )}
-                          {(statusMap[project.slug] ?? project.status ?? "in_progress") === "completed"
-                            ? "Completed"
-                            : "In Progress"}
-                          <ChevronDown
-                            className={`h-3 w-3 transition-transform duration-200 ${
-                              openStatusSlug === project.slug ? "rotate-180" : ""
-                            }`}
-                          />
-                        </button>
+                        {(() => {
+                          const currentStatus = statusMap[project.slug] ?? project.status ?? "in_progress";
+                          const isCompleted = currentStatus === "completed";
+                          const isPublished = currentStatus === "published";
+
+                          return (
+                            <button
+                              onClick={(e) => {
+                                if (openStatusSlug === project.slug) {
+                                  setOpenStatusSlug(null);
+                                } else {
+                                  const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                                  setDropdownPos({ top: rect.bottom + 6, left: rect.left });
+                                  setOpenStatusSlug(project.slug);
+                                }
+                              }}
+                              disabled={updatingStatus[project.slug]}
+                              className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-all cursor-pointer select-none ${
+                                isCompleted
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                                  : isPublished
+                                  ? "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                                  : "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
+                              } disabled:opacity-60 disabled:cursor-not-allowed`}
+                            >
+                              {updatingStatus[project.slug] ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : isCompleted ? (
+                                <CheckCircle2 className="h-3 w-3" />
+                              ) : isPublished ? (
+                                <Globe className="h-3 w-3" />
+                              ) : (
+                                <Circle className="h-3 w-3" />
+                              )}
+                              {isCompleted ? "Completed" : isPublished ? "Published" : "In Progress"}
+                              <ChevronDown
+                                className={`h-3 w-3 transition-transform duration-200 ${
+                                  openStatusSlug === project.slug ? "rotate-180" : ""
+                                }`}
+                              />
+                            </button>
+                          );
+                        })()}
                       </div>
                     </td>
 
@@ -440,6 +451,24 @@ export default function AdminProjectsView({
             >
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
               Completed
+            </button>
+            <div className="mx-3 border-t border-slate-100" />
+            <button
+              onClick={() => {
+                const proj = filteredProjects.find((p) => p.slug === openStatusSlug);
+                if (proj) handleStatusChange(proj.slug, "published");
+                setOpenStatusSlug(null);
+              }}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-colors hover:bg-slate-50 ${
+                (statusMap[openStatusSlug] ??
+                  filteredProjects.find((p) => p.slug === openStatusSlug)?.status ??
+                  "in_progress") === "published"
+                  ? "text-blue-700 font-semibold bg-blue-50/60"
+                  : "text-slate-600"
+              }`}
+            >
+              <Globe className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+              Published
             </button>
           </div>
         </>

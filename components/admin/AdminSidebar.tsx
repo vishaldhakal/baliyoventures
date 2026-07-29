@@ -10,6 +10,7 @@ import {
   LogOut,
   Menu,
   Package,
+  ShoppingBag,
   ShoppingCart,
   Wrench,
   X,
@@ -54,6 +55,12 @@ export default function AdminSidebar() {
       href: "/admin",
       icon: FolderGit2,
       active: pathname === "/admin" || pathname.startsWith("/admin/projects"),
+    },
+    {
+      name: "Project Orders",
+      href: "/admin/project-orders",
+      icon: ShoppingBag,
+      active: pathname.startsWith("/admin/project-orders"),
     },
     {
       name: "Inventory",

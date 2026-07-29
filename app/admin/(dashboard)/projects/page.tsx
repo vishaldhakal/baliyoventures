@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import AdminProjectsView from "@/components/admin/projects/AdminProjectsView";
-import { Loader2 } from "lucide-react";
 import { ProjectsListResponse } from "@/types/projects";
+import { Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const PAGE_SIZE = 9;
 

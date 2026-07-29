@@ -1,10 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import Header from "./Header";
 import Footer from "./Footer";
+import Header from "./Header";
 
-const EXCLUDED_PATHS = ["/leave-form", "/admin"];
+const EXCLUDED_PATHS = ["/leave-form", "/admin", "/create-project-order"];
 
 export default function ConditionalLayout({
   children,

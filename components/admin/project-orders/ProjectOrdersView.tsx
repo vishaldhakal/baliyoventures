@@ -46,12 +46,15 @@ export default function ProjectOrdersView() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (query: string = searchTerm) => {
     setLoading(true);
     setError(false);
     try {
+      const searchParam = query.trim()
+        ? `&search=${encodeURIComponent(query.trim())}`
+        : "";
       const res = await fetch(
-        `${apiBase}/project-orders/?page=${currentPage}&page_size=${PAGE_SIZE}`,
+        `${apiBase}/project-orders/?page=${currentPage}&page_size=${PAGE_SIZE}${searchParam}`,
         { cache: "no-store" }
       );
       if (!res.ok) throw new Error("Failed to fetch project orders");
@@ -66,8 +69,12 @@ export default function ProjectOrdersView() {
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, [currentPage]);
+    const timer = setTimeout(() => {
+      fetchOrders(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [currentPage, searchTerm]);
 
   const handleDelete = async () => {
     if (!deleteOrder) return;
@@ -79,7 +86,7 @@ export default function ProjectOrdersView() {
       if (!res.ok) throw new Error("Failed to delete order");
       setIsDeleteOpen(false);
       setDeleteOrder(null);
-      fetchOrders();
+      fetchOrders(searchTerm);
     } catch (err) {
       console.error(err);
       alert("Could not delete project order. Please try again.");
@@ -88,13 +95,7 @@ export default function ProjectOrdersView() {
     }
   };
 
-  const filteredOrders =
-    ordersData?.results.filter(
-      (order) =>
-        order.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.project_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (order.phone_number && order.phone_number.includes(searchTerm))
-    ) || [];
+  const displayOrders = ordersData?.results || [];
 
 
   return (
@@ -165,7 +166,7 @@ export default function ProjectOrdersView() {
                 Failed to load project orders.
               </p>
             </div>
-          ) : filteredOrders.length === 0 ? (
+          ) : displayOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center px-4 space-y-2">
               <AlertCircle className="h-10 w-10 text-slate-300" />
               <h3 className="text-sm font-bold text-slate-700">No Orders Found</h3>
@@ -197,7 +198,7 @@ export default function ProjectOrdersView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
-                {filteredOrders.map((order) => (
+                {displayOrders.map((order: ProjectOrder) => (
                   <tr
                     key={order.id}
                     className="hover:bg-slate-50/80 transition-colors cursor-pointer group"

@@ -62,6 +62,7 @@ export interface ComponentPurchase {
   purchase_date?: string | null;
   total_price?: number | null;
   notes?: string | null;
+  bill_file?: string | null;
   items?: ComponentPurchaseItem[];
   created_at?: string;
   updated_at?: string;

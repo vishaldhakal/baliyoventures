@@ -14,10 +14,12 @@ import {
   Building2,
   Calendar,
   Cpu,
+  ExternalLink,
   Eye,
   FileText,
   Loader2,
   MapPin,
+  Paperclip,
   Pencil,
   Phone,
   Plus,
@@ -66,6 +68,8 @@ export default function PurchasesView() {
     new Date().toISOString().split("T")[0]
   );
   const [notes, setNotes] = useState("");
+  const [billFile, setBillFile] = useState<File | null>(null);
+  const [existingBillUrl, setExistingBillUrl] = useState<string | null>(null);
   const [formItems, setFormItems] = useState<PurchaseItemForm[]>([
     { component_model: "", quantity: 1, price_per_item: 0 },
   ]);
@@ -162,6 +166,8 @@ export default function PurchasesView() {
       bill.purchase_date || new Date().toISOString().split("T")[0]
     );
     setNotes(bill.notes || "");
+    setExistingBillUrl(bill.bill_file || null);
+    setBillFile(null);
     setShowFormModal(true);
     fetchMeta();
 
@@ -199,6 +205,8 @@ export default function PurchasesView() {
   const handleCloseFormModal = () => {
     setShowFormModal(false);
     setEditingBillId(null);
+    setBillFile(null);
+    setExistingBillUrl(null);
   };
 
   const addItem = () =>
@@ -239,16 +247,25 @@ export default function PurchasesView() {
     setSubmitting(true);
 
     try {
-      const body: Record<string, unknown> = {
-        items: validItems.map((item) => ({
-          component_model: item.component_model,
-          quantity: item.quantity,
-          price_per_item: item.price_per_item,
-        })),
-        purchase_date: purchaseDate || null,
-        notes: notes || null,
-        vendor: selectedVendor !== "" ? selectedVendor : null,
-      };
+      const formData = new FormData();
+      formData.append("purchase_date", purchaseDate || "");
+      formData.append("notes", notes || "");
+      if (selectedVendor !== "") {
+        formData.append("vendor", String(selectedVendor));
+      }
+      if (billFile) {
+        formData.append("bill_file", billFile);
+      }
+      formData.append(
+        "items",
+        JSON.stringify(
+          validItems.map((item) => ({
+            component_model: item.component_model,
+            quantity: item.quantity,
+            price_per_item: item.price_per_item,
+          }))
+        )
+      );
 
       const url = editingBillId
         ? `${apiBase}/component-purchases/${editingBillId}/`
@@ -258,8 +275,7 @@ export default function PurchasesView() {
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: formData,
       });
 
       if (res.ok) {
@@ -634,6 +650,44 @@ export default function PurchasesView() {
                   </div>
                 )}
 
+                {/* Attached Bill File / Image */}
+                {viewingBill.bill_file && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-xs">
+                    <p className="font-bold text-slate-800 flex items-center gap-1.5">
+                      <Paperclip className="h-4 w-4 text-slate-600" />
+                      Attached Bill / Invoice
+                    </p>
+                    {/\.(jpg|jpeg|png|webp|gif)$/i.test(viewingBill.bill_file) ? (
+                      <div className="space-y-2">
+                        <img
+                          src={viewingBill.bill_file}
+                          alt="Bill attachment"
+                          className="max-h-56 w-auto rounded-lg border border-slate-200 object-contain bg-white"
+                        />
+                        <a
+                          href={viewingBill.bill_file}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-slate-900 underline"
+                        >
+                          <ExternalLink className="h-3 w-3" /> View full resolution
+                        </a>
+                      </div>
+                    ) : (
+                      <a
+                        href={viewingBill.bill_file}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 font-semibold hover:bg-slate-100 transition-colors"
+                      >
+                        <FileText className="h-4 w-4 text-slate-500" />
+                        <span>Open Bill Document</span>
+                        <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
+                      </a>
+                    )}
+                  </div>
+                )}
+
                 {/* Bottom actions */}
                 <div className="flex justify-between items-center pt-2 border-t border-slate-100">
                   <button
@@ -848,6 +902,61 @@ export default function PurchasesView() {
                         onChange={(e) => setNotes(e.target.value)}
                         className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 outline-none focus:bg-white focus:border-slate-400 resize-none"
                       />
+                    </div>
+
+                    {/* Bill File Field */}
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-700 block">
+                        Bill / Invoice File <span className="text-slate-400 font-normal">(optional)</span>
+                      </label>
+
+                      {existingBillUrl && !billFile && (
+                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs mb-1.5">
+                          <div className="flex items-center gap-2 truncate">
+                            <Paperclip className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+                            <span className="text-slate-700 font-medium truncate">Current file attached</span>
+                          </div>
+                          <a
+                            href={existingBillUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 text-[11px] text-slate-800 font-semibold hover:underline shrink-0 ml-2"
+                          >
+                            <ExternalLink className="h-3 w-3" /> View current file
+                          </a>
+                        </div>
+                      )}
+
+                      {billFile ? (
+                        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                          <Paperclip className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+                          <span className="font-medium text-slate-700 truncate flex-1">{billFile.name}</span>
+                          <span className="text-[10px] text-slate-400 shrink-0">
+                            {(billFile.size / 1024).toFixed(1)} KB
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setBillFile(null)}
+                            className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                            title="Clear selected file"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-dashed border-slate-300 hover:border-slate-400 hover:bg-slate-100 transition-all cursor-pointer">
+                          <Paperclip className="h-3.5 w-3.5 text-slate-400" />
+                          <span className="text-xs text-slate-500 font-medium">
+                            {existingBillUrl ? "Click to upload replacement bill file" : "Click to upload bill file (PDF or image)"}
+                          </span>
+                          <input
+                            type="file"
+                            accept=".pdf,.png,.jpg,.jpeg,.webp,.gif"
+                            className="hidden"
+                            onChange={(e) => setBillFile(e.target.files?.[0] ?? null)}
+                          />
+                        </label>
+                      )}
                     </div>
 
                     {grandTotal > 0 && (

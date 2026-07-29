@@ -158,9 +158,37 @@ export default function ProjectWorkspaceView({
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Editable Title State
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editTitle, setEditTitle] = useState(initialProject?.title || "");
+  const [savingTitle, setSavingTitle] = useState(false);
+
   // Quick Editable Specs
   const [editingField, setEditingField] = useState<"desc" | "specs" | "problem" | "team" | "thumbnail" | null>(null);
   const [savingField, setSavingField] = useState<"desc" | "specs" | "problem" | "team" | "thumbnail" | null>(null);
+
+  const handleSaveTitle = async () => {
+    if (!project || !editTitle.trim()) return;
+    setSavingTitle(true);
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
+    try {
+      const res = await fetch(`${apiBase}/projects/${project.slug}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: editTitle.trim() }),
+      });
+      if (res.ok) {
+        const updatedData = await res.json();
+        setProject((prev) => (prev ? { ...prev, title: updatedData.title || editTitle.trim() } : prev));
+        setIsEditingTitle(false);
+        router.refresh();
+      }
+    } catch (err) {
+      console.error("Failed to save title:", err);
+    } finally {
+      setSavingTitle(false);
+    }
+  };
   const [editDescription, setEditDescription] = useState("");
   const [editSpecs, setEditSpecs] = useState("");
   const [editProblem, setEditProblem] = useState("");
@@ -299,6 +327,7 @@ export default function ProjectWorkspaceView({
       }
       const data: ProjectDetailResponse = await response.json();
       setProject(data);
+      setEditTitle(data.title || "");
       setEditDescription(data.description || "");
       setEditSpecs(data.specs || "");
       setEditProblem(data.problem_it_solves || "");
@@ -717,10 +746,73 @@ export default function ProjectWorkspaceView({
             <ArrowLeft className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
           </Link>
           <div className="min-w-0 flex-1">
-
-            <h1 className="text-xl sm:text-2xl md:text-2xl text-slate-900 tracking-tight mt-0.5 truncate">
-              {project.title}
-            </h1>
+            {isEditingTitle ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  autoFocus
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSaveTitle();
+                    if (e.key === "Escape") {
+                      setEditTitle(project.title);
+                      setIsEditingTitle(false);
+                    }
+                  }}
+                  className="w-full text-lg sm:text-xl font-bold text-slate-900 bg-white border border-slate-300 rounded-xl px-3 py-1 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-all"
+                  placeholder="Enter project title..."
+                />
+                <button
+                  type="button"
+                  onClick={handleSaveTitle}
+                  disabled={savingTitle || !editTitle.trim()}
+                  className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                  title="Save title"
+                >
+                  {savingTitle ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-white" />
+                  ) : (
+                    <Check className="h-4 w-4 text-white" />
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditTitle(project.title);
+                    setIsEditingTitle(false);
+                  }}
+                  disabled={savingTitle}
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all cursor-pointer shrink-0"
+                  title="Cancel"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <div
+                className="flex items-center gap-2 group cursor-pointer"
+                onClick={() => setIsEditingTitle(true)}
+              >
+                <h1
+                  className="text-xl sm:text-2xl md:text-2xl font-bold text-slate-900 tracking-tight mt-0.5 truncate hover:text-slate-700 transition-colors"
+                  title="Click to edit project title"
+                >
+                  {project.title}
+                </h1>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditingTitle(true);
+                  }}
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all opacity-70 group-hover:opacity-100 shrink-0"
+                  title="Edit title"
+                >
+                  <Edit className="h-4 w-4" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1813,84 +1905,11 @@ export default function ProjectWorkspaceView({
 
           {/* TAB 7: TOOLS ATTACHED */}
           {activeTab === "tools" && (() => {
-            const attachedToolIds = new Set((project.tools_used || []).map(tu => tu.tool));
-            const searchLower = toolSearch.toLowerCase().trim();
-            const filtered = allTools.filter(t =>
-              t.name.toLowerCase().includes(searchLower)
-            );
-            const exactMatch = allTools.some(t => t.name.toLowerCase() === searchLower);
             const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
 
             // Attach an existing tool by id — POST to project-tool-used
-            const attachToolById = async (toolId: number, tool: ProjectTool, quantity?: number | null) => {
-              if (attachedToolIds.has(toolId) || addingTool) return;
-              setAddingTool(true);
-              setToolSearch("");
-              setNewToolQuantity("");
-              try {
-                const res = await fetch(`${apiBase}/project-tool-used/`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    project: project.id,
-                    tool: toolId,
-                    quantity: quantity ?? null,
-                  }),
-                });
-                if (res.ok) {
-                  fetchDetails();
-                }
-              } catch (err) {
-                console.error(err);
-                fetchDetails();
-              } finally {
-                setAddingTool(false);
-              }
-            };
 
             // Create tool by name then attach — creates ProjectTool first, then attaches
-            const attachToolByName = async (name: string, quantity?: number | null) => {
-              if (!name.trim() || addingTool) return;
-              setAddingTool(true);
-              setToolSearch("");
-              setNewToolQuantity("");
-              try {
-                // Get or create the ProjectTool
-                let toolObj = allTools.find(t => t.name.toLowerCase() === name.trim().toLowerCase());
-                if (!toolObj) {
-                  const createRes = await fetch(`${apiBase}/project-tools/`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ name: name.trim() }),
-                  });
-                  if (createRes.ok) {
-                    toolObj = await createRes.json();
-                    // Refresh tools list
-                    fetch(`${apiBase}/project-tools/`, { cache: "no-store" })
-                      .then(r => r.ok ? r.json() : null)
-                      .then(d => d && setAllTools(d));
-                  }
-                }
-                if (toolObj) {
-                  const res = await fetch(`${apiBase}/project-tool-used/`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      project: project.id,
-                      tool: toolObj.id,
-                      quantity: quantity ?? null,
-                    }),
-                  });
-                  if (res.ok) {
-                    fetchDetails();
-                  }
-                }
-              } catch (err) {
-                console.error(err);
-              } finally {
-                setAddingTool(false);
-              }
-            };
 
             // Update inline tool quantity via PATCH on project-tool-used
             const updateToolQuantity = async (toolUsedId: number, quantity: number | null) => {

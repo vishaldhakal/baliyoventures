@@ -1,26 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { Component, ComponentModel, Vendor } from "@/types/projects";
 import {
   ArrowLeft,
-  ShoppingCart,
-  Plus,
-  Trash2,
-  Loader2,
   Building2,
   Calendar,
-  FileText,
-  Save,
   Cpu,
+  FileText,
+  Loader2,
+  Paperclip,
+  Plus,
+  Save,
+  ShoppingCart,
+  Trash2,
+  X,
 } from "lucide-react";
-import { Vendor, Component, ComponentModel } from "@/types/projects";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface PurchaseItemForm {
   component_model: number | "";
-  quantity: number;
-  price_per_item: number;
+  quantity: number | "";
+  price_per_item: number | "";
 }
 
 export default function CreatePurchaseView() {
@@ -40,11 +42,12 @@ export default function CreatePurchaseView() {
   );
   const [notes, setNotes] = useState("");
   const [formItems, setFormItems] = useState<PurchaseItemForm[]>([
-    { component_model: "", quantity: 1, price_per_item: 0 },
+    { component_model: "", quantity: "", price_per_item: "" },
   ]);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [billFile, setBillFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchMeta = async () => {
@@ -80,7 +83,7 @@ export default function CreatePurchaseView() {
   const addItem = () =>
     setFormItems((prev) => [
       ...prev,
-      { component_model: "", quantity: 1, price_per_item: 0 },
+      { component_model: "", quantity: "", price_per_item: "" },
     ]);
 
   const removeItem = (index: number) =>
@@ -112,7 +115,7 @@ export default function CreatePurchaseView() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validItems = formItems.filter(
-      (item) => item.component_model !== "" && item.quantity > 0
+      (item) => item.component_model !== "" && Number(item.quantity) > 0
     );
 
     if (validItems.length === 0) {
@@ -124,21 +127,30 @@ export default function CreatePurchaseView() {
     setSubmitting(true);
 
     try {
-      const body = {
-        items: validItems.map((item) => ({
-          component_model: item.component_model,
-          quantity: item.quantity,
-          price_per_item: item.price_per_item,
-        })),
-        purchase_date: purchaseDate || null,
-        notes: notes || null,
-        vendor: selectedVendor !== "" ? selectedVendor : null,
-      };
+      const formData = new FormData();
+      formData.append("purchase_date", purchaseDate || "");
+      formData.append("notes", notes || "");
+      if (selectedVendor !== "") {
+        formData.append("vendor", String(selectedVendor));
+      }
+      if (billFile) {
+        formData.append("bill_file", billFile);
+      }
+      // items are sent as a JSON string in a separate key and parsed in the view
+      formData.append(
+        "items",
+        JSON.stringify(
+          validItems.map((item) => ({
+            component_model: item.component_model,
+            quantity: item.quantity,
+            price_per_item: item.price_per_item,
+          }))
+        )
+      );
 
       const res = await fetch(`${apiBase}/component-purchases/`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: formData,
       });
 
       if (res.ok) {
@@ -238,24 +250,14 @@ export default function CreatePurchaseView() {
 
             {/* Items Header */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <Cpu className="h-4 w-4 text-slate-600" />
-                    Purchase Line Items <span className="text-rose-500">*</span>
-                  </label>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    Add component models purchased along with quantity and unit cost.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={addItem}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-all cursor-pointer"
-                >
-                  <Plus className="h-4 w-4 text-slate-600" />
-                  Add Line Item
-                </button>
+              <div>
+                <label className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <Cpu className="h-4 w-4 text-slate-600" />
+                  Purchase Line Items <span className="text-rose-500">*</span>
+                </label>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Add component models purchased along with quantity and unit cost.
+                </p>
               </div>
 
               {/* Items List */}
@@ -320,7 +322,7 @@ export default function CreatePurchaseView() {
                               updateItem(
                                 index,
                                 "quantity",
-                                e.target.value === "" ? 1 : Number(e.target.value)
+                                e.target.value === "" ? "" : Number(e.target.value)
                               )
                             }
                             className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:border-slate-400 transition-all"
@@ -341,7 +343,7 @@ export default function CreatePurchaseView() {
                               updateItem(
                                 index,
                                 "price_per_item",
-                                e.target.value === "" ? 0 : Number(e.target.value)
+                                e.target.value === "" ? "" : Number(e.target.value)
                               )
                             }
                             className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:border-slate-400 transition-all"
@@ -371,6 +373,16 @@ export default function CreatePurchaseView() {
                   );
                 })}
               </div>
+
+              {/* Add Line Item Button at bottom of line items, above Grand Total */}
+              <button
+                type="button"
+                onClick={addItem}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-100/80 hover:border-slate-300 text-slate-700 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+              >
+                <Plus className="h-4 w-4 text-slate-700" />
+                Add Line Item
+              </button>
             </div>
 
             {/* Total summary */}
@@ -403,6 +415,42 @@ export default function CreatePurchaseView() {
                 onChange={(e) => setNotes(e.target.value)}
                 className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none focus:border-slate-400 focus:bg-white transition-all"
               />
+            </div>
+
+            {/* Bill File Upload */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Paperclip className="h-4 w-4 text-slate-600" />
+                Bill / Invoice File <span className="text-slate-400 font-normal">(Optional)</span>
+              </label>
+              {billFile ? (
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                  <Paperclip className="h-4 w-4 text-slate-500 shrink-0" />
+                  <span className="text-xs font-medium text-slate-700 truncate flex-1">{billFile.name}</span>
+                  <span className="text-[10px] text-slate-400 shrink-0">
+                    {(billFile.size / 1024).toFixed(1)} KB
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setBillFile(null)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                    title="Remove file"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-dashed border-slate-300 hover:border-slate-400 hover:bg-slate-100 transition-all cursor-pointer">
+                  <Paperclip className="h-4 w-4 text-slate-400" />
+                  <span className="text-xs text-slate-500 font-medium">Click to upload bill or invoice (PDF, image, etc.)</span>
+                  <input
+                    type="file"
+                    accept=".pdf,.png,.jpg,.jpeg,.webp,.gif"
+                    className="hidden"
+                    onChange={(e) => setBillFile(e.target.files?.[0] ?? null)}
+                  />
+                </label>
+              )}
             </div>
 
             {/* Submit buttons */}

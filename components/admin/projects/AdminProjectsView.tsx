@@ -100,7 +100,6 @@ export default function AdminProjectsView({
     }
   };
 
-  const totalPages = Math.ceil(projectsData.count / pageSize);
 
   // Filter projects by search term client-side
   const filteredProjects = projectsData.results.filter(
@@ -110,36 +109,6 @@ export default function AdminProjectsView({
   );
 
   // Pagination calculation
-  const getPageNumbers = (): (number | string)[] => {
-    const delta = 2;
-    const range: number[] = [];
-    const rangeWithDots: (number | string)[] = [];
-    let l: number | undefined;
-
-    for (let i = 1; i <= totalPages; i++) {
-      if (
-        i === 1 ||
-        i === totalPages ||
-        (i >= currentPage - delta && i <= currentPage + delta)
-      ) {
-        range.push(i);
-      }
-    }
-
-    range.forEach((i) => {
-      if (l !== undefined) {
-        if (i - l === 2) {
-          rangeWithDots.push(l + 1);
-        } else if (i - l !== 1) {
-          rangeWithDots.push("...");
-        }
-      }
-      rangeWithDots.push(i);
-      l = i;
-    });
-
-    return rangeWithDots;
-  };
 
   // Open full page workspace
   const handleOpenDetails = (slug: string) => {
@@ -315,7 +284,13 @@ export default function AdminProjectsView({
                                   setOpenStatusSlug(null);
                                 } else {
                                   const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
-                                  setDropdownPos({ top: rect.bottom + 6, left: rect.left });
+                                  const dropdownHeight = 145;
+                                  const spaceBelow = window.innerHeight - rect.bottom;
+                                  const topPos =
+                                    spaceBelow < dropdownHeight && rect.top > dropdownHeight
+                                      ? rect.top - dropdownHeight - 6
+                                      : rect.bottom + 6;
+                                  setDropdownPos({ top: topPos, left: rect.left });
                                   setOpenStatusSlug(project.slug);
                                 }
                               }}

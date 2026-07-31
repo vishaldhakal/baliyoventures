@@ -76,11 +76,12 @@ function hasValue(val?: string | null) {
   return stripped.length > 0;
 }
 
-function getVideoInfo(url: string): { embedUrl: string | null; thumbnailUrl: string | null; type: "youtube" | "vimeo" | "loom" | "direct" | "generic" } {
+function getVideoInfo(url: string): { embedUrl: string | null; thumbnailUrl: string | null; type: "youtube" | "instagram" | "facebook" | "tiktok" | "vimeo" | "loom" | "direct" | "generic" } {
   if (!url) return { embedUrl: null, thumbnailUrl: null, type: "generic" };
+  const cleanUrl = url.trim();
   
   // YouTube
-  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+  const ytMatch = cleanUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
   if (ytMatch && ytMatch[1]) {
     return {
       embedUrl: `https://www.youtube-nocookie.com/embed/${ytMatch[1]}?autoplay=1`,
@@ -89,8 +90,37 @@ function getVideoInfo(url: string): { embedUrl: string | null; thumbnailUrl: str
     };
   }
 
+  // Instagram
+  const igMatch = cleanUrl.match(/(?:instagram\.com|instagr\.am)\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/);
+  if (igMatch && igMatch[1]) {
+    return {
+      embedUrl: `https://www.instagram.com/p/${igMatch[1]}/embed`,
+      thumbnailUrl: null,
+      type: "instagram"
+    };
+  }
+
+  // Facebook
+  if (cleanUrl.includes("facebook.com") || cleanUrl.includes("fb.watch")) {
+    return {
+      embedUrl: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(cleanUrl)}&show_text=false`,
+      thumbnailUrl: null,
+      type: "facebook"
+    };
+  }
+
+  // TikTok
+  const tiktokMatch = cleanUrl.match(/(?:tiktok\.com\/@[^\/]+\/video\/|tiktok\.com\/embed\/v2\/)([0-9]+)/);
+  if (tiktokMatch && tiktokMatch[1]) {
+    return {
+      embedUrl: `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`,
+      thumbnailUrl: null,
+      type: "tiktok"
+    };
+  }
+
   // Vimeo
-  const vimeoMatch = url.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/[^\/]*\/videos\/|album\/\d+\/video\/|video\/|)(\d+)/);
+  const vimeoMatch = cleanUrl.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/[^\/]*\/videos\/|album\/\d+\/video\/|video\/|)(\d+)/);
   if (vimeoMatch && vimeoMatch[1]) {
     return {
       embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`,
@@ -100,7 +130,7 @@ function getVideoInfo(url: string): { embedUrl: string | null; thumbnailUrl: str
   }
 
   // Loom
-  const loomMatch = url.match(/loom\.com\/(?:share|embed)\/([a-f0-9]+)/);
+  const loomMatch = cleanUrl.match(/loom\.com\/(?:share|embed)\/([a-f0-9]+)/);
   if (loomMatch && loomMatch[1]) {
     return {
       embedUrl: `https://www.loom.com/embed/${loomMatch[1]}?autoplay=1`,
@@ -110,8 +140,12 @@ function getVideoInfo(url: string): { embedUrl: string | null; thumbnailUrl: str
   }
 
   // Direct MP4 / WebM / OGG
-  if (/\.(mp4|webm|ogg)($|\?)/i.test(url)) {
-    return { embedUrl: url, thumbnailUrl: null, type: "direct" };
+  if (/\.(mp4|webm|ogg)($|\?)/i.test(cleanUrl)) {
+    return { embedUrl: cleanUrl, thumbnailUrl: null, type: "direct" };
+  }
+
+  if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")) {
+    return { embedUrl: cleanUrl, thumbnailUrl: null, type: "generic" };
   }
 
   return { embedUrl: null, thumbnailUrl: null, type: "generic" };

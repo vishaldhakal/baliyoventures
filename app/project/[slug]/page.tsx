@@ -1,25 +1,26 @@
-import Image from "next/image";
-import Link from "next/link";
+import ResearchOverview from "@/app/services/components/ResearchOverview";
+import { getProjectDetails } from "@/services/project.service";
+import { SimilarProject } from "@/types/projects";
 import {
-  ChevronLeft,
   Calendar,
-  Tag,
-  FileText,
-  Download,
+  ChevronLeft,
   ChevronRight,
+  ClipboardList,
+  Download,
   ExternalLink,
-  Users,
-  Play,
-  Video,
+  FileCheck,
+  FileText,
   Image as ImageIcon,
   Lightbulb,
-  FileCheck,
-  ClipboardList,
+  Play,
+  Tag,
+  Users,
+  Video,
 } from "lucide-react";
-import { getProjectDetails } from "@/services/project.service";
-import ResearchOverview from "@/app/services/components/ResearchOverview";
-import { SimilarProject } from "@/types/projects";
+import Image from "next/image";
+import Link from "next/link";
 import ShareButtons from "./components/ShareButtons";
+import ProjectImageGallery from "./components/ProjectImageGallery";
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
@@ -41,18 +42,87 @@ const resolveImageUrl = (url: string | null): string => {
   return `${baseDomain}${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
-// Extract YouTube video ID from URL
-const getYouTubeEmbedUrl = (url: string): string | null => {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-    /youtube\.com\/embed\/([^&\n?#]+)/,
-  ];
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) {
-      return `https://www.youtube.com/embed/${match[1]}`;
-    }
+type VideoEmbedDetails = {
+  embedUrl: string;
+  platform: "youtube" | "instagram" | "facebook" | "tiktok" | "vimeo" | "loom" | "generic";
+};
+
+// Extract video embed URL details for various platforms (YouTube, Instagram, Facebook, TikTok, Vimeo, Loom, etc.)
+const getVideoEmbedDetails = (url: string | null | undefined): VideoEmbedDetails | null => {
+  if (!url) return null;
+  const cleanUrl = url.trim();
+
+  // YouTube
+  const youtubeMatch = cleanUrl.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([^&\n?#]+)/
+  );
+  if (youtubeMatch && youtubeMatch[1]) {
+    return {
+      embedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}`,
+      platform: "youtube",
+    };
   }
+
+  // Instagram (Posts, Reels, IGTV)
+  const instagramMatch = cleanUrl.match(
+    /(?:instagram\.com|instagr\.am)\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/
+  );
+  if (instagramMatch && instagramMatch[1]) {
+    return {
+      embedUrl: `https://www.instagram.com/p/${instagramMatch[1]}/embed`,
+      platform: "instagram",
+    };
+  }
+
+  // Facebook
+  if (cleanUrl.includes("facebook.com") || cleanUrl.includes("fb.watch")) {
+    return {
+      embedUrl: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(cleanUrl)}&show_text=false`,
+      platform: "facebook",
+    };
+  }
+
+  // TikTok
+  const tiktokMatch = cleanUrl.match(
+    /(?:tiktok\.com\/@[^\/]+\/video\/|tiktok\.com\/embed\/v2\/)([0-9]+)/
+  );
+  if (tiktokMatch && tiktokMatch[1]) {
+    return {
+      embedUrl: `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`,
+      platform: "tiktok",
+    };
+  }
+
+  // Vimeo
+  const vimeoMatch = cleanUrl.match(
+    /(?:vimeo\.com\/(?:video\/)?)([^&\n?#]+)/
+  );
+  if (vimeoMatch && vimeoMatch[1]) {
+    return {
+      embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}`,
+      platform: "vimeo",
+    };
+  }
+
+  // Loom
+  const loomMatch = cleanUrl.match(
+    /(?:loom\.com\/(?:share|embed)\/)([a-f0-9]+)/
+  );
+  if (loomMatch && loomMatch[1]) {
+    return {
+      embedUrl: `https://www.loom.com/embed/${loomMatch[1]}`,
+      platform: "loom",
+    };
+  }
+
+  // If already an embed URL or generic valid HTTP(S) link
+  if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")) {
+    return {
+      embedUrl: cleanUrl,
+      platform: "generic",
+    };
+  }
+
   return null;
 };
 
@@ -267,45 +337,59 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                     <Video className="h-5 w-5 text-yellow-300" />
                     Demos & Videos
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {project.demos?.map((demo, index) => {
-                      // Check if it's a YouTube video
-                      const youtubeEmbedUrl = demo.video_url
-                        ? getYouTubeEmbedUrl(demo.video_url)
+                      const embedDetails = demo.video_url
+                        ? getVideoEmbedDetails(demo.video_url)
                         : null;
                       const videoFileUrl = demo.video_file
                         ? resolveImageUrl(demo.video_file)
                         : null;
 
+                      const isInstagram = embedDetails?.platform === "instagram";
+
                       return (
                         <div
                           key={demo.id || index}
-                          className="relative aspect-video w-full overflow-hidden rounded-md border border-white/[0.08] bg-white/[0.01] group"
+                          className="flex flex-col gap-3 rounded-lg border border-white/[0.08] bg-white/[0.01] p-3 transition-all duration-300 hover:border-white/[0.15]"
                         >
-                          {youtubeEmbedUrl ? (
-                            <iframe
-                              src={youtubeEmbedUrl}
-                              title={`${project.title} Demo ${index + 1}`}
-                              className="w-full h-full"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            />
-                          ) : videoFileUrl ? (
-                            <video
-                              src={videoFileUrl}
-                              controls
-                              className="w-full h-full object-cover"
-                              poster={project.thumbnail_image || undefined}
-                            >
-                              Your browser does not support the video tag.
-                            </video>
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                              <Play className="h-12 w-12 opacity-20" />
-                            </div>
-                          )}
-                          <div className="absolute bottom-2 right-2 bg-black/60 px-2 py-1 rounded text-xs text-white/80">
-                            Demo {index + 1}
+                          <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] pb-2">
+                            <h3 className="font-oxanium text-sm font-semibold uppercase tracking-wider text-[#E4E4E4] flex items-center gap-2 min-w-0 truncate">
+                              <Play className="h-3.5 w-3.5 text-yellow-300 fill-yellow-300/30 shrink-0" />
+                              <span className="truncate">{demo.name || `Demo ${index + 1}`}</span>
+                            </h3>
+                          </div>
+
+                          <div
+                            className={`relative w-full overflow-hidden rounded-md border border-white/[0.06] bg-black ${
+                              isInstagram
+                                ? "h-[450px] sm:h-[465px] w-full"
+                                : "aspect-video min-h-[260px] w-full"
+                            }`}
+                          >
+                            {embedDetails ? (
+                              <iframe
+                                src={embedDetails.embedUrl}
+                                title={demo.name || `${project.title} Demo ${index + 1}`}
+                                className="w-full h-full border-0"
+                                scrolling="no"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                              />
+                            ) : videoFileUrl ? (
+                              <video
+                                src={videoFileUrl}
+                                controls
+                                className="w-full h-full object-cover"
+                                poster={project.thumbnail_image || undefined}
+                              >
+                                Your browser does not support the video tag.
+                              </video>
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                <Play className="h-12 w-12 opacity-20" />
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -316,52 +400,24 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
 
               {/* Gallery Images */}
               {galleryImages.length > 0 && (
-                <div className="flex flex-col gap-6">
-                  <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3 flex items-center gap-2">
-                    <ImageIcon className="h-5 w-5 text-yellow-300" />
-                    Project Gallery
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {galleryImages.map((imgUrl, index) => (
-                      <div
-                        key={index}
-                        className="group relative aspect-[4/3] w-full overflow-hidden rounded-md border border-white/[0.08] bg-white/[0.01]"
-                      >
-                        <Image
-                          src={resolveImageUrl(imgUrl)}
-                          alt={`${project.title} Gallery ${index + 1}`}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <ProjectImageGallery
+                  title="Project Gallery"
+                  images={galleryImages.map((imgUrl, index) => ({
+                    url: resolveImageUrl(imgUrl),
+                    alt: `${project.title} Gallery ${index + 1}`,
+                  }))}
+                />
               )}
 
               {/* Rendering Images */}
               {hasRenderingImages && (
-                <div className="flex flex-col gap-6">
-                  <h2 className="font-oxanium text-2xl font-semibold uppercase tracking-[0.02em] text-[#E4E4E4] border-b border-white/[0.08] pb-3 flex items-center gap-2">
-                    <ImageIcon className="h-5 w-5 text-yellow-300" />
-                    Rendering Images
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {project.rendering_images?.map((render, index) => (
-                      <div
-                        key={render.id || index}
-                        className="group relative aspect-[4/3] w-full overflow-hidden rounded-md border border-white/[0.08] bg-white/[0.01]"
-                      >
-                        <Image
-                          src={resolveImageUrl(render.image)}
-                          alt={`${project.title} Rendering ${index + 1}`}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <ProjectImageGallery
+                  title="Rendering Images"
+                  images={(project.rendering_images || []).map((render, index) => ({
+                    url: resolveImageUrl(render.image),
+                    alt: `${project.title} Rendering ${index + 1}`,
+                  }))}
+                />
               )}
             </div>
 

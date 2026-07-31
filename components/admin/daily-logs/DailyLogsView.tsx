@@ -487,6 +487,17 @@ export default function DailyLogsView() {
               );
             })}
           </div>
+
+          {/* Bottom Pagination Controls */}
+          <PaginationControls
+            currentPage={currentPage}
+            totalCount={totalCount}
+            pageSize={pageSize}
+            onPageChange={(page) => fetchLogs(selectedProjectId, searchTerm, page)}
+            loading={loading}
+            itemLabel="logs"
+            className="mt-6"
+          />
         </div>
       )}
     </div>

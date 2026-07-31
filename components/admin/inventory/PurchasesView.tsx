@@ -86,10 +86,11 @@ export default function PurchasesView() {
   const [hasPrev, setHasPrev] = useState(false);
   const pageSize = 10;
 
-  const fetchPurchases = useCallback(async (page = 1) => {
+  const fetchPurchases = useCallback(async (page = 1, query = searchTerm) => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/component-purchases/?page=${page}&page_size=${pageSize}`, {
+      const searchParam = query.trim() ? `&search=${encodeURIComponent(query.trim())}` : "";
+      const res = await fetch(`${apiBase}/component-purchases/?page=${page}&page_size=${pageSize}${searchParam}`, {
         cache: "no-store",
       });
       if (res.ok) {
@@ -107,11 +108,16 @@ export default function PurchasesView() {
     } finally {
       setLoading(false);
     }
-  }, [apiBase]);
+  }, [apiBase, pageSize, searchTerm]);
 
+  // Debounced backend search effect
   useEffect(() => {
-    fetchPurchases(1);
-  }, [fetchPurchases]);
+    const timer = setTimeout(() => {
+      fetchPurchases(1, searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, fetchPurchases]);
 
   const handleSelectBill = async (p: ComponentPurchase) => {
     setViewingBill(p);
@@ -313,17 +319,6 @@ export default function PurchasesView() {
     }
   };
 
-  const filteredPurchases = purchases.filter((p) => {
-    const term = searchTerm.toLowerCase();
-    if (!term) return true;
-    return (
-      p.vendor_name?.toLowerCase().includes(term) ||
-      String(p.id).includes(term) ||
-      p.purchase_date?.includes(term) ||
-      p.notes?.toLowerCase().includes(term)
-    );
-  });
-
   const fmtDate = (d?: string | null) =>
     d
       ? new Date(d).toLocaleDateString("en-US", {
@@ -364,7 +359,7 @@ export default function PurchasesView() {
         <Search className="h-4 w-4 text-slate-400 shrink-0" />
         <input
           type="text"
-          placeholder="Search by vendor or date..."
+          placeholder="Search by vendor, notes, or date..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="flex-1 bg-transparent text-xs text-slate-900 outline-none placeholder-slate-400"
@@ -376,7 +371,7 @@ export default function PurchasesView() {
         currentPage={currentPage}
         totalCount={totalCount}
         pageSize={pageSize}
-        onPageChange={(page) => fetchPurchases(page)}
+        onPageChange={(page) => fetchPurchases(page, searchTerm)}
         loading={loading}
         itemLabel="orders"
       />
@@ -400,9 +395,9 @@ export default function PurchasesView() {
           <div className="flex justify-center py-16">
             <Loader2 className="h-8 w-8 text-slate-500 animate-spin" />
           </div>
-        ) : filteredPurchases.length === 0 ? (
+        ) : purchases.length === 0 ? (
           <div className="p-14 text-center text-xs text-slate-400 italic font-sans">
-            No purchase orders found. Click &quot;New Purchase Order&quot; to create one.
+            {searchTerm ? `No purchase orders found matching "${searchTerm}".` : "No purchase orders found. Click \"New Purchase Order\" to create one."}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -417,7 +412,7 @@ export default function PurchasesView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm">
-                {filteredPurchases.map((purchase) => (
+                {purchases.map((purchase) => (
                   <tr
                     key={purchase.id}
                     className="hover:bg-slate-50/60 transition-colors group cursor-pointer"
@@ -489,6 +484,16 @@ export default function PurchasesView() {
           </div>
         )}
       </div>
+
+      {/* Bottom Pagination Controls */}
+      <PaginationControls
+        currentPage={currentPage}
+        totalCount={totalCount}
+        pageSize={pageSize}
+        onPageChange={(page) => fetchPurchases(page, searchTerm)}
+        loading={loading}
+        itemLabel="orders"
+      />
 
       {/* ── Bill Detail Modal ── */}
       <AnimatePresence>

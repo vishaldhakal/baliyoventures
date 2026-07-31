@@ -1,5 +1,6 @@
 "use client";
 
+import PaginationControls from "@/components/admin/PaginationControls";
 import { Component, ComponentModel, Vendor } from "@/types/projects";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -35,6 +36,11 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
 
   // Search filter
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 10;
 
   // Currently selected Component (when viewing component models via /admin/components/[slug])
   const [selectedComponent, setSelectedComponent] = useState<Component | null>(null);
@@ -78,14 +84,22 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
 
   const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
 
-  // Fetch only components (NO vendors call upfront)
-  const fetchComponentsOnly = async () => {
+  // Fetch components with pagination & backend search
+  const fetchComponentsOnly = async (page = 1, query = searchTerm) => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/components/`, { cache: "no-store" });
+      const searchParam = query.trim() ? `&search=${encodeURIComponent(query.trim())}` : "";
+      const res = await fetch(`${apiBase}/components/?page=${page}&page_size=${pageSize}${searchParam}`, { cache: "no-store" });
       if (res.ok) {
         const cData = await res.json();
-        setComponentsList(cData.results || cData);
+        const results = Array.isArray(cData) ? cData : cData.results || [];
+        setComponentsList(results);
+        if (!Array.isArray(cData)) {
+          setTotalCount(cData.count || results.length);
+        } else {
+          setTotalCount(results.length);
+        }
+        setCurrentPage(page);
       }
     } catch (err) {
       console.error("Failed to fetch components:", err);
@@ -138,9 +152,17 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
       fetchedSlugRef.current = null;
       setSelectedComponent(null);
       setComponentModels([]);
-      fetchComponentsOnly();
     }
   }, [slug]);
+
+  // Debounced backend search effect (triggers when searchTerm changes)
+  useEffect(() => {
+    if (slug) return;
+    const timer = setTimeout(() => {
+      fetchComponentsOnly(1, searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm, slug]);
 
   const handleSelectComponent = (comp: Component) => {
     router.push(`/admin/components/${comp.slug || comp.id}`);
@@ -182,7 +204,7 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
         setComponentName("");
         setSelectedVendorId("");
         setShowAddComponentModal(false);
-        fetchComponentsOnly();
+        fetchComponentsOnly(1);
       }
     } catch (err) {
       console.error(err);
@@ -216,7 +238,7 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
         if (slug) {
           fetchComponentDetailBySlug(slug);
         } else {
-          fetchComponentsOnly();
+          fetchComponentsOnly(currentPage);
         }
       }
     } catch (err) {
@@ -238,7 +260,7 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
         if (selectedComponent?.id === deletingComponent.id) {
           handleBackToComponents();
         } else {
-          fetchComponentsOnly();
+          fetchComponentsOnly(currentPage);
         }
       }
     } catch (err) {
@@ -329,13 +351,6 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
       setDeletingMod(false);
     }
   };
-
-  const filteredComponents = componentsList.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (c.vendor_name && c.vendor_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (c.vendor_details?.name && c.vendor_details.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
 
   return (
     <div className="space-y-6 font-sans">
@@ -516,11 +531,21 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
             />
           </div>
 
+          {/* Top Pagination Controls */}
+          <PaginationControls
+            currentPage={currentPage}
+            totalCount={totalCount}
+            pageSize={pageSize}
+            onPageChange={(page) => fetchComponentsOnly(page)}
+            loading={loading}
+            itemLabel="components"
+          />
+
           {/* Components Table List */}
           <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
             <div className="p-4 border-b border-slate-200 bg-slate-50/70">
               <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                Registered Components List ({filteredComponents.length})
+                Registered Components List ({totalCount || componentsList.length})
               </h3>
             </div>
 
@@ -528,9 +553,9 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
               <div className="flex justify-center py-16">
                 <Loader2 className="h-8 w-8 text-slate-600 animate-spin" />
               </div>
-            ) : filteredComponents.length === 0 ? (
+            ) : componentsList.length === 0 ? (
               <div className="p-12 text-center text-xs text-slate-400 italic font-sans">
-                No components found matching "{searchTerm}". Click "Create Component" above to add one.
+                {searchTerm ? `No components found matching "${searchTerm}".` : "No components registered yet. Click \"Create Component\" above to add one."}
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -544,7 +569,7 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-800">
-                    {filteredComponents.map((comp) => {
+                    {componentsList.map((comp) => {
                       const count = comp.no_of_models ?? comp.models_count ?? comp.models?.length ?? 0;
                       return (
                         <tr
@@ -605,6 +630,16 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
               </div>
             )}
           </div>
+
+          {/* Bottom Pagination Controls */}
+          <PaginationControls
+            currentPage={currentPage}
+            totalCount={totalCount}
+            pageSize={pageSize}
+            onPageChange={(page) => fetchComponentsOnly(page)}
+            loading={loading}
+            itemLabel="components"
+          />
         </div>
       )}
 

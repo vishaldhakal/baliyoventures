@@ -39,10 +39,11 @@ export default function ToolsView() {
   const apiBase =
     process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
 
-  const fetchTools = async (page = 1) => {
+  const fetchTools = async (page = 1, query = searchTerm) => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/project-tools/?page=${page}&page_size=${pageSize}`, { cache: "no-store" });
+      const searchParam = query.trim() ? `&search=${encodeURIComponent(query.trim())}` : "";
+      const res = await fetch(`${apiBase}/project-tools/?page=${page}&page_size=${pageSize}${searchParam}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         setTools(Array.isArray(data) ? data : data.results || []);
@@ -61,9 +62,13 @@ export default function ToolsView() {
     }
   };
 
+  // Debounced backend search effect
   useEffect(() => {
-    fetchTools(1);
-  }, []);
+    const timer = setTimeout(() => {
+      fetchTools(1, searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const handleAddTool = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +87,7 @@ export default function ToolsView() {
         setNewToolName("");
         setNewToolQuantity("");
         setShowAddForm(false);
-        fetchTools(1);
+        fetchTools(1, searchTerm);
       }
     } catch (err) {
       console.error(err);
@@ -112,7 +117,7 @@ export default function ToolsView() {
       });
       if (res.ok) {
         setEditingTool(null);
-        fetchTools(currentPage);
+        fetchTools(currentPage, searchTerm);
       }
     } catch (err) {
       console.error("Failed to update tool:", err);
@@ -130,7 +135,7 @@ export default function ToolsView() {
       });
       if (res.ok) {
         setDeletingTool(null);
-        fetchTools(currentPage);
+        fetchTools(currentPage, searchTerm);
       }
     } catch (err) {
       console.error("Failed to delete tool:", err);
@@ -138,10 +143,6 @@ export default function ToolsView() {
       setDeletingTl(false);
     }
   };
-
-  const filteredTools = tools.filter((t) =>
-    t.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="space-y-6 pb-12 font-sans">
@@ -186,7 +187,7 @@ export default function ToolsView() {
         currentPage={currentPage}
         totalCount={totalCount}
         pageSize={pageSize}
-        onPageChange={(page) => fetchTools(page)}
+        onPageChange={(page) => fetchTools(page, searchTerm)}
         loading={loading}
         itemLabel="tools"
       />
@@ -226,14 +227,14 @@ export default function ToolsView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
-                {filteredTools.length === 0 ? (
+                {tools.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-5 py-12 text-center text-slate-400 italic">
-                      No tools found matching your criteria.
+                      {searchTerm ? `No tools found matching "${searchTerm}".` : "No tools created yet. Click \"Create New Tool\" above to create one."}
                     </td>
                   </tr>
                 ) : (
-                  filteredTools.map((tool) => (
+                  tools.map((tool) => (
                     <tr key={tool.id} className="hover:bg-slate-50/50 transition-colors group">
                       <td className="px-5 py-3.5">
                         <span className="font-semibold text-slate-800 text-sm">{tool.name}</span>
@@ -280,6 +281,16 @@ export default function ToolsView() {
           </div>
         )}
       </div>
+
+      {/* Bottom Pagination Controls */}
+      <PaginationControls
+        currentPage={currentPage}
+        totalCount={totalCount}
+        pageSize={pageSize}
+        onPageChange={(page) => fetchTools(page, searchTerm)}
+        loading={loading}
+        itemLabel="tools"
+      />
 
       {/* --- CREATE NEW TOOL MODAL --- */}
       <AnimatePresence>

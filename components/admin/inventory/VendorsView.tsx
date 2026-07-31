@@ -49,10 +49,11 @@ export default function VendorsView() {
   const [hasPrev, setHasPrev] = useState(false);
   const pageSize = 10;
 
-  const fetchVendors = async (page = 1) => {
+  const fetchVendors = async (page = 1, query = searchTerm) => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/vendors/?page=${page}&page_size=${pageSize}`, { cache: "no-store" });
+      const searchParam = query.trim() ? `&search=${encodeURIComponent(query.trim())}` : "";
+      const res = await fetch(`${apiBase}/vendors/?page=${page}&page_size=${pageSize}${searchParam}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         setVendors(Array.isArray(data) ? data : data.results || []);
@@ -70,9 +71,13 @@ export default function VendorsView() {
     }
   };
 
+  // Debounced backend search effect
   useEffect(() => {
-    fetchVendors(1);
-  }, []);
+    const timer = setTimeout(() => {
+      fetchVendors(1, searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const handleCreateVendor = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +98,7 @@ export default function VendorsView() {
         setVendorPhone("");
         setVendorAddress("");
         setShowAddVendorForm(false);
-        fetchVendors(1);
+        fetchVendors(1, searchTerm);
       }
     } catch (err) {
       console.error(err);
@@ -126,7 +131,7 @@ export default function VendorsView() {
       });
       if (res.ok) {
         setEditingVendor(null);
-        fetchVendors(currentPage);
+        fetchVendors(currentPage, searchTerm);
       }
     } catch (err) {
       console.error("Failed to update vendor:", err);
@@ -145,7 +150,7 @@ export default function VendorsView() {
       });
       if (res.ok) {
         setDeletingVendor(null);
-        fetchVendors(currentPage);
+        fetchVendors(currentPage, searchTerm);
       }
     } catch (err) {
       console.error("Failed to delete vendor:", err);
@@ -153,13 +158,6 @@ export default function VendorsView() {
       setDeletingVen(false);
     }
   };
-
-  const filteredVendors = vendors.filter(
-    (v) =>
-      v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (v.phone_no && v.phone_no.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (v.vendor_address && v.vendor_address.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
 
   return (
     <div className="space-y-6 font-sans">
@@ -198,7 +196,7 @@ export default function VendorsView() {
         currentPage={currentPage}
         totalCount={totalCount}
         pageSize={pageSize}
-        onPageChange={(page) => fetchVendors(page)}
+        onPageChange={(page) => fetchVendors(page, searchTerm)}
         loading={loading}
         itemLabel="vendors"
       />
@@ -210,9 +208,9 @@ export default function VendorsView() {
           <div className="flex justify-center py-16">
             <Loader2 className="h-8 w-8 text-slate-600 animate-spin" />
           </div>
-        ) : filteredVendors.length === 0 ? (
+        ) : vendors.length === 0 ? (
           <div className="p-12 text-center text-xs text-slate-400 italic font-sans">
-            No vendors registered yet. Click "Add Vendor Profile" above to create one.
+            {searchTerm ? `No vendors found matching "${searchTerm}".` : "No vendors registered yet. Click \"Add Vendor Profile\" above to create one."}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -226,7 +224,7 @@ export default function VendorsView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-800">
-                {filteredVendors.map((v) => (
+                {vendors.map((v) => (
                   <tr key={v.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-3.5 font-semibold text-slate-900 text-sm flex items-center gap-2">
                       <Building2 className="h-4 w-4 text-slate-500 shrink-0" />
@@ -277,6 +275,16 @@ export default function VendorsView() {
           </div>
         )}
       </div>
+
+      {/* Bottom Pagination Controls */}
+      <PaginationControls
+        currentPage={currentPage}
+        totalCount={totalCount}
+        pageSize={pageSize}
+        onPageChange={(page) => fetchVendors(page, searchTerm)}
+        loading={loading}
+        itemLabel="vendors"
+      />
 
       {/* --- CREATE VENDOR MODAL --- */}
       <AnimatePresence>

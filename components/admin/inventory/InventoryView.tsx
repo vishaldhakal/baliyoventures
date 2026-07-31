@@ -60,11 +60,12 @@ export default function InventoryView({
   const [hasPrev, setHasPrev] = useState(false);
   const pageSize = 10;
 
-  // Fetch Inventory Data directly from GET /api/baliyo/inventory/
-  const fetchInventory = async (page = 1) => {
+  // Fetch Inventory Data directly from GET /api/baliyo/inventory/ with pagination & backend search
+  const fetchInventory = async (page = 1, searchQuery = search) => {
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/inventory/?page=${page}&page_size=${pageSize}`, { cache: "no-store" });
+      const searchParam = searchQuery.trim() ? `&search=${encodeURIComponent(searchQuery.trim())}` : "";
+      const res = await fetch(`${apiBase}/inventory/?page=${page}&page_size=${pageSize}${searchParam}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         setItems(Array.isArray(data) ? data : data.results || []);
@@ -82,9 +83,14 @@ export default function InventoryView({
     }
   };
 
+  // Debounced backend search effect (triggers when search input changes)
   useEffect(() => {
-    fetchInventory();
-  }, []);
+    const timer = setTimeout(() => {
+      fetchInventory(1, search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Fetch component models from API with debounced search query param
   useEffect(() => {
@@ -135,7 +141,7 @@ export default function InventoryView({
         setSelectedInvModelId("");
         setInvStockQty(1);
         setShowAddStockForm(false);
-        fetchInventory();
+        fetchInventory(1, search);
       }
     } catch (err) {
       console.error(err);
@@ -163,7 +169,7 @@ export default function InventoryView({
       });
       if (res.ok) {
         setEditingItem(null);
-        fetchInventory();
+        fetchInventory(currentPage, search);
       }
     } catch (err) {
       console.error("Failed to update inventory stock quantity:", err);
@@ -181,7 +187,7 @@ export default function InventoryView({
       });
       if (res.ok) {
         setDeletingItem(null);
-        fetchInventory(currentPage);
+        fetchInventory(currentPage, search);
       }
     } catch (err) {
       console.error("Failed to delete inventory stock:", err);
@@ -191,18 +197,10 @@ export default function InventoryView({
   };
 
   const filteredStock = items.filter((item) => {
-    const modelName = item.model_name || item.component_model_details?.name || "";
-    const compName = item.component_name || item.component_model_details?.component_name || "";
-    const vendorName = item.vendor_name || "";
-
-    const matchesSearch =
-      modelName.toLowerCase().includes(search.toLowerCase()) ||
-      compName.toLowerCase().includes(search.toLowerCase()) ||
-      vendorName.toLowerCase().includes(search.toLowerCase());
     const matchesLowStock = filterLowStock
       ? item.quantity <= (item.min_threshold || 10)
       : true;
-    return matchesSearch && matchesLowStock;
+    return matchesLowStock;
   });
 
   return (
@@ -266,7 +264,7 @@ export default function InventoryView({
         currentPage={currentPage}
         totalCount={totalCount}
         pageSize={pageSize}
-        onPageChange={(page) => fetchInventory(page)}
+        onPageChange={(page) => fetchInventory(page, search)}
         loading={loading}
         itemLabel="items"
       />
@@ -366,6 +364,16 @@ export default function InventoryView({
           </div>
         )}
       </div>
+
+      {/* Bottom Pagination Controls */}
+      <PaginationControls
+        currentPage={currentPage}
+        totalCount={totalCount}
+        pageSize={pageSize}
+        onPageChange={(page) => fetchInventory(page, search)}
+        loading={loading}
+        itemLabel="items"
+      />
 
       {/* --- EDIT QUANTITY MODAL --- */}
       <AnimatePresence>

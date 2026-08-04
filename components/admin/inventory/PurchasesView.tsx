@@ -35,6 +35,7 @@ import { useCallback, useEffect, useState } from "react";
 interface PurchaseItemForm {
   component_model: number | "";
   quantity: number;
+  unit: string;
   price_per_item: number;
 }
 
@@ -71,7 +72,7 @@ export default function PurchasesView() {
   const [billFile, setBillFile] = useState<File | null>(null);
   const [existingBillUrl, setExistingBillUrl] = useState<string | null>(null);
   const [formItems, setFormItems] = useState<PurchaseItemForm[]>([
-    { component_model: "", quantity: 1, price_per_item: 0 },
+    { component_model: "", quantity: 1, unit: "pcs", price_per_item: 0 },
   ]);
 
   // Delete modal state
@@ -189,6 +190,7 @@ export default function PurchasesView() {
               detailData.items.map((i) => ({
                 component_model: i.component_model,
                 quantity: i.quantity,
+                unit: i.unit || "pcs",
                 price_per_item: i.price_per_item,
               }))
             );
@@ -202,6 +204,7 @@ export default function PurchasesView() {
         bill.items.map((i) => ({
           component_model: i.component_model,
           quantity: i.quantity,
+          unit: i.unit || "pcs",
           price_per_item: i.price_per_item,
         }))
       );
@@ -216,7 +219,7 @@ export default function PurchasesView() {
   };
 
   const addItem = () =>
-    setFormItems((p) => [...p, { component_model: "", quantity: 1, price_per_item: 0 }]);
+    setFormItems((p) => [...p, { component_model: "", quantity: 1, unit: "pcs", price_per_item: 0 }]);
 
   const removeItem = (i: number) =>
     setFormItems((p) => p.filter((_, idx) => idx !== i));
@@ -224,7 +227,7 @@ export default function PurchasesView() {
   const updateItem = (
     i: number,
     field: keyof PurchaseItemForm,
-    value: number | ""
+    value: number | string
   ) =>
     setFormItems((p) =>
       p.map((item, idx) => (idx === i ? { ...item, [field]: value } : item))
@@ -268,6 +271,7 @@ export default function PurchasesView() {
           validItems.map((item) => ({
             component_model: item.component_model,
             quantity: item.quantity,
+            unit: item.unit || "pcs",
             price_per_item: item.price_per_item,
           }))
         )
@@ -598,6 +602,7 @@ export default function PurchasesView() {
                             <th className="px-4 py-2.5">Component</th>
                             <th className="px-4 py-2.5">Model</th>
                             <th className="px-4 py-2.5 text-right">Qty</th>
+                            <th className="px-4 py-2.5 text-left">Unit</th>
                             <th className="px-4 py-2.5 text-right">Price/Unit</th>
                             <th className="px-4 py-2.5 text-right">Subtotal</th>
                           </tr>
@@ -606,15 +611,20 @@ export default function PurchasesView() {
                           {viewingBill.items && viewingBill.items.length > 0 ? (
                             viewingBill.items.map((item: ComponentPurchaseItem) => (
                               <tr key={item.id} className="hover:bg-slate-50/60">
-                                <td className="px-4 py-2.5 font-medium text-slate-800 flex items-center gap-1.5">
-                                  <Cpu className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                                  {item.component_name ?? "—"}
+                                <td className="px-4 py-2.5 font-medium text-slate-800">
+                                  <div className="flex items-center gap-1.5">
+                                    <Cpu className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                                    {item.component_name ?? "—"}
+                                  </div>
                                 </td>
                                 <td className="px-4 py-2.5 text-slate-600">
                                   {item.component_model_name ?? `Model #${item.component_model}`}
                                 </td>
                                 <td className="px-4 py-2.5 text-right font-mono text-slate-700">
                                   {item.quantity}
+                                </td>
+                                <td className="px-4 py-2.5 text-left text-slate-500 text-[11px] font-semibold uppercase">
+                                  {item.unit || "pcs"}
                                 </td>
                                 <td className="px-4 py-2.5 text-right font-mono text-slate-600">
                                   {fmtCurrency(item.price_per_item)}
@@ -626,7 +636,7 @@ export default function PurchasesView() {
                             ))
                           ) : (
                             <tr>
-                              <td colSpan={5} className="px-4 py-4 text-center text-slate-400 italic">
+                              <td colSpan={6} className="px-4 py-4 text-center text-slate-400 italic">
                                 No items recorded.
                               </td>
                             </tr>
@@ -634,7 +644,7 @@ export default function PurchasesView() {
                         </tbody>
                         <tfoot>
                           <tr className="border-t border-slate-200 bg-slate-50 font-bold">
-                            <td colSpan={4} className="px-4 py-2.5 text-right text-slate-700">
+                            <td colSpan={5} className="px-4 py-2.5 text-right text-slate-700">
                               Grand Total
                             </td>
                             <td className="px-4 py-2.5 text-right text-slate-900 font-extrabold">
@@ -858,6 +868,23 @@ export default function PurchasesView() {
                                 }
                                 className="w-full p-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-900 outline-none focus:border-slate-400"
                               />
+                            </div>
+
+                            <div>
+                              <label className="text-[10px] font-semibold text-slate-500 block mb-1">
+                                Unit
+                              </label>
+                              <select
+                                value={item.unit}
+                                onChange={(e) =>
+                                  updateItem(index, "unit", e.target.value)
+                                }
+                                className="w-full p-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-900 outline-none focus:border-slate-400 cursor-pointer"
+                              >
+                                <option value="pcs">Pcs</option>
+                                <option value="kg">Kg</option>
+                                <option value="m">Meter (m)</option>
+                              </select>
                             </div>
 
                             <div>

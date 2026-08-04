@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 interface PurchaseItemForm {
   component_model: number | "";
   quantity: number | "";
+  unit: string;
   price_per_item: number | "";
 }
 
@@ -42,7 +43,7 @@ export default function CreatePurchaseView() {
   );
   const [notes, setNotes] = useState("");
   const [formItems, setFormItems] = useState<PurchaseItemForm[]>([
-    { component_model: "", quantity: "", price_per_item: "" },
+    { component_model: "", quantity: "", unit: "pcs", price_per_item: "" },
   ]);
 
   const [submitting, setSubmitting] = useState(false);
@@ -83,7 +84,7 @@ export default function CreatePurchaseView() {
   const addItem = () =>
     setFormItems((prev) => [
       ...prev,
-      { component_model: "", quantity: "", price_per_item: "" },
+      { component_model: "", quantity: "", unit: "pcs", price_per_item: "" },
     ]);
 
   const removeItem = (index: number) =>
@@ -92,7 +93,7 @@ export default function CreatePurchaseView() {
   const updateItem = (
     index: number,
     field: keyof PurchaseItemForm,
-    value: number | ""
+    value: number | string
   ) =>
     setFormItems((prev) =>
       prev.map((item, idx) => (idx === index ? { ...item, [field]: value } : item))
@@ -143,6 +144,7 @@ export default function CreatePurchaseView() {
           validItems.map((item) => ({
             component_model: item.component_model,
             quantity: item.quantity,
+            unit: item.unit || "pcs",
             price_per_item: item.price_per_item,
           }))
         )
@@ -273,7 +275,7 @@ export default function CreatePurchaseView() {
                     >
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
                         {/* Component Model Select */}
-                        <div className="md:col-span-6 space-y-1">
+                        <div className="md:col-span-4 space-y-1">
                           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                             Component Model *
                           </label>
@@ -327,6 +329,24 @@ export default function CreatePurchaseView() {
                             }
                             className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:border-slate-400 transition-all"
                           />
+                        </div>
+
+                        {/* Unit */}
+                        <div className="md:col-span-2 space-y-1">
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                            Unit
+                          </label>
+                          <select
+                            value={item.unit}
+                            onChange={(e) =>
+                              updateItem(index, "unit", e.target.value)
+                            }
+                            className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:border-slate-400 transition-all cursor-pointer"
+                          >
+                            <option value="pcs">Pcs</option>
+                            <option value="kg">Kg</option>
+                            <option value="m">Meter (m)</option>
+                          </select>
                         </div>
 
                         {/* Unit Price */}

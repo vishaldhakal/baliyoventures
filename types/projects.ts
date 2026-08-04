@@ -48,6 +48,7 @@ export interface ComponentPurchaseItem {
   component_slug?: string | null;
   component_model_slug?: string | null;
   quantity: number;
+  unit?: string;
   price_per_item: number;
   total_price: number;
   created_at?: string;

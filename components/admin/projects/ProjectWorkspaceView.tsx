@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Download,
   Edit,
   ExternalLink,
   FileCode,
@@ -344,6 +345,104 @@ export default function ProjectWorkspaceView({
   const [newDocFile, setNewDocFile] = useState<File | null>(null);
   const [addingDoc, setAddingDoc] = useState(false);
 
+  // 6. Import States
+  const [allProjects, setAllProjects] = useState<{ id: number; title: string; slug: string }[]>([]);
+  const [projectSearch, setProjectSearch] = useState("");
+  const [projectDropdownOpen, setProjectDropdownOpen] = useState(false);
+  const [fetchingProjects, setFetchingProjects] = useState(false);
+  const [isImportInvModalOpen, setIsImportInvModalOpen] = useState(false);
+  const [isImportToolModalOpen, setIsImportToolModalOpen] = useState(false);
+  const [selectedSourceProjectId, setSelectedSourceProjectId] = useState<number | "">("");
+  const [importingInv, setImportingInv] = useState(false);
+  const [importingTool, setImportingTool] = useState(false);
+  const [importError, setImportError] = useState("");
+
+  const fetchAllProjects = async (searchQuery = "") => {
+    setFetchingProjects(true);
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
+    try {
+      const url = searchQuery.trim()
+        ? `${apiBase}/projects/?search=${encodeURIComponent(searchQuery.trim())}&page_size=50`
+        : `${apiBase}/projects/?page_size=50`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setAllProjects(Array.isArray(data) ? data : data.results || []);
+      }
+    } catch (err) {
+      console.error("Error fetching projects for import:", err);
+    } finally {
+      setFetchingProjects(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!projectSearch.trim()) {
+      fetchAllProjects();
+      return;
+    }
+    const timer = setTimeout(() => {
+      fetchAllProjects(projectSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [projectSearch]);
+
+  const handleImportInventory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!project || !selectedSourceProjectId) return;
+    setImportingInv(true);
+    setImportError("");
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
+    try {
+      const res = await fetch(`${apiBase}/inventory/${project.id}/import/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project_id: Number(selectedSourceProjectId) }),
+      });
+      if (res.ok) {
+        setIsImportInvModalOpen(false);
+        setSelectedSourceProjectId("");
+        fetchDetails();
+      } else {
+        const errData = await res.json();
+        setImportError(errData.detail || "Failed to import inventory from project.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setImportError(err.message || "Failed to import inventory from project.");
+    } finally {
+      setImportingInv(false);
+    }
+  };
+
+  const handleImportTools = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!project || !selectedSourceProjectId) return;
+    setImportingTool(true);
+    setImportError("");
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
+    try {
+      const res = await fetch(`${apiBase}/project-tools/${project.id}/import/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project_id: Number(selectedSourceProjectId) }),
+      });
+      if (res.ok) {
+        setIsImportToolModalOpen(false);
+        setSelectedSourceProjectId("");
+        fetchDetails();
+      } else {
+        const errData = await res.json();
+        setImportError(errData.detail || "Failed to import tools from project.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setImportError(err.message || "Failed to import tools from project.");
+    } finally {
+      setImportingTool(false);
+    }
+  };
+
   const fetchDetails = async () => {
     setLoading(true);
     setError("");
@@ -355,6 +454,8 @@ export default function ProjectWorkspaceView({
         const toolsData = await toolsRes.json();
         setAllTools(Array.isArray(toolsData) ? toolsData : toolsData.results || []);
       }
+      
+      fetchAllProjects();
       
       const response = await fetch(`${apiBase}/projects/${projectSlug}/`, { cache: "no-store" });
       if (!response.ok) {
@@ -1857,17 +1958,29 @@ export default function ProjectWorkspaceView({
                       Select and tag inventory components used for this project.
                     </p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setEditingInvUsedId(null);
-                      setSelectedInventoryId("");
-                      setUsedQuantity(1);
-                      setIsTagInventoryModalOpen(true);
-                    }}
-                    className="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0 self-start sm:self-auto"
-                  >
-                    <Plus className="h-3.5 w-3.5" /> Tag Inventory Used
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                    <button
+                      onClick={() => {
+                        setSelectedSourceProjectId("");
+                        setImportError("");
+                        setIsImportInvModalOpen(true);
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Download className="h-3.5 w-3.5 text-slate-500" /> Import Inventory
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingInvUsedId(null);
+                        setSelectedInventoryId("");
+                        setUsedQuantity(1);
+                        setIsTagInventoryModalOpen(true);
+                      }}
+                      className="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Plus className="h-3.5 w-3.5" /> Tag Inventory Used
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -2014,13 +2127,26 @@ export default function ProjectWorkspaceView({
                       Manage tools, frameworks, and equipment used in this project.
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsAddToolModalOpen(true)}
-                    className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 shadow-xs"
-                  >
-                    <Plus className="h-3.5 w-3.5" /> Attach Tool
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedSourceProjectId("");
+                        setImportError("");
+                        setIsImportToolModalOpen(true);
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                    >
+                      <Download className="h-3.5 w-3.5 text-slate-500" /> Import Tools
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddToolModalOpen(true)}
+                      className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                    >
+                      <Plus className="h-3.5 w-3.5" /> Attach Tool
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -3129,6 +3255,312 @@ export default function ProjectWorkspaceView({
               </div>
             );
           })()}
+        </AnimatePresence>
+
+        {/* --- IMPORT INVENTORY MODAL --- */}
+        <AnimatePresence>
+          {isImportInvModalOpen && (
+            <div className="fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-4 font-sans">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs cursor-pointer"
+                onClick={() => {
+                  setIsImportInvModalOpen(false);
+                  setSelectedSourceProjectId("");
+                  setImportError("");
+                }}
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl z-10 flex flex-col"
+              >
+                <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl">
+                  <div className="flex items-center gap-2">
+                    <Download className="h-4 w-4 text-slate-700" />
+                    <h3 className="text-sm font-bold text-slate-900">Import Inventory Used</h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsImportInvModalOpen(false);
+                      setSelectedSourceProjectId("");
+                      setImportError("");
+                    }}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleImportInventory} className="p-4 sm:p-5 space-y-4">
+                  {importError && (
+                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 shrink-0" />
+                      <span>{importError}</span>
+                    </div>
+                  )}
+
+                  {/* Custom Searchable Project Select Dropdown */}
+                  <div className="relative z-30">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                      Select Source Project <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div
+                        onClick={() => setProjectDropdownOpen(!projectDropdownOpen)}
+                        className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 cursor-pointer hover:bg-white focus:border-slate-400 transition-all"
+                      >
+                        <span className={selectedSourceProjectId ? "text-slate-900 font-semibold truncate" : "text-slate-400 truncate"}>
+                          {allProjects.find((p) => p.id === Number(selectedSourceProjectId))?.title || "-- Choose a project to import from --"}
+                        </span>
+                        <ChevronDown className={`h-4 w-4 text-slate-400 shrink-0 transition-transform ${projectDropdownOpen ? "rotate-180" : ""}`} />
+                      </div>
+
+                      {projectDropdownOpen && (
+                        <>
+                          <div
+                            className="fixed inset-0 z-40"
+                            onClick={() => setProjectDropdownOpen(false)}
+                          />
+                          <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden max-h-56 flex flex-col">
+                            <div className="p-2 border-b border-slate-100 bg-slate-50/50">
+                              <div className="relative">
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                                <input
+                                  type="text"
+                                  placeholder="Search projects..."
+                                  value={projectSearch}
+                                  onChange={(e) => setProjectSearch(e.target.value)}
+                                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg outline-none focus:border-slate-400"
+                                  autoFocus
+                                />
+                              </div>
+                            </div>
+                            <div className="overflow-y-auto max-h-40 divide-y divide-slate-100">
+                              {fetchingProjects ? (
+                                <div className="p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Searching...
+                                </div>
+                              ) : (
+                                allProjects
+                                  .filter((p) => p.id !== project?.id)
+                                  .map((p) => {
+                                    const isSelected = selectedSourceProjectId === p.id;
+                                    return (
+                                      <button
+                                        key={p.id}
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedSourceProjectId(p.id);
+                                          setProjectDropdownOpen(false);
+                                        }}
+                                        className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-left transition-colors cursor-pointer ${
+                                          isSelected ? "bg-slate-100 font-bold" : "hover:bg-slate-50"
+                                        }`}
+                                      >
+                                        <span className="text-slate-800 truncate">{p.title}</span>
+                                        {isSelected && <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />}
+                                      </button>
+                                    );
+                                  })
+                              )}
+                              {!fetchingProjects && allProjects.filter((p) => p.id !== project?.id).length === 0 && (
+                                <div className="p-3 text-xs text-slate-400 text-center">
+                                  No matching projects found
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      This will copy all tagged inventory components from the selected project into this workspace and deduct quantity from main stock.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsImportInvModalOpen(false);
+                        setSelectedSourceProjectId("");
+                        setImportError("");
+                      }}
+                      className="px-4 py-2 rounded-xl text-slate-600 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={importingInv || !selectedSourceProjectId}
+                      className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                    >
+                      {importingInv ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                      Import Inventory
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* --- IMPORT TOOLS MODAL --- */}
+        <AnimatePresence>
+          {isImportToolModalOpen && (
+            <div className="fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-4 font-sans">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs cursor-pointer"
+                onClick={() => {
+                  setIsImportToolModalOpen(false);
+                  setSelectedSourceProjectId("");
+                  setImportError("");
+                }}
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl z-10 flex flex-col"
+              >
+                <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl">
+                  <div className="flex items-center gap-2">
+                    <Download className="h-4 w-4 text-slate-700" />
+                    <h3 className="text-sm font-bold text-slate-900">Import Tools Used</h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsImportToolModalOpen(false);
+                      setSelectedSourceProjectId("");
+                      setImportError("");
+                    }}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleImportTools} className="p-4 sm:p-5 space-y-4">
+                  {importError && (
+                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 shrink-0" />
+                      <span>{importError}</span>
+                    </div>
+                  )}
+
+                  {/* Custom Searchable Project Select Dropdown */}
+                  <div className="relative z-30">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                      Select Source Project <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div
+                        onClick={() => setProjectDropdownOpen(!projectDropdownOpen)}
+                        className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 cursor-pointer hover:bg-white focus:border-slate-400 transition-all"
+                      >
+                        <span className={selectedSourceProjectId ? "text-slate-900 font-semibold truncate" : "text-slate-400 truncate"}>
+                          {allProjects.find((p) => p.id === Number(selectedSourceProjectId))?.title || "-- Choose a project to import from --"}
+                        </span>
+                        <ChevronDown className={`h-4 w-4 text-slate-400 shrink-0 transition-transform ${projectDropdownOpen ? "rotate-180" : ""}`} />
+                      </div>
+
+                      {projectDropdownOpen && (
+                        <>
+                          <div
+                            className="fixed inset-0 z-40"
+                            onClick={() => setProjectDropdownOpen(false)}
+                          />
+                          <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden max-h-56 flex flex-col">
+                            <div className="p-2 border-b border-slate-100 bg-slate-50/50">
+                              <div className="relative">
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                                <input
+                                  type="text"
+                                  placeholder="Search projects..."
+                                  value={projectSearch}
+                                  onChange={(e) => setProjectSearch(e.target.value)}
+                                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg outline-none focus:border-slate-400"
+                                  autoFocus
+                                />
+                              </div>
+                            </div>
+                            <div className="overflow-y-auto max-h-40 divide-y divide-slate-100">
+                              {fetchingProjects ? (
+                                <div className="p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Searching...
+                                </div>
+                              ) : (
+                                allProjects
+                                  .filter((p) => p.id !== project?.id)
+                                  .map((p) => {
+                                    const isSelected = selectedSourceProjectId === p.id;
+                                    return (
+                                      <button
+                                        key={p.id}
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedSourceProjectId(p.id);
+                                          setProjectDropdownOpen(false);
+                                        }}
+                                        className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-left transition-colors cursor-pointer ${
+                                          isSelected ? "bg-slate-100 font-bold" : "hover:bg-slate-50"
+                                        }`}
+                                      >
+                                        <span className="text-slate-800 truncate">{p.title}</span>
+                                        {isSelected && <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />}
+                                      </button>
+                                    );
+                                  })
+                              )}
+                              {!fetchingProjects && allProjects.filter((p) => p.id !== project?.id).length === 0 && (
+                                <div className="p-3 text-xs text-slate-400 text-center">
+                                  No matching projects found
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      This will copy all tools and equipment used from the selected project into this workspace.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsImportToolModalOpen(false);
+                        setSelectedSourceProjectId("");
+                        setImportError("");
+                      }}
+                      className="px-4 py-2 rounded-xl text-slate-600 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={importingTool || !selectedSourceProjectId}
+                      className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                    >
+                      {importingTool ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                      Import Tools
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
         </AnimatePresence>
         {/* Custom Delete Image Confirmation Modal */}
         {deleteImageTarget && (

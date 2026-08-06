@@ -5,12 +5,15 @@ import {
   ArrowLeft,
   Building2,
   Calendar,
+  Check,
+  ChevronDown,
   Cpu,
   FileText,
   Loader2,
   Paperclip,
   Plus,
   Save,
+  Search,
   ShoppingCart,
   Trash2,
   X,
@@ -36,6 +39,11 @@ export default function CreatePurchaseView() {
   const [componentModels, setComponentModels] = useState<ComponentModel[]>([]);
   const [loadingMeta, setLoadingMeta] = useState(true);
 
+  // Custom Searchable Dropdown States for Line Items
+  const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null);
+  const [searchTerms, setSearchTerms] = useState<Record<number, string>>({});
+  const [searchingModels, setSearchingModels] = useState(false);
+
   // Form states
   const [selectedVendor, setSelectedVendor] = useState<number | "">("");
   const [purchaseDate, setPurchaseDate] = useState(
@@ -49,6 +57,36 @@ export default function CreatePurchaseView() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [billFile, setBillFile] = useState<File | null>(null);
+
+  const fetchComponentModelList = async (query = "") => {
+    setSearchingModels(true);
+    try {
+      const url = query.trim()
+        ? `${apiBase}/component-models/?search=${encodeURIComponent(query.trim())}`
+        : `${apiBase}/component-models/?page_size=100`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (res.ok) {
+        const d = await res.json();
+        setComponentModels(d.results ?? d);
+      }
+    } catch (err) {
+      console.error("Error fetching component models:", err);
+    } finally {
+      setSearchingModels(false);
+    }
+  };
+
+  useEffect(() => {
+    if (openDropdownIndex === null) return;
+    const currentQuery = (searchTerms[openDropdownIndex] || "").trim();
+    // Only call API if user typed a search term
+    if (!currentQuery) return;
+
+    const timer = setTimeout(() => {
+      fetchComponentModelList(currentQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [openDropdownIndex, openDropdownIndex !== null ? searchTerms[openDropdownIndex] : ""]);
 
   useEffect(() => {
     const fetchMeta = async () => {
@@ -266,48 +304,121 @@ export default function CreatePurchaseView() {
               <div className="space-y-3">
                 {formItems.map((item, index) => {
                   const subtotal = (Number(item.quantity) || 0) * (Number(item.price_per_item) || 0);
-                  const compName = getComponentName(item.component_model);
 
                   return (
                     <div
                       key={index}
-                      className="p-4 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-3"
+                      className="p-4 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-3 relative"
+                      style={{ zIndex: openDropdownIndex === index ? 50 : 10 - index }}
                     >
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
-                        {/* Component Model Select */}
-                        <div className="md:col-span-4 space-y-1">
+                        {/* Component Model Custom Search Select Dropdown */}
+                        <div className="md:col-span-4 space-y-1 relative">
                           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                             Component Model *
                           </label>
-                          <select
-                            required
-                            value={item.component_model}
-                            onChange={(e) =>
-                              updateItem(
-                                index,
-                                "component_model",
-                                e.target.value === "" ? "" : Number(e.target.value)
-                              )
-                            }
-                            className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-900 outline-none focus:border-slate-400 transition-all cursor-pointer"
-                          >
-                            <option value="">— Select component model —</option>
-                            {componentModels.map((m) => {
-                              const cName = getComponentName(m.id);
-                              return (
-                                <option key={m.id} value={m.id}>
-                                  {cName ? `${cName} › ` : ""}
-                                  {m.name}
-                                </option>
-                              );
-                            })}
-                          </select>
-                          {compName && (
-                            <p className="text-[11px] text-slate-500 font-medium flex items-center gap-1 mt-1">
-                              <Cpu className="h-3 w-3 text-slate-400" />
-                              Component: {compName}
-                            </p>
-                          )}
+                          {(() => {
+                            const selectedModel = componentModels.find((m) => m.id === item.component_model);
+                            const selectedCompName = selectedModel ? getComponentName(selectedModel.id) : "";
+                            const isOpen = openDropdownIndex === index;
+
+                            return (
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  onClick={() => setOpenDropdownIndex(isOpen ? null : index)}
+                                  className="w-full flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 outline-none focus:border-slate-400 transition-all cursor-pointer text-left shadow-xs"
+                                >
+                                  {selectedModel ? (
+                                    <div className="min-w-0 flex-1 truncate">
+                                      <span className="font-semibold text-slate-800">
+                                        {selectedModel.name}
+                                      </span>
+                                      {selectedCompName && (
+                                        <span className="text-slate-400 text-[10px] ml-1.5 font-mono">
+                                          ({selectedCompName})
+                                        </span>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="text-slate-400 font-medium truncate">— Select component model —</span>
+                                  )}
+                                  <ChevronDown className={`h-4 w-4 text-slate-400 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                                </button>
+
+                                {isOpen && (
+                                  <>
+                                    <div
+                                      className="fixed inset-0 z-40"
+                                      onClick={() => setOpenDropdownIndex(null)}
+                                    />
+                                    <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden max-h-56 flex flex-col">
+                                      {/* Search Input */}
+                                      <div className="p-2 bg-slate-50 border-b border-slate-100 relative shrink-0">
+                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 z-10" />
+                                        <input
+                                          type="text"
+                                          placeholder="Search component models..."
+                                          value={searchTerms[index] || ""}
+                                          onChange={(e) => {
+                                            const val = e.target.value;
+                                            setSearchTerms((prev) => ({ ...prev, [index]: val }));
+                                          }}
+                                          className="w-full pl-7 pr-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-slate-400 transition-all"
+                                          autoFocus
+                                        />
+                                      </div>
+
+                                      {/* Model Results */}
+                                      <div className="overflow-y-auto flex-1 divide-y divide-slate-100">
+                                        {searchingModels ? (
+                                          <div className="p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2 font-medium">
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" /> Searching component models...
+                                          </div>
+                                        ) : componentModels.length > 0 ? (
+                                          componentModels.map((m) => {
+                                            const isSelected = item.component_model === m.id;
+                                            const cName = getComponentName(m.id);
+
+                                            return (
+                                              <button
+                                                key={m.id}
+                                                type="button"
+                                                onClick={() => {
+                                                  updateItem(index, "component_model", m.id);
+                                                  setOpenDropdownIndex(null);
+                                                  setSearchTerms((prev) => ({ ...prev, [index]: "" }));
+                                                }}
+                                                className={`w-full flex items-center justify-between p-2.5 text-xs transition-colors cursor-pointer text-left ${
+                                                  isSelected ? "bg-slate-900 text-white font-bold" : "hover:bg-slate-50 text-slate-800"
+                                                }`}
+                                              >
+                                                <div className="min-w-0 flex-1 truncate">
+                                                  <p className={`font-semibold truncate ${isSelected ? "text-white" : "text-slate-900"}`}>
+                                                    {m.name}
+                                                  </p>
+                                                  {cName && (
+                                                    <p className={`text-[10px] font-mono truncate ${isSelected ? "text-slate-300" : "text-slate-400"}`}>
+                                                      {cName}
+                                                    </p>
+                                                  )}
+                                                </div>
+                                                {isSelected && <Check className="h-4 w-4 text-amber-400 shrink-0 ml-2" />}
+                                              </button>
+                                            );
+                                          })
+                                        ) : (
+                                          <div className="p-4 text-center text-xs text-slate-400 font-medium">
+                                            No component models found matching "{searchTerms[index] || ""}"
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </div>
 
                         {/* Quantity */}

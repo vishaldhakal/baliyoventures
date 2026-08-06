@@ -126,19 +126,47 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
     }
   };
 
-  // Fetch vendors lazily when opening Create / Edit modal
-  const fetchVendorsIfNeeded = async () => {
-    if (vendors.length > 0) return;
+  // Fetch vendors lazily with backend search
+  const [fetchingVendors, setFetchingVendors] = useState(false);
+
+  const fetchVendorsList = async (query = "") => {
+    setFetchingVendors(true);
     try {
-      const vRes = await fetch(`${apiBase}/vendors/`, { cache: "no-store" });
+      const url = query.trim()
+        ? `${apiBase}/vendors/?search=${encodeURIComponent(query.trim())}`
+        : `${apiBase}/vendors/`;
+      const vRes = await fetch(url, { cache: "no-store" });
       if (vRes.ok) {
         const vData = await vRes.json();
         setVendors(vData.results || vData);
       }
     } catch (err) {
       console.error("Failed to fetch vendors:", err);
+    } finally {
+      setFetchingVendors(false);
     }
   };
+
+  const fetchVendorsIfNeeded = async () => {
+    if (vendors.length > 0) return;
+    await fetchVendorsList();
+  };
+
+  useEffect(() => {
+    if (!isVendorDropdownOpen || !vendorSearch.trim()) return;
+    const timer = setTimeout(() => {
+      fetchVendorsList(vendorSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [vendorSearch, isVendorDropdownOpen]);
+
+  useEffect(() => {
+    if (!isEditVendorDropdownOpen || !editVendorSearch.trim()) return;
+    const timer = setTimeout(() => {
+      fetchVendorsList(editVendorSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [editVendorSearch, isEditVendorDropdownOpen]);
 
   const fetchedSlugRef = useRef<string | null>(null);
 
@@ -772,31 +800,33 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
                                     <span>-- None / Unassigned --</span>
                                     {selectedVendorId === "" && <Check className="h-4 w-4 text-slate-700" />}
                                   </button>
-                                  {vendors.filter((v) => !vendorSearch.trim() || v.name.toLowerCase().includes(vendorSearch.toLowerCase())).length > 0 ? (
-                                    vendors
-                                      .filter((v) => !vendorSearch.trim() || v.name.toLowerCase().includes(vendorSearch.toLowerCase()))
-                                      .map((v) => {
-                                        const isSelected = selectedVendorId === v.id;
-                                        return (
-                                          <button
-                                            key={v.id}
-                                            type="button"
-                                            onClick={() => {
-                                              setSelectedVendorId(v.id);
-                                              setIsVendorDropdownOpen(false);
-                                              setVendorSearch("");
-                                            }}
-                                            className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition-colors cursor-pointer text-left ${
-                                              isSelected
-                                                ? "bg-slate-900 text-white font-bold"
-                                                : "hover:bg-slate-50 text-slate-800"
-                                            }`}
-                                          >
-                                            <span className="truncate">{v.name}</span>
-                                            {isSelected && <Check className="h-4 w-4 text-amber-400 shrink-0 ml-2" />}
-                                          </button>
-                                        );
-                                      })
+                                  {fetchingVendors ? (
+                                    <div className="p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2 font-medium">
+                                      <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" /> Searching vendors...
+                                    </div>
+                                  ) : vendors.length > 0 ? (
+                                    vendors.map((v) => {
+                                      const isSelected = selectedVendorId === v.id;
+                                      return (
+                                        <button
+                                          key={v.id}
+                                          type="button"
+                                          onClick={() => {
+                                            setSelectedVendorId(v.id);
+                                            setIsVendorDropdownOpen(false);
+                                            setVendorSearch("");
+                                          }}
+                                          className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition-colors cursor-pointer text-left ${
+                                            isSelected
+                                              ? "bg-slate-900 text-white font-bold"
+                                              : "hover:bg-slate-50 text-slate-800"
+                                          }`}
+                                        >
+                                          <span className="truncate">{v.name}</span>
+                                          {isSelected && <Check className="h-4 w-4 text-amber-400 shrink-0 ml-2" />}
+                                        </button>
+                                      );
+                                    })
                                   ) : (
                                     <div className="p-4 text-center text-xs text-slate-400 font-medium">
                                       No vendors matching "{vendorSearch}"
@@ -1051,31 +1081,33 @@ export default function ComponentsView({ slug }: ComponentsViewProps) {
                                     <span>-- None / Unassigned --</span>
                                     {editCompVendorId === "" && <Check className="h-4 w-4 text-slate-700" />}
                                   </button>
-                                  {vendors.filter((v) => !editVendorSearch.trim() || v.name.toLowerCase().includes(editVendorSearch.toLowerCase())).length > 0 ? (
-                                    vendors
-                                      .filter((v) => !editVendorSearch.trim() || v.name.toLowerCase().includes(editVendorSearch.toLowerCase()))
-                                      .map((v) => {
-                                        const isSelected = editCompVendorId === v.id;
-                                        return (
-                                          <button
-                                            key={v.id}
-                                            type="button"
-                                            onClick={() => {
-                                              setEditCompVendorId(v.id);
-                                              setIsEditVendorDropdownOpen(false);
-                                              setEditVendorSearch("");
-                                            }}
-                                            className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition-colors cursor-pointer text-left ${
-                                              isSelected
-                                                ? "bg-slate-900 text-white font-bold"
-                                                : "hover:bg-slate-50 text-slate-800"
-                                            }`}
-                                          >
-                                            <span className="truncate">{v.name}</span>
-                                            {isSelected && <Check className="h-4 w-4 text-amber-400 shrink-0 ml-2" />}
-                                          </button>
-                                        );
-                                      })
+                                  {fetchingVendors ? (
+                                    <div className="p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2 font-medium">
+                                      <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" /> Searching vendors...
+                                    </div>
+                                  ) : vendors.length > 0 ? (
+                                    vendors.map((v) => {
+                                      const isSelected = editCompVendorId === v.id;
+                                      return (
+                                        <button
+                                          key={v.id}
+                                          type="button"
+                                          onClick={() => {
+                                            setEditCompVendorId(v.id);
+                                            setIsEditVendorDropdownOpen(false);
+                                            setEditVendorSearch("");
+                                          }}
+                                          className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition-colors cursor-pointer text-left ${
+                                            isSelected
+                                              ? "bg-slate-900 text-white font-bold"
+                                              : "hover:bg-slate-50 text-slate-800"
+                                          }`}
+                                        >
+                                          <span className="truncate">{v.name}</span>
+                                          {isSelected && <Check className="h-4 w-4 text-amber-400 shrink-0 ml-2" />}
+                                        </button>
+                                      );
+                                    })
                                   ) : (
                                     <div className="p-4 text-center text-xs text-slate-400 font-medium">
                                       No vendors matching "{editVendorSearch}"

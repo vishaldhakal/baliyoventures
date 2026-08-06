@@ -337,6 +337,7 @@ export default function ProjectWorkspaceView({
   const [selectedInventoryId, setSelectedInventoryId] = useState<number | "">("");
   const [usedQuantity, setUsedQuantity] = useState<number | "">(1);
   const [addingUsedInv, setAddingUsedInv] = useState(false);
+  const [fetchingInventory, setFetchingInventory] = useState(false);
 
   // 5. Tech Docs Form
   const [newDocName, setNewDocName] = useState("");
@@ -376,16 +377,22 @@ export default function ProjectWorkspaceView({
     }
   };
 
-  const fetchInventoryList = async () => {
+  const fetchInventoryList = async (query = "") => {
+    setFetchingInventory(true);
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
     try {
-      const res = await fetch(`${apiBase}/inventory/`, { cache: "no-store" });
+      const url = query.trim()
+        ? `${apiBase}/inventory/?search=${encodeURIComponent(query.trim())}`
+        : `${apiBase}/inventory/`;
+      const res = await fetch(url, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         setInventoryList(data.results || data);
       }
     } catch (err) {
       console.error("Error fetching inventory list:", err);
+    } finally {
+      setFetchingInventory(false);
     }
   };
 
@@ -393,6 +400,14 @@ export default function ProjectWorkspaceView({
     fetchDetails();
     fetchInventoryList();
   }, [projectSlug]);
+
+  useEffect(() => {
+    if (!invSearch.trim()) return;
+    const timer = setTimeout(() => {
+      fetchInventoryList(invSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [invSearch]);
 
   const handleSaveField = async (
     fieldName: "description" | "specs" | "problem_it_solves" | "team_member",
@@ -2362,9 +2377,9 @@ export default function ProjectWorkspaceView({
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="relative w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[92vh] z-10"
+              className="relative w-full max-w-lg bg-white rounded-2xl shadow-xl flex flex-col z-10"
             >
-              <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 bg-slate-50/50">
+              <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl">
                 <h3 className="text-sm font-bold text-slate-900">
                   {editingInvUsedId ? "Edit Tagged Inventory" : "Tag Inventory Used"}
                 </h3>
@@ -2379,9 +2394,9 @@ export default function ProjectWorkspaceView({
                 </button>
               </div>
 
-              <div className="p-4 sm:p-6 overflow-y-auto">
+              <div className="p-4 sm:p-6 space-y-4">
                 <form id="add-inventory-form" onSubmit={handleTagInventoryUsed} className="space-y-4">
-                  <div className="space-y-1.5 relative">
+                  <div className="space-y-1.5 relative z-30">
                     <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Inventory Item *</label>
                     {(() => {
                       const selectedItem = inventoryList.find(inv => inv.id === selectedInventoryId);
@@ -2427,7 +2442,7 @@ export default function ProjectWorkspaceView({
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: -4, scale: 0.98 }}
                                   transition={{ duration: 0.15 }}
-                                  className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden max-h-60 flex flex-col"
+                                  className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden max-h-56 flex flex-col"
                                 >
                                   {/* Search Box */}
                                   <div className="p-2.5 bg-slate-50 border-b border-slate-100 relative shrink-0">
@@ -2443,60 +2458,50 @@ export default function ProjectWorkspaceView({
 
                                   {/* Item List */}
                                   <div className="overflow-y-auto flex-1 divide-y divide-slate-100">
-                                    {inventoryList.filter((inv) => {
-                                      if (!invSearch.trim()) return true;
-                                      const q = invSearch.toLowerCase();
-                                      const cName = inv.component_model_details?.component_name?.toLowerCase() || "";
-                                      const mName = inv.component_model_details?.name?.toLowerCase() || "";
-                                      return cName.includes(q) || mName.includes(q);
-                                    }).length > 0 ? (
-                                      inventoryList
-                                        .filter((inv) => {
-                                          if (!invSearch.trim()) return true;
-                                          const q = invSearch.toLowerCase();
-                                          const cName = inv.component_model_details?.component_name?.toLowerCase() || "";
-                                          const mName = inv.component_model_details?.name?.toLowerCase() || "";
-                                          return cName.includes(q) || mName.includes(q);
-                                        })
-                                        .map((inv) => {
-                                          const isSelected = selectedInventoryId === inv.id;
-                                          const mName = inv.component_model_details?.name || `Inventory #${inv.id}`;
-                                          const cName = inv.component_model_details?.component_name;
+                                    {fetchingInventory ? (
+                                      <div className="p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2 font-medium">
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" /> Searching inventory...
+                                      </div>
+                                    ) : inventoryList.length > 0 ? (
+                                      inventoryList.map((inv) => {
+                                        const isSelected = selectedInventoryId === inv.id;
+                                        const mName = inv.component_model_details?.name || `Inventory #${inv.id}`;
+                                        const cName = inv.component_model_details?.component_name;
 
-                                          return (
-                                            <button
-                                              key={inv.id}
-                                              type="button"
-                                              onClick={() => {
-                                                setSelectedInventoryId(inv.id);
-                                                setInvDropdownOpen(false);
-                                                setInvSearch("");
-                                              }}
-                                              className={`w-full flex items-center justify-between p-3 text-xs transition-colors cursor-pointer text-left ${
-                                                isSelected ? "bg-slate-900 text-white font-bold" : "hover:bg-slate-50 text-slate-800"
-                                              }`}
-                                            >
-                                              <div className="min-w-0 flex-1">
-                                                <p className={`font-semibold truncate ${isSelected ? "text-white" : "text-slate-900"}`}>
-                                                  {mName}
+                                        return (
+                                          <button
+                                            key={inv.id}
+                                            type="button"
+                                            onClick={() => {
+                                              setSelectedInventoryId(inv.id);
+                                              setInvDropdownOpen(false);
+                                              setInvSearch("");
+                                            }}
+                                            className={`w-full flex items-center justify-between p-3 text-xs transition-colors cursor-pointer text-left ${
+                                              isSelected ? "bg-slate-900 text-white font-bold" : "hover:bg-slate-50 text-slate-800"
+                                            }`}
+                                          >
+                                            <div className="min-w-0 flex-1">
+                                              <p className={`font-semibold truncate ${isSelected ? "text-white" : "text-slate-900"}`}>
+                                                {mName}
+                                              </p>
+                                              {cName && (
+                                                <p className={`text-[10px] font-mono truncate ${isSelected ? "text-slate-300" : "text-slate-400"}`}>
+                                                  {cName}
                                                 </p>
-                                                {cName && (
-                                                  <p className={`text-[10px] font-mono truncate ${isSelected ? "text-slate-300" : "text-slate-400"}`}>
-                                                    {cName}
-                                                  </p>
-                                                )}
-                                              </div>
-                                              <div className="flex items-center gap-2 shrink-0 ml-3">
-                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                                                  isSelected ? "bg-slate-800 text-emerald-300 border border-slate-700" : "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                                }`}>
-                                                  Stock: {inv.quantity}
-                                                </span>
-                                                {isSelected && <Check className="h-4 w-4 text-amber-400 shrink-0" />}
-                                              </div>
-                                            </button>
-                                          );
-                                        })
+                                              )}
+                                            </div>
+                                            <div className="flex items-center gap-2 shrink-0 ml-3">
+                                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                                                isSelected ? "bg-slate-800 text-emerald-300 border border-slate-700" : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                              }`}>
+                                                Stock: {inv.quantity}
+                                              </span>
+                                              {isSelected && <Check className="h-4 w-4 text-amber-400 shrink-0" />}
+                                            </div>
+                                          </button>
+                                        );
+                                      })
                                     ) : (
                                       <div className="p-4 text-center text-xs text-slate-400 font-medium">
                                         No inventory items matching "{invSearch}"
@@ -2512,7 +2517,7 @@ export default function ProjectWorkspaceView({
                     })()}
                   </div>
 
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 relative z-10">
                     <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Quantity Used *</label>
                     <input
                       type="number"
@@ -2527,7 +2532,7 @@ export default function ProjectWorkspaceView({
                 </form>
               </div>
 
-              <div className="flex items-center justify-end gap-3 px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-3 px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-t border-slate-100 rounded-b-2xl">
                 <button
                   type="button"
                   onClick={() => setIsTagInventoryModalOpen(false)}
@@ -2940,7 +2945,7 @@ export default function ProjectWorkspaceView({
             };
 
             return (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 font-sans">
+              <div className="fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-4 font-sans">
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -2958,7 +2963,7 @@ export default function ProjectWorkspaceView({
                   initial={{ opacity: 0, scale: 0.95, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                  className="relative w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl z-10 overflow-visible"
+                  className="relative w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl z-10 flex flex-col"
                 >
                   <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl">
                     <div className="flex items-center gap-2">
@@ -2982,7 +2987,7 @@ export default function ProjectWorkspaceView({
 
                   <form onSubmit={handleAttachTool} className="p-4 sm:p-5 space-y-4">
                     {/* Tool Select Dropdown with Search */}
-                    <div>
+                    <div className="relative z-30">
                       <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
                         Select Tool / Technology <span className="text-rose-500">*</span>
                       </label>
@@ -3001,7 +3006,12 @@ export default function ProjectWorkspaceView({
                         </div>
 
                         {invDropdownOpen && (
-                          <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden max-h-56 flex flex-col">
+                          <>
+                            <div
+                              className="fixed inset-0 z-40"
+                              onClick={() => setInvDropdownOpen(false)}
+                            />
+                            <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden max-h-56 flex flex-col">
                             <div className="p-2 border-b border-slate-100 bg-slate-50/50">
                               <div className="relative">
                                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
@@ -3062,6 +3072,7 @@ export default function ProjectWorkspaceView({
                               )}
                             </div>
                           </div>
+                          </>
                         )}
                       </div>
                     </div>

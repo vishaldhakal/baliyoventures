@@ -24,9 +24,9 @@ import { useEffect, useState } from "react";
 
 interface PurchaseItemForm {
   component_model: number | "";
-  quantity: number | "";
+  quantity: number | string;
   unit: string;
-  price_per_item: number | "";
+  price_per_item: number | string;
 }
 
 export default function CreatePurchaseView() {
@@ -181,9 +181,9 @@ export default function CreatePurchaseView() {
         JSON.stringify(
           validItems.map((item) => ({
             component_model: item.component_model,
-            quantity: item.quantity,
+            quantity: Number(item.quantity),
             unit: item.unit || "pcs",
-            price_per_item: item.price_per_item,
+            price_per_item: item.price_per_item === "" ? 0 : Number(item.price_per_item),
           }))
         )
       );
@@ -428,15 +428,12 @@ export default function CreatePurchaseView() {
                           </label>
                           <input
                             type="number"
-                            min={1}
+                            step="any"
+                            min="0"
                             required
                             value={item.quantity}
                             onChange={(e) =>
-                              updateItem(
-                                index,
-                                "quantity",
-                                e.target.value === "" ? "" : Number(e.target.value)
-                              )
+                              updateItem(index, "quantity", e.target.value)
                             }
                             className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:border-slate-400 transition-all"
                           />
@@ -467,15 +464,11 @@ export default function CreatePurchaseView() {
                           </label>
                           <input
                             type="number"
-                            step="0.01"
-                            min={0}
+                            step="any"
+                            min="0"
                             value={item.price_per_item}
                             onChange={(e) =>
-                              updateItem(
-                                index,
-                                "price_per_item",
-                                e.target.value === "" ? "" : Number(e.target.value)
-                              )
+                              updateItem(index, "price_per_item", e.target.value)
                             }
                             className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-900 outline-none focus:border-slate-400 transition-all"
                           />

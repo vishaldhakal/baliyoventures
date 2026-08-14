@@ -336,7 +336,7 @@ export default function ProjectWorkspaceView({
 
   // 4. Tag Inventory Used Form
   const [selectedInventoryId, setSelectedInventoryId] = useState<number | "">("");
-  const [usedQuantity, setUsedQuantity] = useState<number | "">(1);
+  const [usedQuantity, setUsedQuantity] = useState<number | string | "">(1);
   const [addingUsedInv, setAddingUsedInv] = useState(false);
   const [fetchingInventory, setFetchingInventory] = useState(false);
 
@@ -695,7 +695,8 @@ export default function ProjectWorkspaceView({
   // 9. Tag / Edit Inventory Used in Project
   const handleTagInventoryUsed = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!project || !selectedInventoryId || !usedQuantity) return;
+    const parsedQty = parseFloat(usedQuantity.toString());
+    if (!project || !selectedInventoryId || isNaN(parsedQty) || parsedQty <= 0) return;
     setAddingUsedInv(true);
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
     try {
@@ -711,7 +712,7 @@ export default function ProjectWorkspaceView({
         body: JSON.stringify({
           project: project.id,
           inventory: selectedInventoryId,
-          quantity: parseInt(usedQuantity.toString(), 10),
+          quantity: parsedQty,
         }),
       });
       if (res.ok) {
@@ -2648,10 +2649,11 @@ export default function ProjectWorkspaceView({
                     <input
                       type="number"
                       required
-                      min={1}
-                      placeholder="E.g. 2"
+                      step="any"
+                      min={0.0001}
+                      placeholder="E.g. 0.5"
                       value={usedQuantity}
-                      onChange={(e) => setUsedQuantity(e.target.value ? parseInt(e.target.value, 10) : "")}
+                      onChange={(e) => setUsedQuantity(e.target.value)}
                       className="w-full p-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all"
                     />
                   </div>

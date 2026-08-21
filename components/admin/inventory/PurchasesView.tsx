@@ -17,6 +17,7 @@ import {
   ExternalLink,
   Eye,
   FileText,
+  FolderGit2,
   Loader2,
   MapPin,
   Paperclip,
@@ -59,12 +60,14 @@ export default function PurchasesView() {
 
   // Metadata dropdown state
   const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [projects, setProjects] = useState<{ id: number; title: string }[]>([]);
   const [components, setComponents] = useState<Component[]>([]);
   const [componentModels, setComponentModels] = useState<ComponentModel[]>([]);
   const [loadingMeta, setLoadingMeta] = useState(false);
 
   // Form fields
   const [selectedVendor, setSelectedVendor] = useState<number | "">("");
+  const [selectedProject, setSelectedProject] = useState<number | "">("");
   const [purchaseDate, setPurchaseDate] = useState(
     new Date().toISOString().split("T")[0]
   );
@@ -158,6 +161,10 @@ export default function PurchasesView() {
         const d = await cmRes.json();
         setComponentModels(d.results ?? d);
       }
+      if (pRes.ok) {
+        const d = await pRes.json();
+        setProjects(d.results ?? d);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -169,6 +176,7 @@ export default function PurchasesView() {
   const handleOpenEdit = async (bill: ComponentPurchase) => {
     setEditingBillId(bill.id);
     setSelectedVendor(bill.vendor ?? "");
+    setSelectedProject(bill.project ?? "");
     setPurchaseDate(
       bill.purchase_date || new Date().toISOString().split("T")[0]
     );
@@ -214,6 +222,7 @@ export default function PurchasesView() {
   const handleCloseFormModal = () => {
     setShowFormModal(false);
     setEditingBillId(null);
+    setSelectedProject("");
     setBillFile(null);
     setExistingBillUrl(null);
   };
@@ -261,6 +270,9 @@ export default function PurchasesView() {
       formData.append("notes", notes || "");
       if (selectedVendor !== "") {
         formData.append("vendor", String(selectedVendor));
+      }
+      if (selectedProject !== "") {
+        formData.append("project", String(selectedProject));
       }
       if (billFile) {
         formData.append("bill_file", billFile);
@@ -410,6 +422,7 @@ export default function PurchasesView() {
                 <tr className="bg-white border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
                   <th className="px-5 py-3">Date</th>
                   <th className="px-5 py-3">Vendor / Supplier</th>
+                  <th className="px-5 py-3">Project</th>
                   <th className="px-5 py-3">Notes</th>
                   <th className="px-5 py-3 text-right">Total Price</th>
                   <th className="px-5 py-3 text-center">Actions</th>
@@ -436,6 +449,18 @@ export default function PurchasesView() {
                         <span className="inline-flex items-center gap-1.5 font-medium text-slate-800">
                           <Building2 className="h-4 w-4 text-slate-400 shrink-0" />
                           {purchase.vendor_name}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 italic">—</span>
+                      )}
+                    </td>
+
+                    {/* Project */}
+                    <td className="px-5 py-3.5">
+                      {purchase.project_title ? (
+                        <span className="inline-flex items-center gap-1 font-semibold text-slate-800 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200 text-xs">
+                          <FolderGit2 className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+                          {purchase.project_title}
                         </span>
                       ) : (
                         <span className="text-slate-400 italic">—</span>
@@ -548,6 +573,17 @@ export default function PurchasesView() {
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                       Vendor
                     </p>
+                    {viewingBill.project_title && (
+                      <div className="mb-3 pb-2 border-b border-slate-200/80">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                          Linked Project
+                        </p>
+                        <p className="font-bold text-slate-900 flex items-center gap-1.5 text-xs">
+                          <FolderGit2 className="h-3.5 w-3.5 text-slate-500" />
+                          {viewingBill.project_title}
+                        </p>
+                      </div>
+                    )}
                     {viewingBill.vendor_name ? (
                       <div className="space-y-0.5">
                         <p className="font-bold text-slate-900 flex items-center gap-1">

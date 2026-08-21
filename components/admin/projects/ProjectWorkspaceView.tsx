@@ -2011,9 +2011,21 @@ export default function ProjectWorkspaceView({
                             )}
                           </div>
 
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
-                            Qty: {item.quantity}
-                          </span>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {item.inventory_details?.unit_price ? (
+                              <span className="text-[10px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                @ Rs. {item.inventory_details.unit_price.toLocaleString()} / unit
+                              </span>
+                            ) : null}
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                              Qty: {item.quantity}
+                            </span>
+                            {item.inventory_details?.unit_price ? (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
+                                Total: Rs. {((item.inventory_details.unit_price || 0) * (item.quantity || 0)).toLocaleString()}
+                              </span>
+                            ) : null}
+                          </div>
                         </div>
 
                         {/* Actions: Edit & Remove */}

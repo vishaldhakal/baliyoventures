@@ -60,6 +60,8 @@ export interface ComponentPurchase {
   vendor_name?: string | null;
   vendor_phone?: string | null;
   vendor_address?: string | null;
+  project?: number | null;
+  project_title?: string | null;
   purchase_date?: string | null;
   total_price?: number | null;
   notes?: string | null;
@@ -73,7 +75,12 @@ export interface Inventory {
   id: number;
   component_model: number;
   component_model_details?: ComponentModel | null;
+  model_name?: string | null;
+  component_name?: string | null;
+  vendor_name?: string | null;
   quantity: number;
+  unit_price?: number | null;
+  total_price?: number | null;
   created_at?: string;
 }
 

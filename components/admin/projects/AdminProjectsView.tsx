@@ -29,6 +29,7 @@ interface AdminProjectsViewProps {
   currentPage: number;
   pageSize: number;
   error?: boolean;
+  onRefresh?: () => void;
 }
 
 export default function AdminProjectsView({
@@ -36,6 +37,7 @@ export default function AdminProjectsView({
   currentPage,
   pageSize,
   error = false,
+  onRefresh,
 }: AdminProjectsViewProps) {
   const router = useRouter();
 
@@ -142,6 +144,9 @@ export default function AdminProjectsView({
       }
       setIsDeleteOpen(false);
       setDeleteProjectSlug(null);
+      if (onRefresh) {
+        onRefresh();
+      }
       router.refresh();
     } catch (err) {
       console.error(err);
@@ -374,6 +379,9 @@ export default function AdminProjectsView({
           setFormProjectSlug(null);
         }}
         onSuccess={() => {
+          if (onRefresh) {
+            onRefresh();
+          }
           router.refresh();
         }}
         projectSlug={formProjectSlug}

@@ -4,7 +4,7 @@ import AdminProjectsView from "@/components/admin/projects/AdminProjectsView";
 import { ProjectsListResponse } from "@/types/projects";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const PAGE_SIZE = 9;
 
@@ -15,10 +15,9 @@ export default function ProjectsAdminPage() {
   const [projectsData, setProjectsData] = useState<ProjectsListResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchProjects = useCallback(() => {
     const apiBase =
       process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
-    setLoading(true);
     fetch(
       `${apiBase}/projects/?page=${currentPage}&page_size=${PAGE_SIZE}&category=product-development`,
       { cache: "no-store" }
@@ -28,6 +27,11 @@ export default function ProjectsAdminPage() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [currentPage]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchProjects();
+  }, [fetchProjects]);
 
   if (loading || !projectsData) {
     return (
@@ -42,6 +46,8 @@ export default function ProjectsAdminPage() {
       projectsData={projectsData}
       currentPage={currentPage}
       pageSize={PAGE_SIZE}
+      onRefresh={fetchProjects}
     />
   );
 }
+

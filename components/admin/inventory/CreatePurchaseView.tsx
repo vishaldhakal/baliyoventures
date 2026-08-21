@@ -9,6 +9,7 @@ import {
   ChevronDown,
   Cpu,
   FileText,
+  FolderGit2,
   Loader2,
   Paperclip,
   Plus,
@@ -35,6 +36,7 @@ export default function CreatePurchaseView() {
     process.env.NEXT_PUBLIC_API_URL || "https://yachu.baliyoventures.com/api/baliyo";
 
   const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [projects, setProjects] = useState<{ id: number; title: string }[]>([]);
   const [components, setComponents] = useState<Component[]>([]);
   const [componentModels, setComponentModels] = useState<ComponentModel[]>([]);
   const [loadingMeta, setLoadingMeta] = useState(true);
@@ -46,6 +48,7 @@ export default function CreatePurchaseView() {
 
   // Form states
   const [selectedVendor, setSelectedVendor] = useState<number | "">("");
+  const [selectedProject, setSelectedProject] = useState<number | "">("");
   const [purchaseDate, setPurchaseDate] = useState(
     new Date().toISOString().split("T")[0]
   );
@@ -92,10 +95,11 @@ export default function CreatePurchaseView() {
     const fetchMeta = async () => {
       setLoadingMeta(true);
       try {
-        const [vRes, cRes, cmRes] = await Promise.all([
-        fetch(`${apiBase}/vendors/?page_size=100`, { cache: "no-store" }),
+        const [vRes, cRes, cmRes, pRes] = await Promise.all([
+          fetch(`${apiBase}/vendors/?page_size=100`, { cache: "no-store" }),
           fetch(`${apiBase}/components/?page_size=100`, { cache: "no-store" }),
           fetch(`${apiBase}/component-models/?page_size=100`, { cache: "no-store" }),
+          fetch(`${apiBase}/projects/?page_size=100`, { cache: "no-store" }),
         ]);
         if (vRes.ok) {
           const d = await vRes.json();
@@ -108,6 +112,10 @@ export default function CreatePurchaseView() {
         if (cmRes.ok) {
           const d = await cmRes.json();
           setComponentModels(d.results ?? d);
+        }
+        if (pRes.ok) {
+          const d = await pRes.json();
+          setProjects(d.results ?? d);
         }
       } catch (err) {
         console.error("Failed to load metadata:", err);
@@ -171,6 +179,9 @@ export default function CreatePurchaseView() {
       formData.append("notes", notes || "");
       if (selectedVendor !== "") {
         formData.append("vendor", String(selectedVendor));
+      }
+      if (selectedProject !== "") {
+        formData.append("project", String(selectedProject));
       }
       if (billFile) {
         formData.append("bill_file", billFile);
@@ -247,8 +258,8 @@ export default function CreatePurchaseView() {
           </div>
         ) : (
           <>
-            {/* Vendor & Date */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Vendor, Project & Date */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                   <Building2 className="h-4 w-4 text-slate-600" />
@@ -267,6 +278,29 @@ export default function CreatePurchaseView() {
                   {vendors.map((v) => (
                     <option key={v.id} value={v.id}>
                       {v.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <FolderGit2 className="h-4 w-4 text-slate-600" />
+                  Project <span className="text-slate-400 font-normal">(Optional)</span>
+                </label>
+                <select
+                  value={selectedProject}
+                  onChange={(e) =>
+                    setSelectedProject(
+                      e.target.value === "" ? "" : Number(e.target.value)
+                    )
+                  }
+                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-900 outline-none focus:border-slate-400 focus:bg-white transition-all cursor-pointer"
+                >
+                  <option value="">— No project (Direct Purchase) —</option>
+                  {projects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.title}
                     </option>
                   ))}
                 </select>

@@ -32,11 +32,17 @@ export const getProjects = async (
     url.searchParams.set("category", category);
   }
 
-  const response = await fetch(url.toString(), {
-    cache: "no-store",
-  });
-  if (!response.ok) {
-    throw new Error("Failed to fetch projects");
+  try {
+    const response = await fetch(url.toString(), {
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      return { count: 0, next: null, previous: null, results: [] };
+    }
+    return await response.json();
+  } catch (err) {
+    console.error("Failed to fetch projects", err);
+    return { count: 0, next: null, previous: null, results: [] };
   }
-  return response.json();
 };
+

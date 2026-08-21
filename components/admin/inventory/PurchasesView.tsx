@@ -144,10 +144,11 @@ export default function PurchasesView() {
   const fetchMeta = async () => {
     setLoadingMeta(true);
     try {
-      const [vRes, cRes, cmRes] = await Promise.all([
+      const [vRes, cRes, cmRes, pRes] = await Promise.all([
         fetch(`${apiBase}/vendors/?page_size=100`, { cache: "no-store" }),
         fetch(`${apiBase}/components/?page_size=100`, { cache: "no-store" }),
         fetch(`${apiBase}/component-models/?page_size=100`, { cache: "no-store" }),
+        fetch(`${apiBase}/projects/?page_size=100`, { cache: "no-store" }),
       ]);
       if (vRes.ok) {
         const d = await vRes.json();

@@ -11,11 +11,14 @@ import {
   AlertTriangle,
   ArrowLeft,
   Award,
+  Boxes,
+  Calculator,
   Check,
   CheckCircle2,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  CircleDollarSign,
   Clock,
   Download,
   Edit,
@@ -1946,137 +1949,206 @@ export default function ProjectWorkspaceView({
           )}
 
           {/* TAB 4: HARDWARE INVENTORY USED */}
-          {activeTab === "inventory" && (
-            <div className="space-y-0">
-              {/* Top Header Panel (matching Tools & Tech) */}
-              <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50/60">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-bold text-slate-800 mb-0.5 flex items-center gap-2">
-                      <Package className="h-4 w-4 text-slate-700" /> Hardware Inventory Used
-                    </p>
-                    <p className="text-[11px] text-slate-500">
-                      Select and tag inventory components used for this project.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
-                    <button
-                      onClick={() => {
-                        setSelectedSourceProjectId("");
-                        setImportError("");
-                        setIsImportInvModalOpen(true);
-                      }}
-                      className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
-                    >
-                      <Download className="h-3.5 w-3.5 text-slate-500" /> Import Inventory
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditingInvUsedId(null);
-                        setSelectedInventoryId("");
-                        setUsedQuantity(1);
-                        setIsTagInventoryModalOpen(true);
-                      }}
-                      className="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
-                    >
-                      <Plus className="h-3.5 w-3.5" /> Tag Inventory Used
-                    </button>
-                  </div>
-                </div>
-              </div>
+          {activeTab === "inventory" && (() => {
+            const componentsUsed = project.components_used || [];
+            const totalCost = componentsUsed.reduce((sum, item) => {
+              const unitPrice = Number(item.inventory_details?.unit_price) || 0;
+              const qty = Number(item.quantity) || 0;
+              return sum + unitPrice * qty;
+            }, 0);
 
-              {/* Attached Inventory List (matching Tools & Tech item rows) */}
-              {project.components_used && project.components_used.length > 0 ? (
-                <div>
-                  {project.components_used.map((item) => {
-                    const componentName = item.inventory_details?.component_model_details?.component_name;
-                    const modelName = item.inventory_details?.component_model_details?.name || `Inventory #${item.inventory}`;
-
-                    return (
-                      <div
-                        key={item.id}
-                        className="flex items-center gap-3 sm:gap-4 p-4 sm:px-5 sm:py-3.5 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors group"
+            return (
+              <div className="space-y-0 font-sans">
+                {/* Top Header Panel */}
+                <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50/60">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-bold text-slate-800 mb-0.5 flex items-center gap-2">
+                        <Package className="h-4 w-4 text-slate-700" /> Hardware Inventory Used
+                      </p>
+                      <p className="text-[11px] text-slate-500">
+                        Select and tag inventory components used for this project.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                      <button
+                        onClick={() => {
+                          setSelectedSourceProjectId("");
+                          setImportError("");
+                          setIsImportInvModalOpen(true);
+                        }}
+                        className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
                       >
-                        {/* Icon */}
-                        <div className="h-7 w-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
-                          <Package className="h-3.5 w-3.5 text-slate-500" />
-                        </div>
-
-                        {/* Info */}
-                        <div className="flex-1 min-w-0 flex flex-wrap items-center justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-semibold text-slate-800 truncate">{modelName}</p>
-                            {componentName && (
-                              <p className="text-[10px] text-slate-400 font-mono truncate">{componentName}</p>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2 shrink-0">
-                            {item.inventory_details?.unit_price ? (
-                              <span className="text-[10px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                                @ Rs. {item.inventory_details.unit_price.toLocaleString()} / unit
-                              </span>
-                            ) : null}
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
-                              Qty: {item.quantity}
-                            </span>
-                            {item.inventory_details?.unit_price ? (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
-                                Total: Rs. {((item.inventory_details.unit_price || 0) * (item.quantity || 0)).toLocaleString()}
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
-
-                        {/* Actions: Edit & Remove */}
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingInvUsedId(item.id);
-                              setSelectedInventoryId(item.inventory ? item.inventory : "");
-                              setUsedQuantity(item.quantity || 1);
-                              setIsTagInventoryModalOpen(true);
-                            }}
-                            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
-                            title="Edit Tagged Item"
-                          >
-                            <Edit className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setDeleteInvUsedTarget({
-                                id: item.id,
-                                name: modelName,
-                              })
-                            }
-                            disabled={deletingInvUsedId === item.id}
-                            className="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer disabled:opacity-30"
-                            title="Remove Tagged Item"
-                          >
-                            {deletingInvUsedId === item.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-3.5 w-3.5" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-14 text-center">
-                  <div className="h-12 w-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-3">
-                    <Package className="h-5 w-5 text-slate-400" />
+                        <Download className="h-3.5 w-3.5 text-slate-500" /> Import Inventory
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditingInvUsedId(null);
+                          setSelectedInventoryId("");
+                          setUsedQuantity(1);
+                          setIsTagInventoryModalOpen(true);
+                        }}
+                        className="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                      >
+                        <Plus className="h-3.5 w-3.5" /> Tag Inventory Used
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-sm font-semibold text-slate-600">No hardware inventory tagged yet</p>
-                  <p className="text-xs text-slate-400 mt-1">Use the button above to tag inventory components</p>
                 </div>
-              )}
-            </div>
-          )}
+
+                {/* Attached Inventory Table */}
+                {componentsUsed.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                          <th className="px-5 py-3 w-12 text-center">#</th>
+                          <th className="px-5 py-3">Component / Model</th>
+                          <th className="px-5 py-3 text-right">Unit Price</th>
+                          <th className="px-5 py-3 text-center">Quantity</th>
+                          <th className="px-5 py-3 text-right">Total Cost</th>
+                          <th className="px-5 py-3 text-center w-24">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-xs">
+                        {componentsUsed.map((item, idx) => {
+                          const componentName =
+                            item.inventory_details?.component_model_details?.component_name;
+                          const modelName =
+                            item.inventory_details?.component_model_details?.name ||
+                            `Inventory #${item.inventory}`;
+                          const unitPrice = Number(item.inventory_details?.unit_price) || 0;
+                          const qty = Number(item.quantity) || 0;
+                          const lineTotal = unitPrice * qty;
+
+                          return (
+                            <tr
+                              key={item.id}
+                              className="hover:bg-slate-50/60 transition-colors group"
+                            >
+                              {/* # Index */}
+                              <td className="px-5 py-3.5 text-center text-slate-400 font-mono text-[11px]">
+                                {idx + 1}
+                              </td>
+
+                              {/* Component / Model */}
+                              <td className="px-5 py-3.5">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="h-7 w-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+                                    <Package className="h-3.5 w-3.5 text-slate-500" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="font-semibold text-slate-900 truncate">
+                                      {modelName}
+                                    </p>
+                                    {componentName && (
+                                      <p className="text-[10px] text-slate-400 font-mono truncate">
+                                        {componentName}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+
+                              {/* Unit Price */}
+                              <td className="px-5 py-3.5 text-right font-mono text-slate-600">
+                                {unitPrice > 0 ? (
+                                  <span>Rs. {unitPrice.toLocaleString()}</span>
+                                ) : (
+                                  <span className="text-slate-400 italic">—</span>
+                                )}
+                              </td>
+
+                              {/* Quantity */}
+                              <td className="px-5 py-3.5 text-center">
+                                <span className="inline-block px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-bold border border-emerald-200/80">
+                                  {item.quantity}
+                                </span>
+                              </td>
+
+                              {/* Total Cost */}
+                              <td className="px-5 py-3.5 text-right font-bold text-slate-900 font-mono">
+                                {unitPrice > 0 ? (
+                                  <span>Rs. {lineTotal.toLocaleString()}</span>
+                                ) : (
+                                  <span className="text-slate-400 italic">—</span>
+                                )}
+                              </td>
+
+                              {/* Actions */}
+                              <td className="px-5 py-3.5 text-center">
+                                <div className="flex items-center justify-center gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingInvUsedId(item.id);
+                                      setSelectedInventoryId(
+                                        item.inventory ? item.inventory : ""
+                                      );
+                                      setUsedQuantity(item.quantity || 1);
+                                      setIsTagInventoryModalOpen(true);
+                                    }}
+                                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                                    title="Edit Tagged Item"
+                                  >
+                                    <Edit className="h-3.5 w-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setDeleteInvUsedTarget({
+                                        id: item.id,
+                                        name: modelName,
+                                      })
+                                    }
+                                    disabled={deletingInvUsedId === item.id}
+                                    className="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer disabled:opacity-30"
+                                    title="Remove Tagged Item"
+                                  >
+                                    {deletingInvUsedId === item.id ? (
+                                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    ) : (
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    )}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-slate-50/90 border-t-2 border-slate-200">
+                          <td
+                            colSpan={4}
+                            className="px-5 py-3.5 text-right font-bold text-slate-700 text-xs uppercase tracking-wider"
+                          >
+                            Total Cost:
+                          </td>
+                          <td className="px-5 py-3.5 text-right font-extrabold text-slate-900 text-sm font-mono whitespace-nowrap">
+                            Rs. {totalCost.toLocaleString()}
+                          </td>
+                          <td className="px-5 py-3.5"></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-14 text-center">
+                    <div className="h-12 w-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-3">
+                      <Package className="h-5 w-5 text-slate-400" />
+                    </div>
+                    <p className="text-sm font-semibold text-slate-600">
+                      No hardware inventory tagged yet
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Use the button above to tag inventory components
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* TAB 7: TOOLS ATTACHED */}
           {activeTab === "tools" && (() => {
@@ -2663,12 +2735,37 @@ export default function ProjectWorkspaceView({
                       required
                       step="any"
                       min={0.0001}
-                      placeholder="E.g. 0.5"
+                      placeholder="E.g. 1"
                       value={usedQuantity}
                       onChange={(e) => setUsedQuantity(e.target.value)}
                       className="w-full p-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all"
                     />
                   </div>
+
+                  {(() => {
+                    const selectedItem = inventoryList.find((inv) => inv.id === selectedInventoryId);
+                    if (!selectedItem) return null;
+                    const unitPrice = Number(selectedItem.unit_price) || 0;
+                    const qty = Number(usedQuantity) || 0;
+                    const subtotal = unitPrice * qty;
+
+                    return (
+                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                        <div className="space-y-0.5">
+                          <p className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Unit Price</p>
+                          <p className="font-semibold text-slate-800">
+                            {unitPrice > 0 ? `Rs. ${unitPrice.toLocaleString()}` : "Price not set"}
+                          </p>
+                        </div>
+                        <div className="text-right space-y-0.5">
+                          <p className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Line Subtotal</p>
+                          <p className="font-bold text-slate-900">
+                            {unitPrice > 0 ? `Rs. ${subtotal.toLocaleString()}` : "Rs. 0"}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </form>
               </div>
 

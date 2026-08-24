@@ -23,6 +23,7 @@ export const getProjects = async (
   page = 1,
   pageSize = 12,
   category = "product-development",
+  status = "published",
 ): Promise<ProjectsListResponse> => {
   const apiBase = getApiBase();
   const url = new URL(`${apiBase}/projects/`);
@@ -30,6 +31,9 @@ export const getProjects = async (
   url.searchParams.set("page_size", pageSize.toString());
   if (category) {
     url.searchParams.set("category", category);
+  }
+  if (status) {
+    url.searchParams.set("status", status);
   }
 
   try {

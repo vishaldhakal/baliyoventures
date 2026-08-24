@@ -2,10 +2,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { getProjects } from "@/services/project.service";
 
+interface InnovationsProps {
+  status?: string;
+  category?: string;
+}
+
 // This is a Server Component by default
-const Innovations = async () => {
-  // Fetch first 6 projects for the homepage
-  const projectsData = await getProjects(1, 10);
+const Innovations = async ({
+  status = "published",
+  category = "product-development",
+}: InnovationsProps = {}) => {
+  // Fetch first 6 published projects
+  const projectsData = await getProjects(1, 10, category, status);
   const projects = projectsData.results.slice(0, 6);
 
   return (

@@ -223,9 +223,14 @@ export default function PurchasesView() {
   const handleCloseFormModal = () => {
     setShowFormModal(false);
     setEditingBillId(null);
+    setSelectedVendor("");
     setSelectedProject("");
+    setNotes("");
     setBillFile(null);
     setExistingBillUrl(null);
+    setFormItems([
+      { component_model: "", quantity: 1, unit: "pcs", price_per_item: 0 },
+    ]);
   };
 
   const addItem = () =>
@@ -271,9 +276,13 @@ export default function PurchasesView() {
       formData.append("notes", notes || "");
       if (selectedVendor !== "") {
         formData.append("vendor", String(selectedVendor));
+      } else if (editingBillId) {
+        formData.append("vendor", "");
       }
       if (selectedProject !== "") {
         formData.append("project", String(selectedProject));
+      } else if (editingBillId) {
+        formData.append("project", "");
       }
       if (billFile) {
         formData.append("bill_file", billFile);
@@ -797,7 +806,7 @@ export default function PurchasesView() {
                   </div>
                 ) : (
                   <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
                         <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
                           Vendor / Supplier{" "}
@@ -816,6 +825,29 @@ export default function PurchasesView() {
                           {vendors.map((v) => (
                             <option key={v.id} value={v.id}>
                               {v.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                          Project{" "}
+                          <span className="text-slate-400 font-normal">(optional)</span>
+                        </label>
+                        <select
+                          value={selectedProject}
+                          onChange={(e) =>
+                            setSelectedProject(
+                              e.target.value === "" ? "" : Number(e.target.value)
+                            )
+                          }
+                          className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 outline-none focus:bg-white focus:border-slate-400"
+                        >
+                          <option value="">— No project (Direct Purchase) —</option>
+                          {projects.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.title}
                             </option>
                           ))}
                         </select>
